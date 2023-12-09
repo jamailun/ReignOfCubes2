@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
+
 /**
  * Wrap players for the RoC game.
  */
@@ -42,8 +44,16 @@ public class RocPlayer {
         Messages.send(player, language, entry, args);
     }
 
+    public UUID getUUID() {
+        return player.getUniqueId();
+    }
+
     public String getName() {
         return player.getName();
+    }
+
+    public boolean isValid() {
+        return player.isValid() && ! player.isDead();
     }
 
 }

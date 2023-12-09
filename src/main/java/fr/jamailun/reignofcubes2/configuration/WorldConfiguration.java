@@ -1,5 +1,6 @@
 package fr.jamailun.reignofcubes2.configuration;
 
+import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.Throne;
 import lombok.Getter;
 import lombok.NonNull;
@@ -22,6 +23,7 @@ public class WorldConfiguration {
     private final File file;
     @Getter private final String name, author, worldName;
     @Getter @Setter private int playerCountMin = 0, playerCountMax = 0;
+    private double crownningDuration = 0;
     private List<Vector> playerSpawns;
     private Vector throneA, throneB;
 
@@ -57,6 +59,8 @@ public class WorldConfiguration {
         // Load spawns
         configuration.playerSpawns = getVectorsList(config, "spawns");
 
+        configuration.crownningDuration = config.getDouble("crown-duration");
+
         return configuration;
     }
 
@@ -82,7 +86,7 @@ public class WorldConfiguration {
         }
 
         // players-count
-        if(playerCountMin != 0 && playerCountMax != 0) {
+        if(playerCountMin > 0 && playerCountMax > 0) {
             ConfigurationSection pc = config.createSection("players-count");
             pc.set("min", playerCountMin);
             pc.set("max", playerCountMax);
@@ -92,19 +96,24 @@ public class WorldConfiguration {
         if(playerSpawns != null)
             setVectorsList(config, "spawns", playerSpawns);
 
+        if(crownningDuration > 0)
+            config.set("crown-duration", crownningDuration);
+
         config.save(file);
     }
 
     public boolean isValid() {
         return (throneA != null && throneB != null)
-                && (playerSpawns != null &&  !playerSpawns.isEmpty());
+                && (playerSpawns != null &&  !playerSpawns.isEmpty())
+                && (playerCountMin > 0 && playerCountMax > playerCountMin)
+                && (crownningDuration > 0);
     }
 
-    public Throne generateThrone() {
+    public Throne generateThrone(GameManager game) {
         assert isValid() : "Can only generate a throne if the configuration is valid.";
         World world = Bukkit.getWorld(worldName);
         assert world != null;
-        return new Throne(world, throneA, throneB);
+        return new Throne(game, throneA, throneB, crownningDuration);
     }
 
     public List<Location> generateSpawns() {

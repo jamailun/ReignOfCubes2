@@ -9,6 +9,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
+
 public class GameManager {
 
     private final PlayersManager players;
@@ -32,7 +34,7 @@ public class GameManager {
             throw new BadWorldConfigurationException("Configuration invalid.");
         }
         worldConfiguration = wc;
-        throne = worldConfiguration.generateThrone();
+        throne = worldConfiguration.generateThrone(this);
         world = Bukkit.getWorld(worldConfiguration.getWorldName());
     }
 
@@ -77,6 +79,7 @@ public class GameManager {
         if(player == null) {
             if(king != null) {
                 players.broadcast("event.king.death", king.getName());
+                king = null;
             }
             return;
         }
@@ -87,6 +90,29 @@ public class GameManager {
 
     public boolean isInWorld(World w) {
         return this.world.equals(w);
+    }
+
+    public boolean isPlaying() {
+        return state == GameState.PLAYING;
+    }
+
+    public @Nullable RocPlayer toPlayer(Player p) {
+        if(isPlaying()) {
+            if(players.exists(p))
+                return players.get(p);
+            return null;
+        }
+        return players.join(p);
+    }
+
+    public boolean hasKing() {
+        return king != null;
+    }
+
+    public void ceremonyIsOver(RocPlayer player) {
+        assert king == null : "How can a ceremony be ver if there is already a king ?";
+        player.sendMessage("throne.end-ceremony");
+        setKing(player);
     }
 
 }
