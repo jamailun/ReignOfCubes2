@@ -1,0 +1,7 @@
+name: ReignOfCubes2
+version: '${project.version}'
+main: fr.jamailun.reignofcubes2.ReignOfCubes2
+api-version: '1.20'
+prefix: "[RoC]"
+authors: [jamailun]
+description: ROC is back
