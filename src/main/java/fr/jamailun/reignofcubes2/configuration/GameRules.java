@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.configuration.ConfigurationSection;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 @Getter
@@ -26,11 +27,11 @@ public class GameRules {
 
     public GameRules() {}
 
-    public static GameRules load(@Nullable ConfigurationSection config) {
-        GameRules rules = new GameRules();
+    public static @Nonnull GameRules load(@Nullable ConfigurationSection config) {
         if(config == null)
-            return rules;
+            return defaultRules();
 
+        GameRules rules = new GameRules();
         // Players
         ConfigurationSection playerCount = config.getConfigurationSection("players-count");
         if(playerCount != null) {
@@ -80,7 +81,7 @@ public class GameRules {
                 );
     }
 
-    private static GameRules defaultRules() {
+    public static GameRules defaultRules() {
         GameRules rules = new GameRules();
         // players
         rules.playerCountMin = 4;

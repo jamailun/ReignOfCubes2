@@ -1,6 +1,7 @@
 package fr.jamailun.reignofcubes2.configuration;
 
 import fr.jamailun.reignofcubes2.GameManager;
+import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.Throne;
 import lombok.Getter;
 import lombok.NonNull;
@@ -25,8 +26,7 @@ public class WorldConfiguration {
     private Vector throneA, throneB;
     @Getter private GameRules rules;
 
-    public static WorldConfiguration load(String fileName) throws BadWorldConfigurationException {
-        File file = new File(fileName);
+    public static WorldConfiguration load(File file) throws BadWorldConfigurationException {
         if(!file.exists())
             throw new BadWorldConfigurationException("File does not exist: " + file);
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
@@ -54,14 +54,17 @@ public class WorldConfiguration {
         ConfigurationSection rulesSection = config.getConfigurationSection("rules");
         configuration.rules = GameRules.load(rulesSection);
 
+        ReignOfCubes2.info("Loaded configuration " + configuration);
+
         return configuration;
     }
 
-    private WorldConfiguration(File file, String name, String author, String worldName) {
+    public WorldConfiguration(File file, String name, String author, String worldName) {
         this.file = file;
         this.name = name;
         this.author = author;
         this.worldName = worldName;
+        this.rules = GameRules.defaultRules();
     }
 
     public void save() throws IOException {
@@ -135,4 +138,10 @@ public class WorldConfiguration {
         config.set(path, maps);
     }
 
+    @Override
+    public String toString() {
+        return "Configuration{" + name + " by " + author + " for " + worldName
+                + (isValid() ? ", VALID": ", NOT-valid")
+                + "}";
+    }
 }

@@ -1,8 +1,8 @@
 package fr.jamailun.reignofcubes2;
 
+import fr.jamailun.reignofcubes2.configuration.ConfigurationsList;
 import fr.jamailun.reignofcubes2.configuration.GameRules;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
-import static fr.jamailun.reignofcubes2.configuration.WorldConfiguration.BadWorldConfigurationException;
 import fr.jamailun.reignofcubes2.players.PlayersManager;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import lombok.Getter;
@@ -15,39 +15,55 @@ import javax.annotation.Nullable;
 
 public class GameManager {
 
-    private final PlayersManager players;
+    private final PlayersManager players = new PlayersManager();
 
     @Getter private GameState state;
+    @Getter private final ConfigurationsList configurationsList = new ConfigurationsList();
     @Getter private WorldConfiguration worldConfiguration;
     private World world;
     @Getter private RocPlayer king;
     @Getter private Throne throne;
 
-    public GameManager(PlayersManager players, ConfigurationSection defaultConfig) {
-        this.players = players;
-        if(defaultConfig.contains("default")) {
-            String configName = defaultConfig.getString("default");
-            ReignOfCubes2.info("Will try to load default configuration '" + configName + "'.");
-            try {
-                loadConfiguration(configName);
-            } catch (BadWorldConfigurationException e) {
-                ReignOfCubes2.error("Could NOT read default configuration '" + configName + "': " + e.getMessage());
-            }
-        } else {
+    /**
+     * Create a new GameManager
+     * @param defaultConfig default config to use.
+     */
+    public GameManager(ConfigurationSection defaultConfig) {
+        if( ! defaultConfig.contains("default")) {
             ReignOfCubes2.warning("No configuration set.");
             state = GameState.NOT_CONFIGURED;
+            return;
         }
+
+        String configName = defaultConfig.getString("default");
+        if(!configurationsList.contains(configName)) {
+            ReignOfCubes2.error("No configuration name corresponding to default '" + configName + "'.");
+            return;
+        }
+
+        WorldConfiguration wc = configurationsList.get(configName);
+        if(!wc.isValid()) {
+            ReignOfCubes2.error("Default configuration '" + configName + "' is NOT valid.");
+            return;
+        }
+
+        loadConfiguration(wc);
     }
 
-    public void loadConfiguration(String configurationFile) throws BadWorldConfigurationException {
-        WorldConfiguration wc = WorldConfiguration.load(configurationFile);
-        if(!wc.isValid()) {
-            throw new BadWorldConfigurationException("Configuration invalid.");
+    public boolean loadConfiguration(WorldConfiguration configuration) {
+        if(isPlaying()) {
+            ReignOfCubes2.error("Cannot change configuration while playing !");
+            return false;
         }
-        worldConfiguration = wc;
+        if(!configuration.isValid()) {
+            ReignOfCubes2.error("Could not load invalid configuration " + configuration);
+            return false;
+        }
+        worldConfiguration = configuration;
         throne = worldConfiguration.generateThrone(this);
         world = Bukkit.getWorld(worldConfiguration.getWorldName());
         state = GameState.WAITING;
+        return true;
     }
 
 

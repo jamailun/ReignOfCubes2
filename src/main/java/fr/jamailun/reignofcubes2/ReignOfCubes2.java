@@ -26,7 +26,7 @@ public final class ReignOfCubes2 extends JavaPlugin {
         saveDefaultConfig();
 
         // Game manager
-        gameManager = new GameManager(new PlayersManager(), getConfig());
+        gameManager = new GameManager(getConfig());
 
         // Listeners
         new PlayerConnectionListener(this);
