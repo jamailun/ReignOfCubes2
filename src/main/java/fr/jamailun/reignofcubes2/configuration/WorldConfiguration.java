@@ -2,7 +2,7 @@ package fr.jamailun.reignofcubes2.configuration;
 
 import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
-import fr.jamailun.reignofcubes2.Throne;
+import fr.jamailun.reignofcubes2.objects.Throne;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;

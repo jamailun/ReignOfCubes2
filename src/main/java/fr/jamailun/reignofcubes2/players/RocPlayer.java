@@ -1,5 +1,6 @@
 package fr.jamailun.reignofcubes2.players;
 
+import fr.jamailun.reignofcubes2.messages.Messages;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.GameMode;
@@ -19,6 +20,8 @@ public class RocPlayer {
     private int score = 0;
     @Setter private boolean isKing = false;
     @Setter private String language = "fr";
+
+    @Setter private RocPlayer lastDamager;
 
     public RocPlayer(Player player) {
         this.player = player;
@@ -62,6 +65,7 @@ public class RocPlayer {
     public void reset() {
         score = 0;
         isKing = false;
+        lastDamager = null;
         player.getInventory().clear();
         player.setGameMode(GameMode.ADVENTURE);
         player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getDefaultValue());

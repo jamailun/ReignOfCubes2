@@ -1,7 +1,7 @@
 package fr.jamailun.reignofcubes2.listeners;
 
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
-import fr.jamailun.reignofcubes2.Throne;
+import fr.jamailun.reignofcubes2.objects.Throne;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -14,7 +14,7 @@ public class PlayerMovementListener extends RocListener {
 
     @EventHandler
     public void playerMoved(PlayerMoveEvent event) {
-        if(!(game().isInWorld(event.getPlayer().getWorld()) && game().isPlaying())) {
+        if(shouldIgnore(event.getPlayer().getWorld())) {
             return;
         }
 

@@ -1,5 +1,6 @@
-package fr.jamailun.reignofcubes2;
+package fr.jamailun.reignofcubes2.objects;
 
+import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;

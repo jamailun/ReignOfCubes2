@@ -3,6 +3,7 @@ package fr.jamailun.reignofcubes2;
 import fr.jamailun.reignofcubes2.configuration.ConfigurationsList;
 import fr.jamailun.reignofcubes2.configuration.GameRules;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
+import fr.jamailun.reignofcubes2.objects.Throne;
 import fr.jamailun.reignofcubes2.players.PlayersManager;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class GameManager {
@@ -87,15 +89,14 @@ public class GameManager {
         }
     }
 
-    public void playerDies(Player v, Player k) {
-        RocPlayer victim = players.get(v);
-
-        if(k == null) {
-            players.broadcast("event.death.alone", v.getName());
+    public void playerDies(@Nonnull RocPlayer victim) {
+        RocPlayer killer = victim.getLastDamager();
+        if(killer == null) {
+            players.broadcast("event.death.alone", victim.getName());
             //players.deathPenalty();
             return;
         }
-        players.broadcast("event.death.killed", v.getName(), k.getName());
+        players.broadcast("event.death.killed", victim.getName(), killer.getName());
 
         //TODO death logic
         // - points
@@ -127,6 +128,7 @@ public class GameManager {
     }
 
     public @Nullable RocPlayer toPlayer(Player p) {
+        if(p == null) return null;
         if(isPlaying()) {
             if(players.exists(p))
                 return players.get(p);

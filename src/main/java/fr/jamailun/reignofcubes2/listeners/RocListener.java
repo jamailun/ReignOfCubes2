@@ -4,9 +4,10 @@ import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.players.PlayersManager;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.event.Listener;
 
-public class RocListener implements Listener {
+class RocListener implements Listener {
 
     private final ReignOfCubes2 plugin;
 
@@ -22,6 +23,11 @@ public class RocListener implements Listener {
 
     protected GameManager game() {
         return plugin.getGameManager();
+    }
+
+    protected boolean shouldIgnore(World world) {
+        return ! game().isPlaying()
+                || ! game().isInWorld(world);
     }
 
 }

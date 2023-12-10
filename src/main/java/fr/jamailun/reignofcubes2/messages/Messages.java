@@ -1,4 +1,4 @@
-package fr.jamailun.reignofcubes2.players;
+package fr.jamailun.reignofcubes2.messages;
 
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import lombok.NonNull;
