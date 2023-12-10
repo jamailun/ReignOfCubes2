@@ -1,12 +1,10 @@
 package fr.jamailun.reignofcubes2.players;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Handle players in the game.
@@ -33,6 +31,10 @@ public class PlayersManager implements Iterable<RocPlayer> {
         return players.containsKey(player.getUniqueId());
     }
 
+    public int size() {
+        return players.size();
+    }
+
     public @NotNull RocPlayer get(Player player) {
         RocPlayer p = players.get(player.getUniqueId());
         assert p != null : "Got a NULL rocPlayer from vanilla player '" + player.getName() + "'.";
@@ -48,5 +50,21 @@ public class PlayersManager implements Iterable<RocPlayer> {
     @Override
     public @NotNull Iterator<RocPlayer> iterator() {
         return players.values().iterator();
+    }
+
+    public void start(List<Location> spawns) {
+        assert ! spawns.isEmpty();
+        while(spawns.size() < size()) {
+            spawns.addAll(new ArrayList<>(spawns));
+        }
+        Collections.shuffle(spawns);
+        Iterator<Location> spawn = spawns.iterator();
+
+        for(RocPlayer player : this) {
+            // Reset
+            player.reset();
+            // Teleport
+            player.getPlayer().teleport(spawn.next());
+        }
     }
 }

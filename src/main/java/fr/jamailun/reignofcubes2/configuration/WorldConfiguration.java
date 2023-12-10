@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class WorldConfiguration {
 
@@ -113,7 +114,7 @@ public class WorldConfiguration {
         assert world != null;
         return spawns.stream()
                 .map(v -> v.toLocation(world))
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public static class BadWorldConfigurationException extends Exception {

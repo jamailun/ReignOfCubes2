@@ -2,6 +2,8 @@ package fr.jamailun.reignofcubes2.players;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.GameMode;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -9,13 +11,14 @@ import java.util.UUID;
 /**
  * Wrap players for the RoC game.
  */
+@Getter
 public class RocPlayer {
 
-    @Getter private final Player player;
+    private final Player player;
 
-    @Getter private int score = 0;
-    @Getter @Setter private boolean isKing = false;
-    @Getter @Setter private String language = "fr";
+    private int score = 0;
+    @Setter private boolean isKing = false;
+    @Setter private String language = "fr";
 
     public RocPlayer(Player player) {
         this.player = player;
@@ -54,6 +57,14 @@ public class RocPlayer {
 
     public boolean isValid() {
         return player.isValid() && ! player.isDead();
+    }
+
+    public void reset() {
+        score = 0;
+        isKing = false;
+        player.getInventory().clear();
+        player.setGameMode(GameMode.ADVENTURE);
+        player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getDefaultValue());
     }
 
 }

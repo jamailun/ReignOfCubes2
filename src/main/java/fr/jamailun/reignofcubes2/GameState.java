@@ -6,7 +6,5 @@ public enum GameState {
 
     WAITING,
 
-    PLAYING,
-
-    OVER
+    PLAYING
 }

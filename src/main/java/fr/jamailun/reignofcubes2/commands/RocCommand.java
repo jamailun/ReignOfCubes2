@@ -1,6 +1,7 @@
 package fr.jamailun.reignofcubes2.commands;
 
 import fr.jamailun.reignofcubes2.GameManager;
+import fr.jamailun.reignofcubes2.GameState;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.configuration.ConfigurationsList;
 import fr.jamailun.reignofcubes2.configuration.GameRules;
@@ -253,9 +254,27 @@ public class RocCommand implements CommandExecutor, TabCompleter {
             return unexpectedArgument(sender, arg, args_1_config);
         }
 
+        if(arg.equalsIgnoreCase("start")) {
+            if(game().getState() == GameState.NOT_CONFIGURED) {
+                return error(sender, "The game state must be configured first.");
+            }
+            if(game().isPlaying()) {
+                return error(sender, "The game already started.");
+            }
+            game().start();
+            return info(sender, "Command executed.");
+        }
+
+        if(arg.equalsIgnoreCase("stop")) {
+            if(!game().isPlaying()) {
+                return error(sender, "Cannot stop a non-stopped game.");
+            }
+            game().stop();
+            return info(sender, "Command executed.");
+        }
+
         return unexpectedArgument(sender, arg, args_0);
     }
-
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {

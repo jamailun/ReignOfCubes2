@@ -8,7 +8,6 @@ import fr.jamailun.reignofcubes2.players.RocPlayer;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
@@ -55,13 +54,12 @@ public class GameManager {
         return true;
     }
 
-
     public void playerJoinsServer(Player p) {
         RocPlayer player = players.join(p);
         players.broadcast("event.joined", p.getName());
         player.sendMessage("event.joined-direct");
 
-        // Has enough players
+        testShouldStartGame();
     }
 
     public void playerLeftServer(Player p) {
@@ -76,6 +74,16 @@ public class GameManager {
             setKing(null);
         } else {
             players.broadcast("event.left", p.getName());
+        }
+    }
+
+    private void testShouldStartGame() {
+        if(isPlaying()) return;
+        if(worldConfiguration == null || ! worldConfiguration.isValid()) return;
+        int minPlayers = getRules().getPlayerCountMin();
+        if(players.size() >= minPlayers) {
+            ReignOfCubes2.info("Enough players ! Will start the game now.");
+            start();
         }
     }
 
@@ -139,6 +147,27 @@ public class GameManager {
 
     public GameRules getRules() {
         return worldConfiguration.getRules();
+    }
+
+    public void start() {
+        assert state == GameState.WAITING;
+        assert worldConfiguration != null && worldConfiguration.isValid();
+        // 1) tp players to a spawn-point.
+        players.start(worldConfiguration.generateSpawns());
+        // 2) set state
+        state = GameState.PLAYING;
+
+        //TODO message
+        Bukkit.broadcastMessage("§6§l > game started.");
+    }
+
+    public void stop() {
+        if(!isPlaying()) {
+            ReignOfCubes2.warning("Tried to stop the game... Was already the case.");
+            return;
+        }
+
+        //TODO cancel the game.
     }
 
 }
