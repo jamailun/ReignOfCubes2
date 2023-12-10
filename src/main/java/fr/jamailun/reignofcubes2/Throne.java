@@ -63,4 +63,9 @@ public class Throne {
         ceremony = null;
     }
 
+    public void reset() {
+        if(ceremony != null)
+            stopCeremony();
+    }
+
 }

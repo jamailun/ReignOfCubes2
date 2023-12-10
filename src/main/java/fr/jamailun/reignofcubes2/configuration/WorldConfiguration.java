@@ -33,7 +33,7 @@ public class WorldConfiguration {
 
         String name = config.getString("name");
         String author = config.getString("author");
-        String world = config.getString("world-name");
+        String world = config.getString("world");
         if(name == null) name = "unknown";
         if(author == null) author = "unknown";
         if(world == null) throw new BadWorldConfigurationException("World not specified in file " + file);

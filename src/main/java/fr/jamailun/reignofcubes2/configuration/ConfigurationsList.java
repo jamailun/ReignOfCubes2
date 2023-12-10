@@ -2,6 +2,7 @@ package fr.jamailun.reignofcubes2.configuration;
 
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -15,6 +16,7 @@ public class ConfigurationsList {
     private final Map<String, WorldConfiguration> configurations = new HashMap<>();
 
     public ConfigurationsList() {
+        // Load configurations
         directory = ReignOfCubes2.getFile("configurations");
         assert directory.exists() || (directory.mkdirs() && directory.mkdir()) : "Could not generate directories to '"+directory+"'";
         ReignOfCubes2.info("CONFIG_LIST = " + directory);
@@ -31,9 +33,27 @@ public class ConfigurationsList {
                 WorldConfiguration configuration = WorldConfiguration.load(file);
                 configurations.put(configuration.getName(), configuration);
             } catch (WorldConfiguration.BadWorldConfigurationException e) {
-                ReignOfCubes2.error("Could not load " + configurations);
+                ReignOfCubes2.error("Could not load file " + file + " : " + e.getMessage());
             }
         }
+
+        // Load default
+        ConfigurationSection config = ReignOfCubes2.getDefaultConfiguration();
+        String defaultName = config.getString("default");
+        if(defaultName == null) {
+            ReignOfCubes2.warning("No default configuration set.");
+            return;
+        }
+        WorldConfiguration configuration = get(defaultName);
+        if(configuration == null) {
+            ReignOfCubes2.error("Unknown default configuration: '" + defaultName + "'.");
+            return;
+        }
+        if(!configuration.isValid()) {
+            ReignOfCubes2.error("Invalid default configuration: '" + defaultName + "'.");
+            return;
+        }
+        defaultConfiguration = configuration;
     }
 
     public Map<String, WorldConfiguration> getConfigurations() {
@@ -48,7 +68,17 @@ public class ConfigurationsList {
     }
 
     public void setDefault(@Nullable WorldConfiguration configuration) {
-
+        // validity
+        if(configuration != null) {
+            if(!configuration.isValid()) {
+                ReignOfCubes2.error("Cannot set "+ configuration.getName() + " has default configuration : it is invalid.'");
+                return;
+            }
+        }
+        // save
+        defaultConfiguration = configuration;
+        ReignOfCubes2.getDefaultConfiguration().set("default", configuration);
+        ReignOfCubes2.saveDefaultConfiguration();
     }
 
     public @Nullable WorldConfiguration getDefault() {
@@ -57,6 +87,10 @@ public class ConfigurationsList {
 
     public boolean isDefault(WorldConfiguration configuration) {
         return defaultConfiguration != null && defaultConfiguration.getName().equalsIgnoreCase(configuration.getName());
+    }
+
+    public boolean hasDefault() {
+        return defaultConfiguration != null;
     }
 
     public int size() {

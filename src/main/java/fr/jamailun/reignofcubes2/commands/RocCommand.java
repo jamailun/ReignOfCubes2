@@ -60,7 +60,7 @@ public class RocCommand implements CommandExecutor, TabCompleter {
                 WorldConfiguration config = configs().get(name);
                 if(!config.isValid())
                     return error(sender, "Configuration " + name + " is not valid.");
-                info(sender, "Enabling configuration " + config);
+                info(sender, "Enabling configuration " + config + "...");
                 if(game().loadConfiguration(config)) {
                     //TODO message ?
                     return info(sender, "Configuration has been enabled successful.");
@@ -69,7 +69,19 @@ public class RocCommand implements CommandExecutor, TabCompleter {
             }
 
             if(arg.equalsIgnoreCase("set-default")) {
-
+                if(args.length == 0) return error(sender, "Specify the configuration to use.");
+                if(game().isPlaying()) {
+                    return error(sender, "Cannot change configuration while playing.");
+                }
+                String name = args[0];
+                if(!configs().contains(name))
+                    return error(sender, "Unknown configuration: " + name);
+                WorldConfiguration config = configs().get(name);
+                if(!config.isValid())
+                    return error(sender, "Configuration " + name + " is not valid.");
+                info(sender, "Setting configuration " + config + " as default.");
+                configs().setDefault(config);
+                return true;
             }
 
             // list of configurations names
@@ -82,6 +94,12 @@ public class RocCommand implements CommandExecutor, TabCompleter {
                         info(sender, "§6- " + n.getName() + "§7 by " + n.getAuthor() + " on " + n.getWorldName()
                                 + " : " + (n.isValid() ? "§a[VALID]" : "§c[INVALID]")
                 ));
+                WorldConfiguration defaultConfig = configs().getDefault();
+                if(defaultConfig != null) {
+                    info(sender, "§7Default configuration : §6" + defaultConfig.getName());
+                } else {
+                    info(sender, "§7No default configuration !");
+                }
                 return true;
             }
 
@@ -170,4 +188,5 @@ public class RocCommand implements CommandExecutor, TabCompleter {
     protected ConfigurationsList configs() {
         return game().getConfigurationsList();
     }
+
 }

@@ -5,6 +5,7 @@ api-version: '1.20'
 prefix: RoC-2
 authors: [jamailun]
 description: ROC is back
+load: POSTWORLD
 
 commands:
   roc:

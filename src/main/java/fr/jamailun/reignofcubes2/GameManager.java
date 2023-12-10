@@ -24,36 +24,25 @@ public class GameManager {
     @Getter private RocPlayer king;
     @Getter private Throne throne;
 
-    /**
-     * Create a new GameManager
-     * @param defaultConfig default config to use.
-     */
-    public GameManager(ConfigurationSection defaultConfig) {
-        if( ! defaultConfig.contains("default")) {
-            ReignOfCubes2.warning("No configuration set.");
-            state = GameState.NOT_CONFIGURED;
-            return;
-        }
-
-        String configName = defaultConfig.getString("default");
-        if(!configurationsList.contains(configName)) {
-            ReignOfCubes2.error("No configuration name corresponding to default '" + configName + "'.");
-            return;
-        }
-
-        WorldConfiguration wc = configurationsList.get(configName);
-        if(!wc.isValid()) {
-            ReignOfCubes2.error("Default configuration '" + configName + "' is NOT valid.");
-            return;
-        }
-
-        loadConfiguration(wc);
+    public GameManager() {
+        loadConfiguration(configurationsList.getDefault());
     }
 
-    public boolean loadConfiguration(WorldConfiguration configuration) {
+    public boolean loadConfiguration(@Nullable WorldConfiguration configuration) {
         if(isPlaying()) {
             ReignOfCubes2.error("Cannot change configuration while playing !");
             return false;
+        }
+        if(configuration == null) {
+            ReignOfCubes2.warning("Setting GameManager configuration as null.");
+            worldConfiguration = null;
+            if(throne != null) {
+                throne.reset();
+                throne = null;
+            }
+            world = null;
+            state = GameState.NOT_CONFIGURED;
+            return true;
         }
         if(!configuration.isValid()) {
             ReignOfCubes2.error("Could not load invalid configuration " + configuration);

@@ -6,6 +6,7 @@ import fr.jamailun.reignofcubes2.listeners.PlayerMovementListener;
 import fr.jamailun.reignofcubes2.players.PlayersManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
@@ -25,8 +26,12 @@ public final class ReignOfCubes2 extends JavaPlugin {
         // default config
         saveDefaultConfig();
 
+        Bukkit.getScheduler().runTaskLater(this, this::enableRoc, 20L);
+    }
+
+    private void enableRoc() {
         // Game manager
-        gameManager = new GameManager(getConfig());
+        gameManager = new GameManager();
 
         // Listeners
         new PlayerConnectionListener(this);
@@ -63,5 +68,13 @@ public final class ReignOfCubes2 extends JavaPlugin {
     }
     public static void error(String msg) {
         INSTANCE.getLogger().severe(msg);
+    }
+
+    public static ConfigurationSection getDefaultConfiguration() {
+        return INSTANCE.getConfig();
+    }
+
+    public static void saveDefaultConfiguration() {
+        INSTANCE.saveConfig();
     }
 }
