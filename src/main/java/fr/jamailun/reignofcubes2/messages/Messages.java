@@ -21,11 +21,8 @@ public class Messages {
     private String defaultLanguage = "fr";
     private final Map<String, Map<String, String>> messages = new HashMap<>();
     private final MiniMessage messageFormatter = MiniMessage.builder()
-            .tags(TagResolver.builder()
-                    .resolver(StandardTags.color())
-                    .resolver(StandardTags.decorations())
-                    .build()
-            ).build();
+            .tags(TagResolver.builder().resolver(StandardTags.defaults()).build())
+            .build();
 
     private void load(ConfigurationSection config) {
         defaultLanguage = config.getString("default", "fr");
@@ -49,6 +46,10 @@ public class Messages {
     }
 
     private Messages() {
+        init();
+    }
+
+    private void init() {
         // Get real messages.yml
         File file = ReignOfCubes2.getFile("messages.yml");
         if(assertFileExists(file)) {
@@ -126,6 +127,11 @@ public class Messages {
             string = string.replace("{" + i + "}", Objects.toString(values[i]));
         }
         return string;
+    }
+
+    public static void reload() {
+        INSTANCE.messages.clear();
+        INSTANCE.init();
     }
 
 }

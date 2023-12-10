@@ -58,7 +58,7 @@ public class GameManager {
 
     public void playerJoinsServer(Player p) {
         RocPlayer player = players.join(p);
-        players.broadcast("event.joined", p.getName());
+        broadcast("event.joined", p.getName());
         player.sendMessage("event.joined-direct");
 
         testShouldStartGame();
@@ -92,11 +92,11 @@ public class GameManager {
     public void playerDies(@Nonnull RocPlayer victim) {
         RocPlayer killer = victim.getLastDamager();
         if(killer == null) {
-            players.broadcast("event.death.alone", victim.getName());
+            broadcast("event.death.alone", victim.getName());
             //players.deathPenalty();
             return;
         }
-        players.broadcast("event.death.killed", victim.getName(), killer.getName());
+        broadcast("event.death.killed", victim.getName(), killer.getName());
 
         //TODO death logic
         // - points
@@ -107,14 +107,14 @@ public class GameManager {
     private void setKing(RocPlayer player) {
         if(player == null) {
             if(king != null) {
-                players.broadcast("event.king.death", king.getName());
+                broadcast("event.king.death", king.getName());
                 king = null;
             }
             return;
         }
         player.setKing(true);
         king = player;
-        players.broadcast("event.king.new", king.getName());
+        broadcast("event.king.new", king.getName());
     }
 
     public boolean isInWorld(World w) {
@@ -170,6 +170,10 @@ public class GameManager {
         }
 
         //TODO cancel the game.
+    }
+
+    public void broadcast(String entry, Object... args) {
+        players.broadcast(entry, args);
     }
 
 }

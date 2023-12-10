@@ -12,11 +12,13 @@ public class PlayerConnectionListener extends RocListener {
 
     @EventHandler
     public void playerJoined(PlayerJoinEvent event) {
+        event.joinMessage(null);
         game().playerJoinsServer(event.getPlayer());
     }
 
     @EventHandler
     public void playerLeft(PlayerQuitEvent event) {
+        event.quitMessage(null);
         game().playerLeftServer(event.getPlayer());
     }
 }

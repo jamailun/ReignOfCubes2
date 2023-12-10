@@ -3,7 +3,6 @@ package fr.jamailun.reignofcubes2.objects;
 import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
-import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
 public class Ceremony {
@@ -25,6 +24,7 @@ public class Ceremony {
         // Start
         task = ReignOfCubes2.runTaskTimer(this::tick, TICK_RATE);
         ReignOfCubes2.info("[CEREMONY] Started.");
+        game.broadcast("ceremony.start", player.getName());
     }
 
     private void tick() {
@@ -37,9 +37,11 @@ public class Ceremony {
     }
 
     public void stop() {
-        if(!task.isCancelled())
+        if(!task.isCancelled()) {
             task.cancel();
-        ReignOfCubes2.info("[CEREMONY] Stopped.");
+            ReignOfCubes2.info("[CEREMONY] Stopped.");
+            game.broadcast("ceremony.stop", player.getName());
+        }
     }
 
     public boolean isPlayer(RocPlayer player) {

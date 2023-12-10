@@ -2,17 +2,20 @@ default: fr
 messages:
   fr:
     event:
-      joined: "{0} a rejoint."
+      joined: "<yellow><b>[<green>+<yellow>] <gold>{0}<white> a rejoint la partie."
       joined-direct: "Bienvenue dans RoC."
-      left: "{0} est parti."
+      left: "<yellow><b>[<red>-<yellow>] <gold>{0}<white> a quitté la partie."
       left-king: "Le roi {0} est parti."
       death:
         killed: "{1} a tué {0}."
-        alone: "{0} est mort seul."
+        alone: "{0} est mort, <u>seul<!u>."
       king:
         death: "Le roi {0} est mort."
         new: "Nouveau roi : {0}."
     throne:
-      enter: "Tu es assis sur le trône !"
-      leaves: "Tu as quitté le trône..."
-      end-ceremony: "Bravo, tu es le roi."
+      enters: "<yellow><b>[<light_purple>K<yellow>] <green>Tu es assis sur le trône !"
+      leaves: "<yellow><b>[<light_purple>K<yellow>] <red>Tu as quitté le trône..."
+      end-ceremony: "<yellow><b>[<light_purple>K<yellow>] <green>Bravo, tu es le roi !"
+    ceremony:
+      start: "<yellow><b>[<light_purple>K<yellow>] <white><b>Attention, le joueur <gold>{0}<white> débute le couronnement."
+      stop: "<yellow><b>[<light_purple>K<yellow>] <white><b>Le joueur <gold>{0}<white> a échoué son couronnement."

@@ -1,11 +1,15 @@
 package fr.jamailun.reignofcubes2.commands;
 
+import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.regions.Region;
 import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.GameState;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.configuration.ConfigurationsList;
 import fr.jamailun.reignofcubes2.configuration.GameRules;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
+import fr.jamailun.reignofcubes2.messages.Messages;
+import fr.jamailun.reignofcubes2.utils.WorldEditHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.*;
@@ -24,13 +28,17 @@ import java.util.stream.Stream;
 
 public class RocCommand implements CommandExecutor, TabCompleter {
 
-    private final static List<String> args_0 = List.of("config", "start", "stop", "help");
+    private final static Vector MODIFIER_A = new Vector(0, 0, 0);
+    private final static Vector MODIFIER_B = new Vector(1, 1, 1);
+
+    private final static List<String> args_0 = List.of("config", "start", "stop", "help", "reload", "show");
+    private final static List<String> args_1_reload = List.of("messages");
     private final static List<String> args_1_config = List.of("enable", "set-default", "list", "create", "delete", "edit", "edit.spawns", "show");
     private final static List<String> args_list = List.of("add", "remove", "list");
 
     private final static List<String> args_2_edit = List.of(
             "players.min", "players.max",
-            "throne.pos_a", "throne.pos_b",
+            "throne.pos_a", "throne.pos_b", "throne.pos",
             "crowning-duration",
             "scoring.goal", "scoring.king.bonus", "scoring.king.per-second",
             "scoring.kill.flat", "scoring.kill.steal", "scoring.death-penalty"
@@ -158,7 +166,7 @@ public class RocCommand implements CommandExecutor, TabCompleter {
                     return error(sender, "Unknown configuration: " + configName);
                 WorldConfiguration config = configs().get(configName);
 
-                if(property.equals("throne.pos_a") || property.equals("throne.pos_b")) {
+                if(property.equals("throne.pos_a") || property.equals("throne.pos_b") || property.equals("throne.pos")) {
                     if(!(sender instanceof Entity)) {
                         return error(sender, "You must be a player to change the throne position.");
                     }
@@ -169,16 +177,26 @@ public class RocCommand implements CommandExecutor, TabCompleter {
                                 Math.floor(vector.getY()),
                                 Math.floor(vector.getZ())
                         );
-                        config.setThroneA(vector);
-                    } else {
+                        config.setThroneA(vector.add(MODIFIER_A));
+                        info(sender, "Position of throne has been updated to "+niceVector(vector)+" for §6" + configName);
+                    } else if(property.equals("throne.pos_b")) {
                         vector = new Vector(
                                 Math.floor(vector.getX()),
                                 Math.ceil(vector.getY()),
                                 Math.floor(vector.getZ())
                         );
-                        config.setThroneB(vector);
+                        config.setThroneB(vector.add(MODIFIER_B));
+                        info(sender, "Position of throne has been updated to "+niceVector(vector)+" for §6" + configName);
+                    } else {
+                        Region region = WorldEditHandler.getSelectedRegion(sender.getName());
+                        if(region == null) return error(sender, "Select a zone with WE to use this.");
+                        Vector3 min = region.getMinimumPoint().toVector3();
+                        Vector3 max = region.getMaximumPoint().toVector3();
+                        config.setThroneA(new Vector(min.getX(), min.getY(), min.getZ()).add(MODIFIER_A));
+                        config.setThroneB(new Vector(max.getX(), max.getY(), max.getZ()).add(MODIFIER_B));
+                        info(sender, "Position of throne has been updated for §6" + configName
+                                + "§a to §e" + min + "§a ; §e" + max);
                     }
-                    info(sender, "Position of throne has been updated to "+niceVector(vector)+" for §6" + configName);
                     return saveConfiguration(sender, config);
                 }
                 if(args.length < 3)
@@ -273,6 +291,31 @@ public class RocCommand implements CommandExecutor, TabCompleter {
             return info(sender, "Command executed.");
         }
 
+        if(arg.equalsIgnoreCase("reload")) {
+            if(args.length < 1) return missingArgument(sender, args_1_reload);
+            arg = args[0];
+
+            if(arg.equalsIgnoreCase("messages")) {
+                Messages.reload();
+                return info(sender, "Messages configuration reloaded.");
+            }
+
+            return unexpectedArgument(sender, arg, args_1_reload);
+        }
+
+        if(arg.equalsIgnoreCase("show")) {
+            if(!(sender instanceof Player)) return error(sender, "Must be a player.");
+            if(args.length < 1) return error(sender, "Specify the config to show.");
+
+            String name = args[0];
+            if(!configs().contains(name))
+                return error(sender, "Unknown configuration: " + name);
+            WorldConfiguration config = configs().get(name);
+            boolean result = config.debug.toggle((Player)sender);
+            return info(sender, "Debug has been toggled (" + result + ").");
+        }
+
+
         return unexpectedArgument(sender, arg, args_0);
     }
 
@@ -284,6 +327,12 @@ public class RocCommand implements CommandExecutor, TabCompleter {
         else if(args.length == 2) {
             if(args[0].equalsIgnoreCase("config")) {
                 return args_1_config.stream().filter(a -> a.startsWith(args[1].toLowerCase())).toList();
+            }
+            else if(args[0].equalsIgnoreCase("reload")) {
+                return args_1_reload.stream().filter(a -> a.startsWith(args[1].toLowerCase())).toList();
+            }
+            else if(args[0].equalsIgnoreCase("show")) {
+                return configurationsNames().filter(a -> a.startsWith(args[1].toLowerCase())).toList();
             }
         }
         else if(args.length == 3) {

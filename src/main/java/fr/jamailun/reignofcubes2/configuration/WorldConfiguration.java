@@ -3,22 +3,23 @@ package fr.jamailun.reignofcubes2.configuration;
 import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.objects.Throne;
+import fr.jamailun.reignofcubes2.utils.ParticlesPlayer;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class WorldConfiguration {
@@ -168,6 +169,42 @@ public class WorldConfiguration {
 
     private String niceVector(Vector vector) {
         return vector == null ? "§c<unset>§r" : "§a(" + vector.getX() + "," + vector.getY() + "," + vector.getZ() + ")§r";
+    }
+
+    public final Debugger debug = new Debugger();
+
+    public class Debugger {
+        private final Map<UUID, BukkitTask> showing = new HashMap<>();
+        public boolean toggle(Player player) {
+            UUID uuid = player.getUniqueId();
+            if(showing.containsKey(uuid)) {
+                showing.remove(uuid).cancel();
+                return false;
+            }
+            BukkitTask task = ReignOfCubes2.runTaskTimer(() -> {
+                // throne
+                if(throneA != null) {
+                    Location a = throneA.toLocation(player.getWorld());
+                    if(throneB != null) {
+                        Location b = throneB.toLocation(player.getWorld());
+                        ParticlesPlayer.playBox(player, a, b, 0.2, Particle.FLAME);
+                    } else {
+                        ParticlesPlayer.playLine(player, a, a.clone().add(0, 0.1, 0), 0.1, Particle.ENCHANTMENT_TABLE);
+                    }
+                } else if(throneB != null) {
+                    Location b = throneB.toLocation(player.getWorld());
+                    ParticlesPlayer.playLine(player, b, b.clone().add(0, 0.1, 0), 0.1, Particle.ENCHANTMENT_TABLE);
+                }
+
+                // spawns
+                for(Vector v : spawns) {
+                    Location l = v.toLocation(player.getWorld());
+                    ParticlesPlayer.playCircleXZ(player, l, 1, Math.toRadians(6), Particle.DRAGON_BREATH);
+                }
+            },1);
+            showing.put(uuid, task);
+            return true;
+        }
     }
 
 }
