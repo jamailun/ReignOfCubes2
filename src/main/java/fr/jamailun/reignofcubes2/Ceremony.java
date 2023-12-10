@@ -1,6 +1,7 @@
 package fr.jamailun.reignofcubes2;
 
 import fr.jamailun.reignofcubes2.players.RocPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
 public class Ceremony {
@@ -15,16 +16,18 @@ public class Ceremony {
     private final double duration;
     private double elapsed = 0;
 
-    public Ceremony(GameManager game, RocPlayer player, double durationSeconds) {
+    public Ceremony(GameManager game, RocPlayer player) {
         this.game = game;
         this.player = player;
-        this.duration = durationSeconds;
+        this.duration = game.getRules().getCrownDuration();
         // Start
         task = ReignOfCubes2.runTaskTimer(this::tick, TICK_RATE);
+        Bukkit.getLogger().info("[CEREMONY] Started.");
     }
 
     private void tick() {
         elapsed += TICK_RATE;
+        Bukkit.getLogger().info("[CEREMONY] " + elapsed + "/" + duration);
         if(elapsed >= duration) {
             game.ceremonyIsOver(player);
             stop();
@@ -34,6 +37,7 @@ public class Ceremony {
     public void stop() {
         if(!task.isCancelled())
             task.cancel();
+        Bukkit.getLogger().info("[CEREMONY] Stopped.");
     }
 
     public boolean isPlayer(RocPlayer player) {

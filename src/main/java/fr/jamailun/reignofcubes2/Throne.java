@@ -11,18 +11,16 @@ import java.util.UUID;
 public class Throne {
 
     private final GameManager game;
-    private final double crowningDuration;
     private final Vector vectorA, vectorB;
     private final Set<UUID> playersInside = new HashSet<>();
 
     // current
     private Ceremony ceremony;
 
-    public Throne(GameManager game, Vector vectorA, Vector vectorB, double crowningDuration) {
+    public Throne(GameManager game, Vector vectorA, Vector vectorB) {
         this.game = game;
         this.vectorA = vectorA;
         this.vectorB = vectorB;
-        this.crowningDuration = crowningDuration;
     }
 
     public boolean isAlreadyInside(RocPlayer player) {
@@ -56,7 +54,7 @@ public class Throne {
 
     private void startCeremony(RocPlayer player) {
         assert ceremony == null : "A ceremony already exists.";
-        ceremony = new Ceremony(game, player, crowningDuration);
+        ceremony = new Ceremony(game, player);
     }
 
     private void stopCeremony() {

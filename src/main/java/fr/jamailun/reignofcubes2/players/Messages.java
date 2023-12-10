@@ -1,21 +1,25 @@
 package fr.jamailun.reignofcubes2.players;
 
+import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import lombok.NonNull;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class Messages {
 
-    private final Map<Language, Map<String, String>> messages = new HashMap<>();
-
+    private String defaultLanguage = "fr";
+    private final Map<String, Map<String, String>> messages = new HashMap<>();
     private final MiniMessage messageFormatter = MiniMessage.builder()
             .tags(TagResolver.builder()
                     .resolver(StandardTags.color())
@@ -23,26 +27,61 @@ public class Messages {
                     .build()
             ).build();
 
-    private Messages() {
-        for(Language language : Language.values()) {
-            Map<String, String> messages = new HashMap<>();
-            String file = "i18n/messages_" + language.name().toLowerCase() + ".properties";
-            try(BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream(file))))) {
-                String line;
-                while((line = reader.readLine()) != null) {
-                    line = line.trim();
-                    if(line.isBlank() || line.startsWith("#")) continue;
-                    String[] parts = line.split("=", 2);
-                    if(parts.length != 2) {
-                        Bukkit.getLogger().severe("Invalid config line in " + file + " : " + line);
-                        continue;
-                    }
-                    messages.put(parts[0], parts[1]);
+    private void load(ConfigurationSection config) {
+        defaultLanguage = config.getString("default", "fr");
+        ConfigurationSection section = config.getConfigurationSection("messages");
+        if(section == null)
+            return;
+        for(String lan : section.getKeys(false)) {
+            ConfigurationSection messages = section.getConfigurationSection(lan);
+            assert messages != null;
+
+            Map<String, String> entries = new HashMap<>();
+            for(String key : messages.getKeys(true)) {
+                Object obj = messages.get(key);
+                Bukkit.getLogger().info("["+lan+"] : "+((obj instanceof String)?"[valid]":"")+" '" + key + "' => {"+obj+"}");
+                if(obj instanceof String str) {
+                    entries.put(key, str);
                 }
-            } catch(IOException e) {
-                throw new RuntimeException("Could not open '" + file + "' in ressources.");
             }
-            this.messages.put(language, messages);
+            this.messages.put(lan, entries);
+        }
+    }
+
+    private Messages() {
+        // Get real messages.yml
+        File file = ReignOfCubes2.getFile("messages.yml");
+        if(assertFileExists(file)) {
+            createFileFromJar(file);
+        }
+
+        // Read
+        load(YamlConfiguration.loadConfiguration(file));
+    }
+
+    private static boolean assertFileExists(File file) {
+        assert file != null : "File is null";
+        if(file.exists())
+            return false;
+        try {
+            assert file.createNewFile() : "Could not create file.";
+        } catch(IOException e) {
+            assert false : "Could not create file: " + e.getMessage();
+        }
+        return true;
+    }
+
+    private static void createFileFromJar(File file) {
+        try(InputStream in = Messages.class.getClassLoader().getResourceAsStream("messages.yml")) {
+            assert in != null : "Could not get ressource messages.yml";
+            byte[] data = in.readAllBytes();
+
+            try(FileOutputStream out = new FileOutputStream(file)) {
+                out.write(data);
+                out.flush();
+            }
+        } catch(IOException e) {
+            throw new RuntimeException("Could not create Messages instance : " + e.getMessage());
         }
     }
 
@@ -54,21 +93,29 @@ public class Messages {
         return INSTANCE;
     }
 
-    public static String get(Language language, String entry) {
-        return instance().messages.get(language).get(entry);
+    public @Nullable String getEntry(@Nullable String language, String entry) {
+        if(language == null)
+            language = defaultLanguage;
+        if(!messages.containsKey(language)) {
+            Bukkit.getLogger().warning("Language not supported: " + language);
+            language = defaultLanguage;
+        }
+        return messages.get(language).get(entry);
     }
 
-    public static String format(Language language, String entry, Object... args) {
+    public static @NonNull String get(@Nullable String language, String entry) {
+        String msg = instance().getEntry(language, entry);
+        return msg == null ? "{unknown{"+language+";"+entry+"}}" : msg;
+    }
+
+    public static String format(String language, String entry, Object... args) {
         return String.format(get(language, entry), args);
     }
 
-    public static void send(Player p, Language l, String e, Object... a) {
+    public static void send(Player p, String l, String e, Object... a) {
         String msg = format(l, e, a);
         Component cmp = instance().messageFormatter.deserialize(msg);
         p.sendMessage(cmp);
     }
 
-    public enum Language {
-        FR, EN
-    }
 }

@@ -15,7 +15,7 @@ public class RocPlayer {
 
     @Getter private int score = 0;
     @Getter @Setter private boolean isKing = false;
-    @Getter @Setter private Messages.Language language = Messages.Language.FR;
+    @Getter @Setter private String language = "fr";
 
     public RocPlayer(Player player) {
         this.player = player;

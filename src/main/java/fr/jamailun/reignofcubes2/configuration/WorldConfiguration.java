@@ -4,7 +4,6 @@ import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.Throne;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -22,10 +21,9 @@ public class WorldConfiguration {
 
     private final File file;
     @Getter private final String name, author, worldName;
-    @Getter @Setter private int playerCountMin = 0, playerCountMax = 0;
-    private double crownningDuration = 0;
     private List<Vector> playerSpawns;
     private Vector throneA, throneB;
+    @Getter private GameRules rules;
 
     public static WorldConfiguration load(String fileName) throws BadWorldConfigurationException {
         File file = new File(fileName);
@@ -49,17 +47,12 @@ public class WorldConfiguration {
             configuration.throneB = throne.getVector("pos_b");
         }
 
-        // load player-counts
-        ConfigurationSection playerCount = config.getConfigurationSection("players-count");
-        if(playerCount != null) {
-            configuration.playerCountMin = playerCount.getInt("min");
-            configuration.playerCountMax = playerCount.getInt("max");
-        }
-
         // Load spawns
         configuration.playerSpawns = getVectorsList(config, "spawns");
 
-        configuration.crownningDuration = config.getDouble("crown-duration");
+        // Load rules
+        ConfigurationSection rulesSection = config.getConfigurationSection("rules");
+        configuration.rules = GameRules.load(rulesSection);
 
         return configuration;
     }
@@ -85,19 +78,13 @@ public class WorldConfiguration {
             th.set("pos_b", throneB);
         }
 
-        // players-count
-        if(playerCountMin > 0 && playerCountMax > 0) {
-            ConfigurationSection pc = config.createSection("players-count");
-            pc.set("min", playerCountMin);
-            pc.set("max", playerCountMax);
-        }
-
         // spawns
         if(playerSpawns != null)
             setVectorsList(config, "spawns", playerSpawns);
 
-        if(crownningDuration > 0)
-            config.set("crown-duration", crownningDuration);
+        // rules
+        ConfigurationSection rulesSection = config.createSection("rules");
+        rules.write(rulesSection);
 
         config.save(file);
     }
@@ -105,15 +92,14 @@ public class WorldConfiguration {
     public boolean isValid() {
         return (throneA != null && throneB != null)
                 && (playerSpawns != null &&  !playerSpawns.isEmpty())
-                && (playerCountMin > 0 && playerCountMax > playerCountMin)
-                && (crownningDuration > 0);
+                && rules.isValid();
     }
 
     public Throne generateThrone(GameManager game) {
         assert isValid() : "Can only generate a throne if the configuration is valid.";
         World world = Bukkit.getWorld(worldName);
         assert world != null;
-        return new Throne(game, throneA, throneB, crownningDuration);
+        return new Throne(game, throneA, throneB);
     }
 
     public List<Location> generateSpawns() {

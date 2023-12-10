@@ -1,9 +1,8 @@
 package fr.jamailun.reignofcubes2.commands;
 
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
+import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import org.bukkit.Bukkit;
+import org.bukkit.command.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,8 +10,15 @@ import java.util.List;
 
 public class RocCommand implements CommandExecutor, TabCompleter {
 
-    public RocCommand() {
+    protected final ReignOfCubes2 plugin;
+    public RocCommand(ReignOfCubes2 plugin) {
+        this.plugin = plugin;
+        PluginCommand cmd = Bukkit.getPluginCommand("roc");
+        assert cmd != null;
+        cmd.setExecutor(this);
+        cmd.setTabCompleter(this);
 
+        Bukkit.getLogger().info("Command 'roc' enabled.");
     }
 
     @Override

@@ -6,9 +6,9 @@ import fr.jamailun.reignofcubes2.players.RocPlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-public class PlayerMovement extends RocListener {
+public class PlayerMovementListener extends RocListener {
 
-    public PlayerMovement(ReignOfCubes2 plugin) {
+    public PlayerMovementListener(ReignOfCubes2 plugin) {
         super(plugin);
     }
 

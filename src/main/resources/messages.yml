@@ -1,0 +1,18 @@
+default: fr
+messages:
+  fr:
+    event:
+      joined: "{0} a rejoint."
+      joined-direct: "Bienvenue dans RoC."
+      left: "{0} est parti."
+      left-king: "Le roi {0} est parti."
+      death:
+        killed: "{1} a tué {0}."
+        alone: "{0} est mort seul."
+      king:
+        death: "Le roi {0} est mort."
+        new: "Nouveau roi : {0}."
+    throne:
+      enter: "Tu es assis sur le trône !"
+      leaves: "Tu as quitté le trône..."
+      end-ceremony: "Bravo, tu es le roi."
