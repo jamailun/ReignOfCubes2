@@ -98,4 +98,30 @@ public class GameRules {
         return rules;
     }
 
+    public String nicePrint(String prefix, String last) {
+        return "§7{"
+                + prefix + "§7players = " + niceInt(playerCountMin) + " -> " + niceInt(playerCountMax)
+                + prefix + "§7crown-duration = " + niceDouble(crownDuration)
+                + prefix + "§7scoring.goal = " + niceInt(scoreGoal)
+                + prefix + "§7scoring.king = +" + niceInt(scoreKingBonus) + "§7, per-second: " + niceInt(scoreKingPerSecond)
+                + prefix + "§7scoring.kill = +" + niceInt(scoreKillFlat) + "§7, and steal: " + niceDouble(scoreKillSteal)
+                + prefix + "§7scoring.death-penalty = " + niceInt(scoreDeathPenalty)
+                + last + "§7}";
+    }
+
+    private String niceInt(int i) {
+        if(i < 0)
+            return "§c" + "<unset>";
+        if(i == 0)
+            return "§f0";
+        return "§a" + i;
+    }
+    private String niceDouble(double d) {
+        if(d < 0)
+            return "§c" + "<unset>";
+        if(d == 0)
+            return "§f0";
+        return "§a" + d;
+    }
+
 }

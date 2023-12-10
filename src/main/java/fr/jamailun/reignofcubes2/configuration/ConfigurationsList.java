@@ -77,7 +77,7 @@ public class ConfigurationsList {
         }
         // save
         defaultConfiguration = configuration;
-        ReignOfCubes2.getDefaultConfiguration().set("default", configuration);
+        ReignOfCubes2.getDefaultConfiguration().set("default", configuration.getName());
         ReignOfCubes2.saveDefaultConfiguration();
     }
 

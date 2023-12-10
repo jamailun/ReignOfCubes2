@@ -3,22 +3,37 @@ package fr.jamailun.reignofcubes2.commands;
 import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.configuration.ConfigurationsList;
+import fr.jamailun.reignofcubes2.configuration.GameRules;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 public class RocCommand implements CommandExecutor, TabCompleter {
 
     private final static List<String> args_0 = List.of("config", "start", "stop", "help");
+    private final static List<String> args_1_config = List.of("enable", "set-default", "list", "create", "delete", "edit", "edit.spawns", "show");
+    private final static List<String> args_list = List.of("add", "remove", "list");
 
-    private final static List<String> args_1_config = List.of("enable", "set-default", "list", "create", "delete", "edit");
+    private final static List<String> args_2_edit = List.of(
+            "players.min", "players.max",
+            "throne.pos_a", "throne.pos_b",
+            "crowning-duration",
+            "scoring.goal", "scoring.king.bonus", "scoring.king.per-second",
+            "scoring.kill.flat", "scoring.kill.steal", "scoring.death-penalty"
+    );
 
     protected final ReignOfCubes2 plugin;
     public RocCommand(ReignOfCubes2 plugin) {
@@ -120,11 +135,119 @@ public class RocCommand implements CommandExecutor, TabCompleter {
             }
 
             if(arg.equalsIgnoreCase("delete")) {
+                //TODO delete a configuration
                 return error(sender, "TODO");
             }
 
+            // Display the configuration
+            if(arg.equalsIgnoreCase("show")) {
+                String configName = args[0];
+                if(!configs().contains(configName))
+                    return error(sender, "Unknown configuration: " + configName);
+                WorldConfiguration config = configs().get(configName);
+                return info(sender, "§rConfiguration: " + config.nicePrint());
+            }
+
+            // Edit a configuration
             if(arg.equalsIgnoreCase("edit")) {
-                return error(sender, "TODO");
+                if(args.length < 2) return error(sender, "Specify the config-name and the property to edit.");
+                String configName = args[0];
+                String property = args[1].toLowerCase();
+                if(!configs().contains(configName))
+                    return error(sender, "Unknown configuration: " + configName);
+                WorldConfiguration config = configs().get(configName);
+
+                if(property.equals("throne.pos_a") || property.equals("throne.pos_b")) {
+                    if(!(sender instanceof Entity)) {
+                        return error(sender, "You must be a player to change the throne position.");
+                    }
+                    Vector vector = ((Player)sender).getLocation().toVector();
+                    if(property.equals("throne.pos_a")) {
+                        vector = new Vector(
+                                Math.floor(vector.getX()),
+                                Math.floor(vector.getY()),
+                                Math.floor(vector.getZ())
+                        );
+                        config.setThroneA(vector);
+                    } else {
+                        vector = new Vector(
+                                Math.floor(vector.getX()),
+                                Math.ceil(vector.getY()),
+                                Math.floor(vector.getZ())
+                        );
+                        config.setThroneB(vector);
+                    }
+                    info(sender, "Position of throne has been updated to "+niceVector(vector)+" for §6" + configName);
+                    return saveConfiguration(sender, config);
+                }
+                if(args.length < 3)
+                    return error(sender, "To change this property, specify a value");
+                String value = args[2];
+
+                GameRules rules = config.getRules();
+                String success = "Configuration §6"+configName+"§a has been updated successfully.";
+                boolean isSuccess = switch(property) {
+                    case "players.min" -> setInt(sender, value, rules::setPlayerCountMin, success);
+                    case "players.max" -> setInt(sender, value, rules::setPlayerCountMax, success);
+                    case "crowning-duration" -> setDouble(sender, value, rules::setCrownDuration, success);
+                    case "scoring.goal" -> setInt(sender, value, rules::setScoreGoal, success);
+                    case "scoring.king.bonus" -> setInt(sender, value, rules::setScoreKingBonus, success);
+                    case "scoring.king.per-second" -> setInt(sender, value, rules::setScoreKingPerSecond, success);
+                    case "scoring.kill.flat" -> setInt(sender, value, rules::setScoreKillFlat, success);
+                    case "scoring.kill.steal" -> setDouble(sender, value, rules::setScoreKillSteal, success);
+                    case "scoring.death-penalty" -> setInt(sender, value, rules::setScoreDeathPenalty, success);
+                    default -> unexpectedArgument(sender, property, args_2_edit);
+                };
+                if(isSuccess) {
+                    return saveConfiguration(sender, config);
+                }
+                return true;
+            }
+
+            if(arg.equalsIgnoreCase("edit.spawns")) {
+                if(args.length < 2) return error(sender, "Specify the config and the mode.");
+                String configName = args[0];
+                arg = args[1].toLowerCase();
+                if(!configs().contains(configName))
+                    return error(sender, "Unknown configuration: " + configName);
+                WorldConfiguration config = configs().get(configName);
+
+                if(arg.equals("list")) {
+                    if(config.spawnsList().isEmpty()) {
+                        return info(sender, "§7No spawn-point set for §6"+configName+"§7.");
+                    }
+                    info(sender, "§7Spawn-points ("+config.spawnsList().size()+") :");
+                    config.spawnsList().forEach(s -> info(sender, "§7- " + niceVector(s)));
+                    return true;
+                }
+
+                if(arg.equals("add")) {
+                    if(!(sender instanceof Entity)) {
+                        return error(sender, "Must be an entity to add a point.");
+                    }
+                    config.spawnsList().add(((Entity)sender).getLocation().toVector());
+                    info(sender, "Added a spawn-point to the configuration.");
+                    return saveConfiguration(sender, config);
+                }
+
+                if(arg.equals("remove")) {
+                    if(args.length < 3)
+                        return error(sender, "Specify the index of the spawn to remove.");
+                    int index;
+                    try {
+                        index = Integer.parseInt(args[2]);
+                    } catch(NumberFormatException e) {
+                        return error(sender, "Invalid integer format: " + args[2]);
+                    }
+                    if(index < 0 || index >= config.spawnsList().size()) {
+                        return error(sender, "Invalid index. Should be positive and under " + config.spawnsList().size());
+                    }
+                    config.spawnsList().remove(index);
+                    info(sender, "Removed a spawn-point to the configuration.");
+                    return saveConfiguration(sender, config);
+                }
+
+                return unexpectedArgument(sender, arg, args_list);
             }
 
             return unexpectedArgument(sender, arg, args_1_config);
@@ -139,9 +262,30 @@ public class RocCommand implements CommandExecutor, TabCompleter {
         if(args.length == 1) {
             return args_0.stream().filter(a -> a.startsWith(args[0].toLowerCase())).toList();
         }
-        if(args.length == 2) {
+        else if(args.length == 2) {
             if(args[0].equalsIgnoreCase("config")) {
                 return args_1_config.stream().filter(a -> a.startsWith(args[1].toLowerCase())).toList();
+            }
+        }
+        else if(args.length == 3) {
+            if(args[0].equalsIgnoreCase("config")) {
+                if(     args[1].equalsIgnoreCase("edit")
+                        || args[1].equalsIgnoreCase("edit.spawns")
+                        || args[1].equalsIgnoreCase("set-default")
+                        || args[1].equalsIgnoreCase("show")
+                ) {
+                    return configurationsNames().filter(a -> a.startsWith(args[2].toLowerCase())).toList();
+                }
+            }
+        }
+        else if(args.length == 4) {
+            if(args[0].equalsIgnoreCase("config")) {
+                if(args[1].equalsIgnoreCase("edit")) {
+                    return args_2_edit.stream().filter(a -> a.startsWith(args[3].toLowerCase())).toList();
+                }
+                else if(args[1].equalsIgnoreCase("edit.spawns")) {
+                    return args_list.stream().filter(a -> a.startsWith(args[3].toLowerCase())).toList();
+                }
             }
         }
         return Collections.emptyList();
@@ -160,7 +304,6 @@ public class RocCommand implements CommandExecutor, TabCompleter {
 
     private boolean missingArgument(CommandSender sender, List<String> allowed) {
         sender.sendMessage("§c argument missing. Expected : " + Arrays.toString(allowed.toArray()));
-
         return true;
     }
 
@@ -187,6 +330,45 @@ public class RocCommand implements CommandExecutor, TabCompleter {
 
     protected ConfigurationsList configs() {
         return game().getConfigurationsList();
+    }
+
+    private boolean setInt(CommandSender sender, String value, Consumer<Integer> consumer, String success) {
+        try {
+            int v = Integer.parseInt(value);
+            consumer.accept(v);
+            return info(sender, success);
+        } catch(NumberFormatException ignored) {
+            error(sender, "Invalid integer value: '"+value+"'");
+            return false;
+        }
+    }
+    private boolean setDouble(CommandSender sender, String value, Consumer<Double> consumer, String success) {
+        try {
+            double v = Double.parseDouble(value);
+            consumer.accept(v);
+            return info(sender, success);
+        } catch(NumberFormatException ignored) {
+            error(sender, "Invalid integer value: '"+value+"'");
+            return false;
+        }
+    }
+
+    private Stream<String> configurationsNames() {
+        return configs().list().stream().map(WorldConfiguration::getName);
+    }
+
+    private String niceVector(Vector vector) {
+        return "(" + vector.getX() + "," + vector.getY() + "," + vector.getZ() + ")";
+    }
+
+    protected boolean saveConfiguration(CommandSender sender, WorldConfiguration config) {
+        try{
+            config.save();
+            return true;
+        } catch(IOException e) {
+            ReignOfCubes2.error("Could not save " + config.getName() + ": " + e.getMessage());
+            return error(sender,"Could not save " + config.getName() + ": " + e.getMessage());
+        }
     }
 
 }

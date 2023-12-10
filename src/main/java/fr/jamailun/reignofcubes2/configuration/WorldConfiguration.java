@@ -5,6 +5,7 @@ import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.Throne;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -15,6 +16,7 @@ import org.bukkit.util.Vector;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -22,8 +24,8 @@ public class WorldConfiguration {
 
     private final File file;
     @Getter private final String name, author, worldName;
-    private List<Vector> playerSpawns;
-    private Vector throneA, throneB;
+    private List<Vector> spawns = new ArrayList<>();
+    @Setter private Vector throneA, throneB;
     @Getter private GameRules rules;
 
     public static WorldConfiguration load(File file) throws BadWorldConfigurationException {
@@ -48,7 +50,7 @@ public class WorldConfiguration {
         }
 
         // Load spawns
-        configuration.playerSpawns = getVectorsList(config, "spawns");
+        configuration.spawns = getVectorsList(config, "spawns");
 
         // Load rules
         ConfigurationSection rulesSection = config.getConfigurationSection("rules");
@@ -82,8 +84,8 @@ public class WorldConfiguration {
         }
 
         // spawns
-        if(playerSpawns != null)
-            setVectorsList(config, "spawns", playerSpawns);
+        if(spawns != null)
+            setVectorsList(config, "spawns", spawns);
 
         // rules
         ConfigurationSection rulesSection = config.createSection("rules");
@@ -94,7 +96,7 @@ public class WorldConfiguration {
 
     public boolean isValid() {
         return (throneA != null && throneB != null)
-                && (playerSpawns != null &&  !playerSpawns.isEmpty())
+                && (!spawns.isEmpty())
                 && rules.isValid();
     }
 
@@ -109,7 +111,7 @@ public class WorldConfiguration {
         assert isValid() : "Can only generate spawns if the configuration is valid.";
         World world = Bukkit.getWorld(worldName);
         assert world != null;
-        return playerSpawns.stream()
+        return spawns.stream()
                 .map(v -> v.toLocation(world))
                 .toList();
     }
@@ -118,6 +120,10 @@ public class WorldConfiguration {
         public BadWorldConfigurationException(String msg) {
             super(msg);
         }
+    }
+
+    public List<Vector> spawnsList() {
+        return spawns;
     }
 
     @SuppressWarnings("unchecked")
@@ -144,4 +150,23 @@ public class WorldConfiguration {
                 + (isValid() ? ", VALID": ", NOT-valid")
                 + "}";
     }
+
+    public String nicePrint() {
+        String end = "\n  ";
+        String endl = "§r,"+end;
+        return "§r{" + end
+                + "name = §6" + name + endl
+                + "author = §6" + author + endl
+                + "world = " + (Bukkit.getWorld(worldName) != null ? "§a" : "§c") + worldName + endl
+                + "§l" + "valid = " + (isValid() ? "§atrue" : "§cfalse") + endl
+                + "throne = " + niceVector(throneA) + " -> " +  niceVector(throneB) + endl
+                + "spawns = §7" + Arrays.toString(spawns == null ? new Object[0] : spawns.toArray()) + endl
+                + "rules = §7" + rules.nicePrint("\n    ", "\n  ")
+                + "§r\n}";
+    }
+
+    private String niceVector(Vector vector) {
+        return vector == null ? "§c<unset>§r" : "§a(" + vector.getX() + "," + vector.getY() + "," + vector.getZ() + ")§r";
+    }
+
 }
