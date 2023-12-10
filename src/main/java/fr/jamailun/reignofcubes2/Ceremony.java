@@ -22,12 +22,12 @@ public class Ceremony {
         this.duration = game.getRules().getCrownDuration();
         // Start
         task = ReignOfCubes2.runTaskTimer(this::tick, TICK_RATE);
-        Bukkit.getLogger().info("[CEREMONY] Started.");
+        ReignOfCubes2.info("[CEREMONY] Started.");
     }
 
     private void tick() {
         elapsed += TICK_RATE;
-        Bukkit.getLogger().info("[CEREMONY] " + elapsed + "/" + duration);
+        ReignOfCubes2.info("[CEREMONY] " + elapsed + "/" + duration);
         if(elapsed >= duration) {
             game.ceremonyIsOver(player);
             stop();
@@ -37,7 +37,7 @@ public class Ceremony {
     public void stop() {
         if(!task.isCancelled())
             task.cancel();
-        Bukkit.getLogger().info("[CEREMONY] Stopped.");
+        ReignOfCubes2.info("[CEREMONY] Stopped.");
     }
 
     public boolean isPlayer(RocPlayer player) {

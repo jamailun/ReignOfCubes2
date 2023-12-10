@@ -18,7 +18,7 @@ public class RocCommand implements CommandExecutor, TabCompleter {
         cmd.setExecutor(this);
         cmd.setTabCompleter(this);
 
-        Bukkit.getLogger().info("Command 'roc' enabled.");
+        ReignOfCubes2.info("Command 'roc' enabled.");
     }
 
     @Override

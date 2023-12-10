@@ -17,7 +17,7 @@ public class GameManager {
 
     private final PlayersManager players;
 
-    @Getter private GameState state = GameState.WAITING;
+    @Getter private GameState state;
     @Getter private WorldConfiguration worldConfiguration;
     private World world;
     @Getter private RocPlayer king;
@@ -27,11 +27,15 @@ public class GameManager {
         this.players = players;
         if(defaultConfig.contains("default")) {
             String configName = defaultConfig.getString("default");
+            ReignOfCubes2.info("Will try to load default configuration '" + configName + "'.");
             try {
                 loadConfiguration(configName);
             } catch (BadWorldConfigurationException e) {
-                Bukkit.getLogger().severe("Could NOT read default configuration '" + configName + "': " + e.getMessage());
+                ReignOfCubes2.error("Could NOT read default configuration '" + configName + "': " + e.getMessage());
             }
+        } else {
+            ReignOfCubes2.warning("No configuration set.");
+            state = GameState.NOT_CONFIGURED;
         }
     }
 
@@ -43,6 +47,7 @@ public class GameManager {
         worldConfiguration = wc;
         throne = worldConfiguration.generateThrone(this);
         world = Bukkit.getWorld(worldConfiguration.getWorldName());
+        state = GameState.WAITING;
     }
 
 
@@ -79,7 +84,10 @@ public class GameManager {
         }
         players.broadcast("event.death.killed", v.getName(), k.getName());
 
-
+        //TODO death logic
+        // - points
+        // - death of the king
+        // - respawn
     }
 
     private void setKing(RocPlayer player) {
@@ -96,6 +104,8 @@ public class GameManager {
     }
 
     public boolean isInWorld(World w) {
+        if(state == GameState.NOT_CONFIGURED)
+            return false;
         return this.world.equals(w);
     }
 

@@ -6,7 +6,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -15,6 +14,7 @@ import javax.annotation.Nullable;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Messages {
 
@@ -39,7 +39,7 @@ public class Messages {
             Map<String, String> entries = new HashMap<>();
             for(String key : messages.getKeys(true)) {
                 Object obj = messages.get(key);
-                Bukkit.getLogger().info("["+lan+"] : "+((obj instanceof String)?"[valid]":"")+" '" + key + "' => {"+obj+"}");
+            //    ReignOfCubes2.info("["+lan+"] : "+((obj instanceof String)?"[valid]":"")+" '" + key + "' => {"+obj+"}");
                 if(obj instanceof String str) {
                     entries.put(key, str);
                 }
@@ -97,7 +97,7 @@ public class Messages {
         if(language == null)
             language = defaultLanguage;
         if(!messages.containsKey(language)) {
-            Bukkit.getLogger().warning("Language not supported: " + language);
+            ReignOfCubes2.warning("Language not supported: " + language);
             language = defaultLanguage;
         }
         return messages.get(language).get(entry);
@@ -109,13 +109,23 @@ public class Messages {
     }
 
     public static String format(String language, String entry, Object... args) {
-        return String.format(get(language, entry), args);
+        return niceFormat(get(language, entry), args);
     }
 
     public static void send(Player p, String l, String e, Object... a) {
         String msg = format(l, e, a);
         Component cmp = instance().messageFormatter.deserialize(msg);
         p.sendMessage(cmp);
+    }
+
+    private static String niceFormat(String string, Object... values) {
+        assert string != null;
+        if(values == null) return string;
+
+        for(int i = 0; i < values.length; i++) {
+            string = string.replace("{" + i + "}", Objects.toString(values[i]));
+        }
+        return string;
     }
 
 }

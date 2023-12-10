@@ -21,7 +21,7 @@ public final class ReignOfCubes2 extends JavaPlugin {
     @Override
     public void onEnable() {
         INSTANCE = this;
-        Bukkit.getLogger().info("Enabling plugin.");
+        ReignOfCubes2.info("Enabling plugin.");
         // default config
         saveDefaultConfig();
 
@@ -43,7 +43,7 @@ public final class ReignOfCubes2 extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        Bukkit.getLogger().info("Disabling plugin.");
+        ReignOfCubes2.info("Disabling plugin.");
     }
 
     public static BukkitTask runTaskTimer(Runnable runnable, double periodSeconds) {
@@ -53,5 +53,15 @@ public final class ReignOfCubes2 extends JavaPlugin {
 
     public static File getFile(String name) {
         return new File(INSTANCE.getDataFolder(), name);
+    }
+
+    public static void info(String msg) {
+        INSTANCE.getLogger().info(msg);
+    }
+    public static void warning(String msg) {
+        INSTANCE.getLogger().warning(msg);
+    }
+    public static void error(String msg) {
+        INSTANCE.getLogger().severe(msg);
     }
 }
