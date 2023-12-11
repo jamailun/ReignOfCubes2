@@ -3,6 +3,7 @@ package fr.jamailun.reignofcubes2;
 import fr.jamailun.reignofcubes2.configuration.ConfigurationsList;
 import fr.jamailun.reignofcubes2.configuration.GameRules;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
+import fr.jamailun.reignofcubes2.objects.Ceremony;
 import fr.jamailun.reignofcubes2.objects.Throne;
 import fr.jamailun.reignofcubes2.players.PlayersManager;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
@@ -176,6 +177,13 @@ public class GameManager {
             return;
         }
 
+        Bukkit.broadcastMessage("§6§l > game stopped.");
+        if(king != null) {
+            king.setKing(false);
+            king = null;
+        }
+
+        state = GameState.WAITING;
         //TODO cancel the game.
     }
 
@@ -185,6 +193,12 @@ public class GameManager {
 
     public int getPlayersCount() {
         return players.size();
+    }
+
+    public @Nullable Ceremony getCeremony() {
+        if(throne == null || ! throne.hasCeremony())
+            return null;
+        return throne.getCeremony();
     }
 
 }

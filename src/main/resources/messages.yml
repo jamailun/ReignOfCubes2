@@ -40,3 +40,6 @@ messages:
         NOT_CONFIGURED: "&cNon configuré"
         WAITING: "&eEn attente"
         PLAYING: "&aEn cours"
+      bars:
+        ceremony: "&eCouronnement de &a{0}"
+        ceremony-steal: "&eVol du trône par &c{0}"

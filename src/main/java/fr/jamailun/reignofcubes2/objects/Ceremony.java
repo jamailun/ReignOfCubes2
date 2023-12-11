@@ -55,4 +55,13 @@ public class Ceremony {
         return player.getUUID().equals(this.player.getUUID());
     }
 
+    public String getPlayerName() {
+        return player.getName();
+    }
+
+    public double getRatio() {
+        assert duration > 0;
+        return elapsed / duration;
+    }
+
 }

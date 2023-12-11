@@ -3,6 +3,7 @@ package fr.jamailun.reignofcubes2.objects;
 import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import fr.jamailun.reignofcubes2.utils.MinMax;
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
@@ -20,7 +21,7 @@ public class Throne {
     private final Set<UUID> playersInside = new HashSet<>();
 
     // current
-    private Ceremony ceremony;
+    @Getter private Ceremony ceremony;
 
     public Throne(GameManager game, Vector vectorA, Vector vectorB) {
         this.game = game;

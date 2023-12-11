@@ -4,6 +4,7 @@ import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
 import fr.jamailun.reignofcubes2.messages.Messages;
+import fr.jamailun.reignofcubes2.objects.Ceremony;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
@@ -34,7 +35,21 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
             case "online": {
                 return "" + game.getPlayersCount();
             }
-            case "started": return game.isPlaying() ? "1" : "0";
+            case "is_started": return game.isPlaying() ? "1" : "0";
+            case "is_ceremony": return game.isPlaying() && game.getCeremony() != null ? "1" : "0";
+            case "ceremony_text": {
+                Ceremony ceremony = game.getCeremony();
+                if(ceremony == null) return "§cNo ceremony.";
+                return Messages.format(languageOfPlayer(player), "tab.bars.ceremony", ceremony.getPlayerName());
+            }
+            case "ceremony_ratio": {
+                Ceremony ceremony = game.getCeremony();
+                if(ceremony == null) return "0";
+                return String.valueOf(ceremony.getRatio() * 100);
+            }
+            case "ceremony_color": {
+                return "YELLOW";
+            }
         }
 
         // Player-specific
