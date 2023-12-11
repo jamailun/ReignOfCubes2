@@ -134,4 +134,8 @@ public class Messages {
         INSTANCE.init();
     }
 
+    public static String getDefaultLanguage() {
+        return instance().defaultLanguage;
+    }
+
 }

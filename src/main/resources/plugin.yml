@@ -6,7 +6,7 @@ prefix: RoC-2
 authors: [jamailun]
 description: ROC is back
 load: POSTWORLD
-depend: [ WorldEdit ] # I'll remove it at some point.
+depend: [ WorldEdit, PlaceholderAPI ]
 
 commands:
   roc:

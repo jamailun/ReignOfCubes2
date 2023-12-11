@@ -7,15 +7,28 @@ messages:
       left: "<yellow><b>[<red>-<yellow>] <gold>{0}<white> a quitté la partie."
       left-king: "Le roi {0} est parti."
       death:
-        killed: "{1} a tué {0}."
-        alone: "{0} est mort, <u>seul<!u>."
+        killed: "<gray>[<red>k<gray>] <white> Le joueur <yellow>{1}<white> a tué <gray>{0}<white>."
+        killed-as-king: "<gray>[<red>k<gray>] <white> Le Roi <gold>{1}<white> a tué <gray>{0}<white>."
+        killed-king: "<gray><b>[<red>K<gray>] <yellow>Le joueur <dark_green>{1}<yellow> a tué le Roi <dark_red>{0}<yellow>. Il lui vole sa couronne."
+        alone: "<gray>[<red>k<gray>] <white> Le joueur <gray>{1}<white> est mort, seul."
       king:
-        death: "Le roi {0} est mort."
-        new: "Nouveau roi : {0}."
+        death: "<yellow><b>[<light_purple>K<yellow>]<!b> <dark_red>Le roi <gold><b>{0}<!b><dark_red> a abandonné."
+        new: "<yellow><b>[<light_purple>K<yellow>]<!b> <dark_green>Le nouveau roi : <gold><b>{0}<!b><dark_green> a été couronné."
     throne:
-      enters: "<yellow><b>[<light_purple>K<yellow>] <green>Tu es assis sur le trône !"
-      leaves: "<yellow><b>[<light_purple>K<yellow>] <red>Tu as quitté le trône..."
-      end-ceremony: "<yellow><b>[<light_purple>K<yellow>] <green>Bravo, tu es le roi !"
+      enters: "<yellow>[<light_purple>K<yellow>] <gray>Le trône est gelé... <green>Tu commences à te saisir de son pouvoir."
+      enters-as-king: "<yellow>[<light_purple>K<yellow>] <green>Le <gold>trône<green> protège son maître."
+      enters-but-king: "<yellow>[<light_purple>K<yellow>] <gray>Le trône est froid... <green>Tu commences à voler son pouvoir."
+      leaves: "<yellow>[<light_purple>K<yellow>] <red>Tu as quitté le trône..."
+      end-ceremony: "<yellow>[<light_purple>K<yellow>] <green>Bravo, tu es le roi !"
     ceremony:
-      start: "<yellow><b>[<light_purple>K<yellow>] <white><b>Attention, le joueur <gold>{0}<white> débute le couronnement."
-      stop: "<yellow><b>[<light_purple>K<yellow>] <white><b>Le joueur <gold>{0}<white> a échoué son couronnement."
+      start: "<yellow>[<light_purple>K<yellow>] <white><b>Le joueur <yellow>{0}<white> débute le couronnement."
+      start-steal: "<yellow>[<dark_red>K<yellow>] <white><b>Le joueur <red>{0}<white> commence à voler le trône."
+      stop: "<yellow>[<light_purple>K<yellow>] <white><b>Le joueur <gray>{0}<white> a échoué son couronnement."
+    tab:
+      king:
+        you: "<green>toi !"
+        none: "<gray>personne"
+      game-state:
+        NOT_CONFIGURED: "<red>Non configuré"
+        WAITING: "<yellow>En attente"
+        PLAYING: "<green>En cours"

@@ -3,7 +3,8 @@ package fr.jamailun.reignofcubes2;
 import fr.jamailun.reignofcubes2.commands.RocCommand;
 import fr.jamailun.reignofcubes2.listeners.PlayerConnectionListener;
 import fr.jamailun.reignofcubes2.listeners.PlayerMovementListener;
-import fr.jamailun.reignofcubes2.players.PlayersManager;
+import fr.jamailun.reignofcubes2.placeholder.RocPlaceholderExpansion;
+import io.papermc.paper.plugin.configuration.PluginMeta;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -23,6 +24,12 @@ public final class ReignOfCubes2 extends JavaPlugin {
     public void onEnable() {
         INSTANCE = this;
         ReignOfCubes2.info("Enabling plugin.");
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") == null) {
+            warning("Could not find PlaceholderAPI. Disabling.");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+
         // default config
         saveDefaultConfig();
 
@@ -39,6 +46,9 @@ public final class ReignOfCubes2 extends JavaPlugin {
 
         // Commands
         new RocCommand(this);
+
+        // Placeholder API
+        new RocPlaceholderExpansion(gameManager).register();
 
         // Reload
         for(Player onlinePlayer : Bukkit.getOnlinePlayers()) {
@@ -76,5 +86,9 @@ public final class ReignOfCubes2 extends JavaPlugin {
 
     public static void saveDefaultConfiguration() {
         INSTANCE.saveConfig();
+    }
+
+    public static PluginMeta getMeta() {
+        return INSTANCE.getPluginMeta();
     }
 }

@@ -25,7 +25,7 @@ public class GameManager {
     @Getter private RocPlayer king;
     @Getter private Throne throne;
 
-    public GameManager() {
+    GameManager() {
         loadConfiguration(configurationsList.getDefault());
     }
 
@@ -107,11 +107,18 @@ public class GameManager {
     private void setKing(RocPlayer player) {
         if(player == null) {
             if(king != null) {
+                ReignOfCubes2.info("King has been set as null.");
                 broadcast("event.king.death", king.getName());
+                king.setKing(false);
                 king = null;
             }
             return;
         }
+        // remove king from old king.
+        if(king != null)
+            king.setKing(false);
+
+        // set new king
         player.setKing(true);
         king = player;
         broadcast("event.king.new", king.getName());
@@ -127,7 +134,7 @@ public class GameManager {
         return state == GameState.PLAYING;
     }
 
-    public @Nullable RocPlayer toPlayer(Player p) {
+    public @Nullable RocPlayer toPlayer(@Nullable Player p) {
         if(p == null) return null;
         if(isPlaying()) {
             if(players.exists(p))
@@ -174,6 +181,10 @@ public class GameManager {
 
     public void broadcast(String entry, Object... args) {
         players.broadcast(entry, args);
+    }
+
+    public int getPlayersCount() {
+        return players.size();
     }
 
 }

@@ -50,6 +50,10 @@ public class RocPlayer {
         Messages.send(player, language, entry, args);
     }
 
+    public String i18n(String entry, Object... args) {
+        return Messages.format(language, entry, args);
+    }
+
     public UUID getUUID() {
         return player.getUniqueId();
     }

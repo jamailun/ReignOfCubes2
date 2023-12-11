@@ -2,6 +2,7 @@ package fr.jamailun.reignofcubes2.objects;
 
 import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
+import fr.jamailun.reignofcubes2.utils.MinMax;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
@@ -9,6 +10,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Represents the zone of the throne.
+ */
 public class Throne {
 
     private final GameManager game;
@@ -28,29 +32,54 @@ public class Throne {
         return playersInside.contains(player.getUUID());
     }
 
+    /**
+     * Custom AABB test. Check if the location is inside the throne zone.
+     * @param loc location to test
+     * @return true if inside.
+     */
     public boolean isInside(Location loc) {
-        return loc.toVector().isInAABB(vectorA, vectorB);
+        MinMax x = new MinMax(vectorA.getX(), vectorB.getX());
+        MinMax y = new MinMax(vectorA.getY(), vectorB.getY());
+        MinMax z = new MinMax(vectorA.getZ(), vectorB.getZ());
+
+        return x.contains(loc.getX())
+                && y.contains(loc.getY())
+                && z.contains(loc.getZ());
     }
 
     public void enters(RocPlayer player) {
         playersInside.add(player.getUUID());
-        player.sendMessage("throne.enters");
 
-        if(playersInside.size() == 1) {
-            if( ! game.hasKing()) {
-                startCeremony(player);
+        boolean canStart = true;
+        if(game.hasKing()) {
+            if(player.isKing()) {
+                player.sendMessage("throne.enters-as-king");
+                canStart = false;
+            } else {
+                player.sendMessage("throne.enters-but-king");
             }
+        } else {
+            player.sendMessage("throne.enters");
+        }
+
+        if(playersInside.size() == 1 && canStart && !hasCeremony()) {
+            startCeremony(player);
         }
     }
 
     public void leaves(RocPlayer player) {
         playersInside.remove(player.getUUID());
+
         if(!player.isKing())
             player.sendMessage("throne.leaves");
 
-        if(ceremony != null && ceremony.isPlayer(player)) {
+        if(hasCeremony() && ceremony.isPlayer(player)) {
             stopCeremony();
         }
+    }
+
+    public boolean hasCeremony() {
+        return ceremony != null;
     }
 
     private void startCeremony(RocPlayer player) {

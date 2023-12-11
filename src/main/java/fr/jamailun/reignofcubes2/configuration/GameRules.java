@@ -17,6 +17,7 @@ public class GameRules {
     private int playerCountMax = -1;
 
     private double crownDuration = -1;
+    private double crownDurationSteal = -1;
 
     private int scoreGoal = -1;
     private int scoreKingPerSecond = -1;
@@ -41,6 +42,7 @@ public class GameRules {
 
         // crown
         rules.crownDuration = config.getDouble("crown-duration", DEFAULT);
+        rules.crownDurationSteal = config.getDouble("crown-duration-steal", DEFAULT);
 
         // scoring
         ConfigurationSection scoring = config.getConfigurationSection("scoring");
@@ -62,6 +64,7 @@ public class GameRules {
         pc.set("max", playerCountMax);
 
         config.set("crown-duration", crownDuration);
+        config.set("crown-duration-steal", crownDurationSteal);
 
         ConfigurationSection scoring = config.createSection("scoring");
         scoring.set("goal", scoreGoal);
@@ -74,7 +77,7 @@ public class GameRules {
 
     public boolean isValid() {
         return (playerCountMin > 0 && playerCountMax > playerCountMin)
-                && crownDuration > 0
+                && crownDuration > 0 && crownDurationSteal > 0
                 && (
                     scoreGoal > 0 && scoreKingPerSecond >= 0 && scoreKingBonus >= 0
                 && scoreKillFlat >= 0 && scoreKillSteal >= 0 && scoreDeathPenalty >= 0
@@ -88,6 +91,7 @@ public class GameRules {
         rules.playerCountMax = 32;
         // crown
         rules.crownDuration = 25;
+        rules.crownDurationSteal = 60;
         // score
         rules.scoreGoal = 1000;
         rules.scoreKingBonus = 50;
@@ -101,7 +105,7 @@ public class GameRules {
     public String nicePrint(String prefix, String last) {
         return "§7{"
                 + prefix + "§7players = " + niceInt(playerCountMin) + " -> " + niceInt(playerCountMax)
-                + prefix + "§7crown-duration = " + niceDouble(crownDuration)
+                + prefix + "§7crown-duration = " + niceDouble(crownDuration) + "§7, when stealing: " + niceDouble(crownDurationSteal)
                 + prefix + "§7scoring.goal = " + niceInt(scoreGoal)
                 + prefix + "§7scoring.king = +" + niceInt(scoreKingBonus) + "§7, per-second: " + niceInt(scoreKingPerSecond)
                 + prefix + "§7scoring.kill = +" + niceInt(scoreKillFlat) + "§7, and steal: " + niceDouble(scoreKillSteal)
