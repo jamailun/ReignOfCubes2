@@ -64,4 +64,8 @@ public class Ceremony {
         return elapsed / duration;
     }
 
+    public String getColor() {
+        return "YELLOW"; // TODO
+    }
+
 }

@@ -1,5 +1,7 @@
 package fr.jamailun.reignofcubes2.players;
 
+import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.utils.Ranking;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -23,8 +25,13 @@ public class PlayersManager implements Iterable<RocPlayer> {
         return rp;
     }
 
-    public void clear() {
-        players.clear();
+    public void clearOfflines() {
+        for(RocPlayer player : new ArrayList<>(players.values())) {
+            if( ! player.isValid()) {
+                players.remove(player.getUUID());
+                ReignOfCubes2.info("Removed '" + player.getName() + "' from players because he was offline.");
+            }
+        }
     }
 
     public boolean exists(Player player) {
@@ -66,5 +73,9 @@ public class PlayersManager implements Iterable<RocPlayer> {
             // Teleport
             player.getPlayer().teleport(spawn.next());
         }
+    }
+
+    public void updateRanking(Ranking<RocPlayer> ranking) {
+        ranking.update(players.values());
     }
 }

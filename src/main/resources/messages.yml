@@ -46,9 +46,10 @@ messages:
       start-steal: "<yellow>[<dark_red>👑<yellow>] <white><b>Le joueur <red>{0}<white> commence à voler le trône."
       fail: "<yellow>[<light_purple>👑<yellow>] <white><b>Le joueur <gray>{0}<white> a échoué son couronnement."
     tab:
-      king:
+      player:
         you: "&2toi"
-        none: "&7personne"
+        none: "&7(personne)"
+        king: "Roi"
       game-state:
         NOT_CONFIGURED: "&cNon configuré"
         WAITING: "&eEn attente"
@@ -56,3 +57,7 @@ messages:
       bars:
         ceremony: "&eCouronnement de &a{0}"
         ceremony-steal: "&eVol du trône par &c{0}"
+      ranking:
+        score: "Score"
+        title: "Classement :"
+        entry: "&e{0}) {1}&7 &b({2})"

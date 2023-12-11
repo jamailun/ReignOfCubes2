@@ -3,13 +3,14 @@ package fr.jamailun.reignofcubes2.placeholder;
 import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
-import fr.jamailun.reignofcubes2.messages.Messages;
 import fr.jamailun.reignofcubes2.objects.Ceremony;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 public class RocPlaceholderExpansion extends PlaceholderExpansion {
 
@@ -23,38 +24,6 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
 
     @Override
     public @Nullable String onPlaceholderRequest(Player player, @NotNull String param) {
-        // Common:
-        switch (param.toLowerCase()) {
-            case "game_status": {
-                return Messages.format(languageOfPlayer(player), "tab.game-state." + game.getState());
-            }
-            case "map": {
-                return config() == null ? NONE : config().getName();
-            }
-            case "map_author": {
-                return config() == null ? NONE : config().getAuthor();
-            }
-            case "online": {
-                return "" + game.getPlayersCount();
-            }
-            case "is_playing": return game.isPlaying() ? "1" : "0";
-            case "is_ceremony": return game.isPlaying() && game.getCeremony() != null ? "1" : "0";
-            case "ceremony_text": {
-                Ceremony ceremony = game.getCeremony();
-                if(ceremony == null) return "§cNo ceremony.";
-                return Messages.format(languageOfPlayer(player), "tab.bars.ceremony", ceremony.getPlayerName());
-            }
-            case "ceremony_ratio": {
-                Ceremony ceremony = game.getCeremony();
-                if(ceremony == null) return "0";
-                return String.valueOf(ceremony.getRatio() * 100);
-            }
-            case "ceremony_color": {
-                return "YELLOW";
-            }
-        }
-
-        // Player-specific
         if(player == null) return "§4§lnull";
         RocPlayer rocPlayer = game.toPlayer(player);
         if(rocPlayer == null) {
@@ -65,15 +34,48 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
     }
 
     private @Nullable String getRequest(RocPlayer player, String param) {
+        if(param.toLowerCase().startsWith("ranking")) {
+            return handleRanking(player, param);
+        }
+        if(param.toLowerCase().startsWith("i18n")) {
+            return handleI18n(player, param);
+        }
+
         return switch (param.toLowerCase()) {
+            // Configuration
+            case "game_status" -> player.i18n("tab.game-state." + game.getState());
+            case "map" -> config() == null ? NONE : config().getName();
+            case "map_author" -> config() == null ? NONE : config().getAuthor();
+            case "online" -> String.valueOf(game.getPlayersCount());
+            case "is_playing" -> game.isPlaying() ? "1" : "0";
+
+            // Ceremony
+            case "is_ceremony" -> (game.isPlaying() && game.getCeremony() != null) ? "1" : "0";
+            case "ceremony_text" -> {
+                Ceremony ceremony = game.getCeremony();
+                if(ceremony == null) yield "§cNo ceremony.";
+                yield player.i18n("tab.bars.ceremony", ceremony.getPlayerName());
+            }
+            case "ceremony_ratio" -> {
+                Ceremony ceremony = game.getCeremony();
+                if(ceremony == null) yield "0";
+                yield String.valueOf(ceremony.getRatio() * 100);
+            }
+            case "ceremony_color" ->  {
+                Ceremony ceremony = game.getCeremony();
+                yield ceremony == null ? "RED" : ceremony.getColor();
+            }
+
             // properties
             case "title" -> ""; //TODO titles ! :)
             case "score" -> String.valueOf(player.getScore());
             case "is_king" -> player.isKing() ? "1" : "0";
-            case "king" -> player.isKing() ? player.i18n("tab.king.you") : game.hasKing() ? game.getKing().getName() : player.i18n("tab.king.none");
+            case "king" -> player.isKing() ? player.i18n("tab.player.you") : game.hasKing() ? game.getKing().getName() : player.i18n("tab.player.none");
+
             // prefix
             case "prefix_tag" -> player.isKing() ? player.i18n("tab.prefix.king.tag") : player.i18n("tab.prefix.player.tag");
             case "prefix_tab" -> player.isKing() ? player.i18n("tab.prefix.king.tab") : player.i18n("tab.prefix.player.tab");
+
             default -> {
                 ReignOfCubes2.error("[PlaceHolder] Invalid param for ROC: '" + param + "'.");
                 yield null;
@@ -81,10 +83,38 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
         };
     }
 
-    private String languageOfPlayer(Player p) {
-        RocPlayer player = game.toPlayer(p);
-        return player == null ? Messages.getDefaultLanguage() : player.getLanguage();
+    private String handleI18n(RocPlayer player, String param) {
+        String[] tokens = param.split(":", 2);
+        if(tokens.length < 2) return "§4bad_i18n";
+        return player.i18n(tokens[1]);
     }
+
+    private String handleRanking(RocPlayer player, String param) {
+        if(!game.isPlaying()) {
+            return "§4not_started";
+        }
+        String[] tokens = param.split(":", 2);
+        if(tokens.length < 2) return "§4bad_rank";
+        int index;
+        try {
+            index = Integer.parseInt(tokens[1]);
+        } catch(NumberFormatException ignored) {
+            return "§4bad_rank_number";
+        }
+        Optional<RocPlayer> ranking = game.getRanking().getRank(index);
+        if(ranking.isEmpty()) {
+            return "";
+        }
+        RocPlayer ranker = ranking.get();
+        String rankerName = ranker.getName();
+        if(ranker.equals(player)) {
+            rankerName = player.i18n("tab.player.you");
+        } else if(ranker.isKing()) {
+            rankerName = "&6" + rankerName;
+        }
+        return player.i18n("tab.ranking.entry", (index+1), rankerName, ranker.getScore());
+    }
+
 
     @Override
     public @NotNull String getIdentifier() {

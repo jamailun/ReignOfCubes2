@@ -9,6 +9,7 @@ import fr.jamailun.reignofcubes2.players.PlayersManager;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import fr.jamailun.reignofcubes2.players.ScoreAddReason;
 import fr.jamailun.reignofcubes2.players.ScoreRemoveReason;
+import fr.jamailun.reignofcubes2.utils.Ranking;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -28,6 +29,9 @@ public class GameManager {
     private World world;
     @Getter private RocPlayer king;
     @Getter private Throne throne;
+
+    // Score
+    @Getter private final Ranking<RocPlayer> ranking = new Ranking<>(RocPlayer::getScore);
     private BukkitTask scoreTimer;
 
     GameManager() {
@@ -47,6 +51,7 @@ public class GameManager {
                 throne = null;
             }
             world = null;
+            ranking.clear();
             state = GameState.NOT_CONFIGURED;
             return true;
         }
@@ -82,6 +87,11 @@ public class GameManager {
         } else {
             players.broadcast("event.left", p.getName());
         }
+
+        // If he leaves the server, remove it from the throne !
+        if(throne != null) {
+            throne.leaves(player);
+        }
     }
 
     private void testShouldStartGame() {
@@ -105,6 +115,7 @@ public class GameManager {
                 broadcast("event.death.alone", victim.getName());
             }
             victim.removeScore(getRules().getScoreDeathPenalty(), ScoreRemoveReason.DEATH_PENALTY);
+            ranking.update(victim);
             return;
         }
 
@@ -131,6 +142,7 @@ public class GameManager {
 
         killer.sendMessage("score.base.bilan", killer.getScore());
         victim.sendMessage("score.base.bilan", victim.getScore());
+        ranking.update(victim, killer);
     }
 
     private void setKing(RocPlayer player) {
@@ -155,6 +167,7 @@ public class GameManager {
 
         // Add score
         king.addScore(getRules().getScoreKingBonus(), ScoreAddReason.KING_FLAT_BONUS);
+        ranking.update(king);
     }
 
     public boolean isInWorld(World w) {
@@ -196,12 +209,14 @@ public class GameManager {
         assert worldConfiguration != null && worldConfiguration.isValid();
         // 1) tp players to a spawn-point.
         players.start(worldConfiguration.generateSpawns());
+        players.updateRanking(ranking);
         // 2) set state
         state = GameState.PLAYING;
         // 3) Start score timer
         scoreTimer = ReignOfCubes2.runTaskTimer(() -> {
             if(hasKing()) {
                 king.addScore(getRules().getScoreKingPerSecond(), ScoreAddReason.KING_EVERY_SECOND);
+                ranking.update(king);
             }
         }, 1);
 
@@ -217,6 +232,8 @@ public class GameManager {
 
         scoreTimer.cancel();
         scoreTimer = null;
+        players.clearOfflines();
+        ranking.clear();
 
         Bukkit.broadcastMessage("§4§l > game stopped.");
         if(king != null) {

@@ -67,7 +67,7 @@ public class RocPlayer {
     }
 
     public boolean isValid() {
-        return player.isValid() && ! player.isDead();
+        return player.isValid() && ! player.isDead() && player.isOnline();
     }
 
     public void reset() {
@@ -80,4 +80,13 @@ public class RocPlayer {
         player.setSaturation(100);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == null) return false;
+        if(obj == this) return true;
+        if(obj instanceof RocPlayer rp) {
+            return rp.getUUID().equals(getUUID());
+        }
+        return false;
+    }
 }
