@@ -9,18 +9,28 @@ messages:
       prefix.spec.tab: "&7&o"
       prefix.spec.tag: "&7&o"
   fr:
+    score:
+      base:
+        gain: "<light_purple>| Score: <green>+ {0}<gray> : <i>{1}."
+        loose: "<light_purple>| Score: <dark_red>- {0}<gray> : <i>{1}."
+        bilan: "<light_purple>| Nouveau score: <yellow>{0}<light_purple>."
+      king-bonus: "Bonus de couronnement"
+      kill-steal: "Vol de points"
+      kill-bonus: "Bonus de kill"
+      death-penalty: "Pénalité de mort"
+      buy-kit: "Achat de kit"
     game:
       start: "<green>[<b>><!b>] <gold>La partie commence !"
       end: "<dark_gray>[<b>><!b>] <red>Fin de la partie."
     event:
       joined: "<yellow><b>[<green>+<yellow>] <gold>{0}<white> a rejoint la partie."
-      joined-direct: "Bienvenue dans RoC."
       left: "<yellow><b>[<red>-<yellow>] <gold>{0}<white> a quitté la partie."
-      left-king: "Le roi {0} est parti."
+      joined-direct: "Bienvenue dans RoC."
+      left-king: "<gray><b>[<dark_red>👑<gray>]<!b> <yellow>Le joueur Le roi <gold>{0}<yellow> est parti. <b>La couronne est à prendre !"
       death:
         killed: "<gray>[<red>☠<gray>] <white> Le joueur <yellow>{1}<white> a tué <gray>{0}<white>."
         killed-as-king: "<gray>[<red>☠<gray>] <white> Le Roi <gold>{1}<white> a tué <gray>{0}<white>."
-        killed-king: "<gray><b>[<red>☠<gold>👑<gray>]<!b> <yellow>Le joueur <dark_green>{1}<yellow> a tué le Roi <dark_red>{0}<yellow>. <b>Il lui vole sa couronne."
+        killed-king: "<gray><b>[<dark_red>👑<gray>]<!b> <yellow>Le joueur <dark_green>{1}<yellow> a tué le Roi <dark_red>{0}<yellow>. <b>Il lui vole sa couronne."
         alone: "<gray>[<red>☠<gray>] <white>Le joueur <gray>{0}<white> est mort, seul."
       king:
         death: "<gray>[<red>☠<gray>] <white>Le Roi <gold>{0}<white> est mort, seul."

@@ -13,6 +13,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class RocPlaceholderExpansion extends PlaceholderExpansion {
 
+    private final static String NONE = "§7none";
+
     private final GameManager game;
 
     public RocPlaceholderExpansion(GameManager game) {
@@ -27,15 +29,15 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
                 return Messages.format(languageOfPlayer(player), "tab.game-state." + game.getState());
             }
             case "map": {
-                return config() == null ? "§7none" : config().getName();
+                return config() == null ? NONE : config().getName();
             }
             case "map_author": {
-                return config() == null ? "§7none" : config().getAuthor();
+                return config() == null ? NONE : config().getAuthor();
             }
             case "online": {
                 return "" + game.getPlayersCount();
             }
-            case "is_started": return game.isPlaying() ? "1" : "0";
+            case "is_playing": return game.isPlaying() ? "1" : "0";
             case "is_ceremony": return game.isPlaying() && game.getCeremony() != null ? "1" : "0";
             case "ceremony_text": {
                 Ceremony ceremony = game.getCeremony();

@@ -39,7 +39,8 @@ public class RocCommand implements CommandExecutor, TabCompleter {
     private final static List<String> args_2_edit = List.of(
             "players.min", "players.max",
             "throne.pos_a", "throne.pos_b", "throne.pos",
-            "crowning-duration",
+            "crowning-duration", "crowning-duration.steal",
+            "spawn.safe-distance",
             "scoring.goal", "scoring.king.bonus", "scoring.king.per-second",
             "scoring.kill.flat", "scoring.kill.steal", "scoring.death-penalty"
     );
@@ -209,6 +210,8 @@ public class RocCommand implements CommandExecutor, TabCompleter {
                     case "players.min" -> setInt(sender, value, rules::setPlayerCountMin, success);
                     case "players.max" -> setInt(sender, value, rules::setPlayerCountMax, success);
                     case "crowning-duration" -> setDouble(sender, value, rules::setCrownDuration, success);
+                    case "crowning-duration.steal" -> setDouble(sender, value, rules::setCrownDurationSteal, success);
+                    case "spawn.safe-distance" -> setDouble(sender, value, rules::setSpawnSafeDistance, success);
                     case "scoring.goal" -> setInt(sender, value, rules::setScoreGoal, success);
                     case "scoring.king.bonus" -> setInt(sender, value, rules::setScoreKingBonus, success);
                     case "scoring.king.per-second" -> setInt(sender, value, rules::setScoreKingPerSecond, success);
@@ -341,6 +344,7 @@ public class RocCommand implements CommandExecutor, TabCompleter {
                         || args[1].equalsIgnoreCase("edit.spawns")
                         || args[1].equalsIgnoreCase("set-default")
                         || args[1].equalsIgnoreCase("show")
+                        || args[0].equalsIgnoreCase("enable")
                 ) {
                     return configurationsNames().filter(a -> a.startsWith(args[2].toLowerCase())).toList();
                 }

@@ -27,11 +27,13 @@ public class RocPlayer {
         this.player = player;
     }
 
-    public void addScore(int delta) {
+    public void addScore(int delta, ScoreAddReason reason) {
         if(delta == 0) return;
         assert delta > 0;
 
         score += delta;
+        if(reason.hasMessage())
+            sendMessage("score.base.gain", String.valueOf(delta), reason.toString(language));
     }
 
     public boolean hasScore(int score) {
@@ -39,11 +41,13 @@ public class RocPlayer {
         return this.score >= score;
     }
 
-    public void removeScore(int delta) {
+    public void removeScore(int delta, ScoreRemoveReason reason) {
         if(delta == 0) return;
         assert delta > 0;
 
         score = Math.max(0, score - delta);
+        if(reason.hasMessage())
+            sendMessage("score.base.loose", String.valueOf(delta), reason.toString(language));
     }
 
     public void sendMessage(String entry, Object... args) {

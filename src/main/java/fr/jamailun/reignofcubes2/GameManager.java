@@ -7,6 +7,8 @@ import fr.jamailun.reignofcubes2.objects.Ceremony;
 import fr.jamailun.reignofcubes2.objects.Throne;
 import fr.jamailun.reignofcubes2.players.PlayersManager;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
+import fr.jamailun.reignofcubes2.players.ScoreAddReason;
+import fr.jamailun.reignofcubes2.players.ScoreRemoveReason;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -62,7 +64,7 @@ public class GameManager {
     public void playerJoinsServer(Player p) {
         RocPlayer player = players.join(p);
         broadcast("event.joined", p.getName());
-        player.sendMessage("event.joined-direct");
+        //player.sendMessage("event.joined-direct");
 
         testShouldStartGame();
     }
@@ -102,14 +104,14 @@ public class GameManager {
             } else {
                 broadcast("event.death.alone", victim.getName());
             }
-            victim.removeScore(getRules().getScoreDeathPenalty());
+            victim.removeScore(getRules().getScoreDeathPenalty(), ScoreRemoveReason.DEATH_PENALTY);
             return;
         }
 
         // broadcast + king switch
         if(killer.isKing()) {
             broadcast("event.death.killed-as-king", victim.getName(), killer.getName());
-            //TODO points bonus if king
+            //TODO points bonus if king ?
         } else if(victim.isKing()) {
             broadcast("event.death.killed-king", victim.getName(), killer.getName());
             setKing(killer);
@@ -118,13 +120,17 @@ public class GameManager {
         }
 
         // Points
-        killer.addScore(getRules().getScoreKillFlat());
+        killer.addScore(getRules().getScoreKillFlat(), ScoreAddReason.KILL_FLAT);
+        victim.removeScore(getRules().getScoreDeathPenalty(), ScoreRemoveReason.DEATH_PENALTY);
+
         int stoleVictimScore = (int) (victim.getScore() * getRules().getScoreKillSteal());
         if(stoleVictimScore > 0) {
-            killer.addScore(stoleVictimScore);
-            victim.removeScore(stoleVictimScore);
+            killer.addScore(stoleVictimScore, ScoreAddReason.KILL_STEAL);
+            victim.removeScore(stoleVictimScore, ScoreRemoveReason.KILL_STEAL);
         }
-        victim.removeScore(getRules().getScoreDeathPenalty());
+
+        killer.sendMessage("score.base.bilan", killer.getScore());
+        victim.sendMessage("score.base.bilan", victim.getScore());
     }
 
     private void setKing(RocPlayer player) {
@@ -148,7 +154,7 @@ public class GameManager {
         broadcast("event.king.new", king.getName());
 
         // Add score
-        king.addScore(getRules().getScoreKingBonus());
+        king.addScore(getRules().getScoreKingBonus(), ScoreAddReason.KING_FLAT_BONUS);
     }
 
     public boolean isInWorld(World w) {
@@ -195,7 +201,7 @@ public class GameManager {
         // 3) Start score timer
         scoreTimer = ReignOfCubes2.runTaskTimer(() -> {
             if(hasKing()) {
-                king.addScore(getRules().getScoreKingPerSecond());
+                king.addScore(getRules().getScoreKingPerSecond(), ScoreAddReason.KING_EVERY_SECOND);
             }
         }, 1);
 
