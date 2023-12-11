@@ -1,7 +1,9 @@
 package fr.jamailun.reignofcubes2;
 
 import fr.jamailun.reignofcubes2.commands.RocCommand;
+import fr.jamailun.reignofcubes2.listeners.DisabledActionsListener;
 import fr.jamailun.reignofcubes2.listeners.PlayerConnectionListener;
+import fr.jamailun.reignofcubes2.listeners.PlayerDeathListener;
 import fr.jamailun.reignofcubes2.listeners.PlayerMovementListener;
 import fr.jamailun.reignofcubes2.placeholder.RocPlaceholderExpansion;
 import io.papermc.paper.plugin.configuration.PluginMeta;
@@ -43,6 +45,8 @@ public final class ReignOfCubes2 extends JavaPlugin {
         // Listeners
         new PlayerConnectionListener(this);
         new PlayerMovementListener(this);
+        new PlayerDeathListener(this);
+        new DisabledActionsListener(this);
 
         // Commands
         new RocCommand(this);

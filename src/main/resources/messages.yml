@@ -26,9 +26,9 @@ messages:
       stop: "<yellow>[<light_purple>K<yellow>] <white><b>Le joueur <gray>{0}<white> a échoué son couronnement."
     tab:
       king:
-        you: "<green>toi !"
-        none: "<gray>personne"
+        you: "&a&ltoi"
+        none: "&7personne"
       game-state:
-        NOT_CONFIGURED: "<red>Non configuré"
-        WAITING: "<yellow>En attente"
-        PLAYING: "<green>En cours"
+        NOT_CONFIGURED: "&cNon configuré"
+        WAITING: "&eEn attente"
+        PLAYING: "&aEn cours"

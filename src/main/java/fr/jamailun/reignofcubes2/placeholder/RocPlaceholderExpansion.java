@@ -54,7 +54,7 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
         return switch (param.toLowerCase()) {
             case "score" -> String.valueOf(player.getScore());
             case "is_king" -> player.isKing() ? "1" : "0";
-            case "king" -> player.isKing() ? player.i18n("king.you") : game.hasKing() ? game.getKing().getName() : player.i18n("king.none");
+            case "king" -> player.isKing() ? player.i18n("tab.king.you") : game.hasKing() ? game.getKing().getName() : player.i18n("tab.king.none");
             default -> {
                 ReignOfCubes2.error("[PlaceHolder] Invalid param for ROC: '" + param + "'.");
                 yield null;

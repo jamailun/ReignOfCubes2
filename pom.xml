@@ -70,7 +70,7 @@
             <url>https://maven.enginehub.org/repo/</url>
         </repository>
 
-        <!-- Simple score -->
+        <!-- PlaceHolderAPI -->
         <repository>
             <id>placeholderapi</id>
             <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
@@ -101,7 +101,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- SimpleScore -->
+        <!-- PlaceHolderAPI -->
         <dependency>
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
