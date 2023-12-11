@@ -1,10 +1,7 @@
 package fr.jamailun.reignofcubes2;
 
 import fr.jamailun.reignofcubes2.commands.RocCommand;
-import fr.jamailun.reignofcubes2.listeners.DisabledActionsListener;
-import fr.jamailun.reignofcubes2.listeners.PlayerConnectionListener;
-import fr.jamailun.reignofcubes2.listeners.PlayerDeathListener;
-import fr.jamailun.reignofcubes2.listeners.PlayerMovementListener;
+import fr.jamailun.reignofcubes2.listeners.*;
 import fr.jamailun.reignofcubes2.placeholder.RocPlaceholderExpansion;
 import io.papermc.paper.plugin.configuration.PluginMeta;
 import lombok.Getter;
@@ -47,6 +44,7 @@ public final class ReignOfCubes2 extends JavaPlugin {
         new PlayerMovementListener(this);
         new PlayerDeathListener(this);
         new DisabledActionsListener(this);
+        new PlayerRespawnListener(this);
 
         // Commands
         new RocCommand(this);
@@ -68,6 +66,11 @@ public final class ReignOfCubes2 extends JavaPlugin {
     public static BukkitTask runTaskTimer(Runnable runnable, double periodSeconds) {
         long period = (long)( periodSeconds * 20L );
         return Bukkit.getScheduler().runTaskTimer(INSTANCE, runnable, 0L, period);
+    }
+
+    public static BukkitTask runTaskLater(Runnable runnable, double waitSeconds) {
+        long wait = (long)( waitSeconds * 20L );
+        return Bukkit.getScheduler().runTaskLater(INSTANCE, runnable, wait);
     }
 
     public static File getFile(String name) {

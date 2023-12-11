@@ -27,10 +27,10 @@ public class RocPlayer {
         this.player = player;
     }
 
-    public void gainScore(int delta) {
+    public void addScore(int delta) {
         if(delta == 0) return;
-
         assert delta > 0;
+
         score += delta;
     }
 
@@ -39,10 +39,10 @@ public class RocPlayer {
         return this.score >= score;
     }
 
-    public void spendScore(int delta) {
+    public void removeScore(int delta) {
         if(delta == 0) return;
-
         assert delta > 0;
+
         score = Math.max(0, score - delta);
     }
 
@@ -73,6 +73,7 @@ public class RocPlayer {
         player.getInventory().clear();
         player.setGameMode(GameMode.ADVENTURE);
         player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getDefaultValue());
+        player.setSaturation(100);
     }
 
 }

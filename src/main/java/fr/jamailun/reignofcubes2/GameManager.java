@@ -11,6 +11,7 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,6 +26,7 @@ public class GameManager {
     private World world;
     @Getter private RocPlayer king;
     @Getter private Throne throne;
+    private BukkitTask scoreTimer;
 
     GameManager() {
         loadConfiguration(configurationsList.getDefault());
@@ -92,23 +94,42 @@ public class GameManager {
 
     public void playerDies(@Nonnull RocPlayer victim) {
         RocPlayer killer = victim.getLastDamager();
+
         if(killer == null) {
-            broadcast("event.death.alone", victim.getName());
-            //players.deathPenalty();
+            if(victim.isKing()) {
+                setKing(null);
+                broadcast("event.king.death", victim.getName());
+            } else {
+                broadcast("event.death.alone", victim.getName());
+            }
+            victim.removeScore(getRules().getScoreDeathPenalty());
             return;
         }
-        broadcast("event.death.killed", victim.getName(), killer.getName());
 
-        //TODO death logic
-        // - points
-        // - death of the king
-        // - respawn
+        // broadcast + king switch
+        if(killer.isKing()) {
+            broadcast("event.death.killed-as-king", victim.getName(), killer.getName());
+            //TODO points bonus if king
+        } else if(victim.isKing()) {
+            broadcast("event.death.killed-king", victim.getName(), killer.getName());
+            setKing(killer);
+        } else {
+            broadcast("event.death.killed", victim.getName(), killer.getName());
+        }
+
+        // Points
+        killer.addScore(getRules().getScoreKillFlat());
+        int stoleVictimScore = (int) (victim.getScore() * getRules().getScoreKillSteal());
+        if(stoleVictimScore > 0) {
+            killer.addScore(stoleVictimScore);
+            victim.removeScore(stoleVictimScore);
+        }
+        victim.removeScore(getRules().getScoreDeathPenalty());
     }
 
     private void setKing(RocPlayer player) {
         if(player == null) {
             if(king != null) {
-                ReignOfCubes2.info("King has been set as null.");
                 broadcast("event.king.death", king.getName());
                 king.setKing(false);
                 king = null;
@@ -116,13 +137,18 @@ public class GameManager {
             return;
         }
         // remove king from old king.
-        if(king != null)
+        if(king != null) {
+            assert king != player : "The king wanted to become the king again...";
             king.setKing(false);
+        }
 
         // set new king
         player.setKing(true);
         king = player;
         broadcast("event.king.new", king.getName());
+
+        // Add score
+        king.addScore(getRules().getScoreKingBonus());
     }
 
     public boolean isInWorld(World w) {
@@ -166,9 +192,15 @@ public class GameManager {
         players.start(worldConfiguration.generateSpawns());
         // 2) set state
         state = GameState.PLAYING;
+        // 3) Start score timer
+        scoreTimer = ReignOfCubes2.runTaskTimer(() -> {
+            if(hasKing()) {
+                king.addScore(getRules().getScoreKingPerSecond());
+            }
+        }, 1);
 
         //TODO message
-        Bukkit.broadcastMessage("§6§l > game started.");
+        Bukkit.broadcastMessage("§2§l > game started.");
     }
 
     public void stop() {
@@ -177,14 +209,17 @@ public class GameManager {
             return;
         }
 
-        Bukkit.broadcastMessage("§6§l > game stopped.");
+        scoreTimer.cancel();
+        scoreTimer = null;
+
+        Bukkit.broadcastMessage("§4§l > game stopped.");
         if(king != null) {
             king.setKing(false);
             king = null;
         }
 
         state = GameState.WAITING;
-        //TODO cancel the game.
+        //TODO message, TP players, ...
     }
 
     public void broadcast(String entry, Object... args) {

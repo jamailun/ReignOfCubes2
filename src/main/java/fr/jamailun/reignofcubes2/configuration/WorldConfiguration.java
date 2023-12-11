@@ -171,6 +171,29 @@ public class WorldConfiguration {
         return vector == null ? "§c<unset>§r" : "§a(" + vector.getX() + "," + vector.getY() + "," + vector.getZ() + ")§r";
     }
 
+    public Location getSafeSpawn(boolean trySafe) {
+        // Get spawns, and shuffle
+        List<Location> locations = generateSpawns();
+        Collections.shuffle(locations);
+
+        // Iterate over spawns, check safety
+        if(trySafe) {
+            for(Location spawn : locations) {
+                if(isSafe(spawn)) {
+                    return spawn;
+                }
+            }
+        }
+
+        return locations.get(0);
+    }
+
+    private boolean isSafe(Location location) {
+        World world = Bukkit.getWorld(worldName);
+        assert world != null;
+        return world.getNearbyPlayers(location, 10).isEmpty();
+    }
+
     public final Debugger debug = new Debugger();
 
     public class Debugger {
