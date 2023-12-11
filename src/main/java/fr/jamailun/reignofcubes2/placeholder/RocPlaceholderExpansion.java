@@ -21,10 +21,6 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
     @Override
     public @Nullable String onPlaceholderRequest(Player player, @NotNull String param) {
         // Common:
-        // - game_status
-        // - map
-        // - online
-
         switch (param.toLowerCase()) {
             case "game_status": {
                 return Messages.format(languageOfPlayer(player), "tab.game-state." + game.getState());
@@ -38,6 +34,7 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
             case "online": {
                 return "" + game.getPlayersCount();
             }
+            case "started": return game.isPlaying() ? "1" : "0";
         }
 
         // Player-specific
@@ -52,9 +49,14 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
 
     private @Nullable String getRequest(RocPlayer player, String param) {
         return switch (param.toLowerCase()) {
+            // properties
+            case "title" -> ""; //TODO titles ! :)
             case "score" -> String.valueOf(player.getScore());
             case "is_king" -> player.isKing() ? "1" : "0";
             case "king" -> player.isKing() ? player.i18n("tab.king.you") : game.hasKing() ? game.getKing().getName() : player.i18n("tab.king.none");
+            // prefix
+            case "prefix_tag" -> player.isKing() ? player.i18n("tab.prefix.king.tag") : player.i18n("tab.prefix.player.tag");
+            case "prefix_tab" -> player.isKing() ? player.i18n("tab.prefix.king.tab") : player.i18n("tab.prefix.player.tab");
             default -> {
                 ReignOfCubes2.error("[PlaceHolder] Invalid param for ROC: '" + param + "'.");
                 yield null;
@@ -66,7 +68,6 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
         RocPlayer player = game.toPlayer(p);
         return player == null ? Messages.getDefaultLanguage() : player.getLanguage();
     }
-
 
     @Override
     public @NotNull String getIdentifier() {

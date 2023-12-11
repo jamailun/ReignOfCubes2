@@ -19,6 +19,7 @@ import java.util.Objects;
 public class Messages {
 
     private String defaultLanguage = "fr";
+    private final Map<String, String> shared = new HashMap<>();
     private final Map<String, Map<String, String>> messages = new HashMap<>();
     private final MiniMessage messageFormatter = MiniMessage.builder()
             .tags(TagResolver.builder().resolver(StandardTags.defaults()).build())
@@ -41,7 +42,11 @@ public class Messages {
                     entries.put(key, str);
                 }
             }
-            this.messages.put(lan, entries);
+            if(lan.equalsIgnoreCase("_all")) {
+                this.shared.putAll(entries);
+            } else {
+                this.messages.put(lan, entries);
+            }
         }
     }
 
@@ -95,6 +100,7 @@ public class Messages {
     }
 
     public @Nullable String getEntry(@Nullable String language, String entry) {
+        if(shared.containsKey(entry)) return shared.get(entry);
         if(language == null)
             language = defaultLanguage;
         if(!messages.containsKey(language)) {
@@ -131,6 +137,7 @@ public class Messages {
 
     public static void reload() {
         INSTANCE.messages.clear();
+        INSTANCE.shared.clear();
         INSTANCE.init();
     }
 

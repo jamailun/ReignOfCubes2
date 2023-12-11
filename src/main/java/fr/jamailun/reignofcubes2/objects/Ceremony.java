@@ -24,7 +24,12 @@ public class Ceremony {
         // Start
         task = ReignOfCubes2.runTaskTimer(this::tick, TICK_RATE);
         ReignOfCubes2.info("[CEREMONY] Started.");
-        game.broadcast("ceremony.start", player.getName());
+
+        if(game.hasKing()) {
+            game.broadcast("ceremony.start-steal", player.getName());
+        } else {
+            game.broadcast("ceremony.start", player.getName());
+        }
     }
 
     private void tick() {
@@ -40,7 +45,9 @@ public class Ceremony {
         if(!task.isCancelled()) {
             task.cancel();
             ReignOfCubes2.info("[CEREMONY] Stopped.");
-            game.broadcast("ceremony.stop", player.getName());
+            if( ! player.isKing()) {
+                game.broadcast("ceremony.fail", player.getName());
+            }
         }
     }
 

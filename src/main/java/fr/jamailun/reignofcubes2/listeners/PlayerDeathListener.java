@@ -39,5 +39,6 @@ public class PlayerDeathListener extends RocListener {
             return;
         }
         game().playerDies(victim);
+        event.deathMessage(null);
     }
 }
