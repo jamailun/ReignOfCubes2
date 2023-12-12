@@ -42,7 +42,7 @@ public class RocCommand implements CommandExecutor, TabCompleter {
 
     private final static List<String> args_2_edit = List.of(
             "players.min", "players.max",
-            "throne.pos_a", "throne.pos_b", "throne.pos",
+            "throne.pos_a", "throne.pos_b", "throne.pos", "throne.cooldown",
             "crowning-duration", "crowning-duration.steal",
             "spawn.safe-distance",
             "scoring.goal", "scoring.king.bonus", "scoring.king.per-second",
@@ -216,6 +216,7 @@ public class RocCommand implements CommandExecutor, TabCompleter {
                     case "crowning-duration" -> setDouble(sender, value, rules::setCrownDuration, success);
                     case "crowning-duration.steal" -> setDouble(sender, value, rules::setCrownDurationSteal, success);
                     case "spawn.safe-distance" -> setDouble(sender, value, rules::setSpawnSafeDistance, success);
+                    case "throne.cooldown" -> setDouble(sender, value, rules::setThroneCooldown, success);
                     case "scoring.goal" -> setInt(sender, value, rules::setScoreGoal, success);
                     case "scoring.king.bonus" -> setInt(sender, value, rules::setScoreKingBonus, success);
                     case "scoring.king.per-second" -> setInt(sender, value, rules::setScoreKingPerSecond, success);
@@ -291,7 +292,7 @@ public class RocCommand implements CommandExecutor, TabCompleter {
                     return error(sender, "The game already started !");
                 }
                 info(sender, "Starting game.");
-                game().broadcast("game.cancelled", sender.getName());
+                game().broadcast("game.start-force", sender.getName());
                 game().start();
                 return true;
             }
@@ -515,7 +516,7 @@ public class RocCommand implements CommandExecutor, TabCompleter {
         return configs().list().stream().map(WorldConfiguration::getName);
     }
     private Stream<String> playersNames() {
-        return game().playersList().stream().map(RocPlayer::getName);
+        return game().players().map(RocPlayer::getName);
     }
 
     private String niceVector(Vector vector) {

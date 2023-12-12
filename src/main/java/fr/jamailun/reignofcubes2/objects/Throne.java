@@ -1,6 +1,7 @@
 package fr.jamailun.reignofcubes2.objects;
 
 import fr.jamailun.reignofcubes2.GameManager;
+import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import fr.jamailun.reignofcubes2.utils.MinMax;
 import lombok.Getter;
@@ -94,9 +95,32 @@ public class Throne {
         ceremony = null;
     }
 
-    public void reset() {
-        if(ceremony != null)
+    public void resetCeremony() {
+        if(ceremony != null) {
             stopCeremony();
+            ceremony = null;
+        }
+    }
+
+    // COOLDOWNS
+
+    private final Set<UUID> playersCooldowns = new HashSet<>();
+    private final Object pcKey = new Object();
+    public boolean isCooldownOk(UUID uuid) {
+        if(playersCooldowns.contains(uuid)) {
+            return false;
+        }
+        // Add it now
+        synchronized (pcKey) {
+            playersCooldowns.add(uuid);
+        }
+        // Remove it later
+        ReignOfCubes2.runTaskLater(() -> {
+            synchronized (pcKey) {
+                playersCooldowns.remove(uuid);
+            }
+        }, game.getRules().getThroneCooldown());
+        return true;
     }
 
 }

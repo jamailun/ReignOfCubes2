@@ -19,16 +19,11 @@ import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class GameManager {
-
-    //TODO:
-    // - début de partie avec assez de joueurs.
-    // - fin de partie avec score.
-    // - fin de partie avec plus que 1 ou moins joueurs.
 
     private final PlayersManager players = new PlayersManager(this);
 
@@ -46,6 +41,9 @@ public class GameManager {
     // Countdown
     @Getter private GameCountdown countdown;
 
+    // is over with a victory ?
+    private boolean isVictory;
+
     GameManager() {
         loadConfiguration(configurationsList.getDefault());
     }
@@ -59,7 +57,7 @@ public class GameManager {
             ReignOfCubes2.warning("Setting GameManager configuration as null.");
             worldConfiguration = null;
             if(throne != null) {
-                throne.reset();
+                throne.resetCeremony();
                 throne = null;
             }
             world = null;
@@ -103,6 +101,20 @@ public class GameManager {
         // If he leaves the server, remove it from the throne !
         if(throne != null) {
             throne.leaves(player);
+        }
+
+        int remainingPlayers = getOnlinePlayersCount();
+        if(isPlaying() && remainingPlayers <= 1) {
+            if(remainingPlayers == 0) {
+                ReignOfCubes2.info("No players remaining. Stopping game.");
+                stop();
+            } else {
+                RocPlayer alone = players()
+                        .filter(rp -> rp.getPlayer().isOnline())
+                        .findFirst().orElseThrow();
+                alone.sendMessage("game.alone");
+                victory(alone);
+            }
         }
     }
 
@@ -211,21 +223,16 @@ public class GameManager {
 
     public void ceremonyIsOver(RocPlayer player) {
         assert king == null : "How can a ceremony be ver if there is already a king ?";
+        // GG message
         player.sendMessage("throne.end-ceremony");
+        // set king
         setKing(player);
+        // remove ceremony stuff
+        throne.resetCeremony();
     }
 
     public GameRules getRules() {
         return worldConfiguration.getRules();
-    }
-
-    private void testShouldStart() {
-        if(state != GameState.WAITING)
-            return;
-
-        if(players.size() >= getRules().getPlayerCountMin()) {
-            startCountdown();
-        }
     }
 
     public void startCountdown() {
@@ -258,6 +265,7 @@ public class GameManager {
         assert state != GameState.NOT_CONFIGURED && state != GameState.PLAYING;
         assert worldConfiguration != null && worldConfiguration.isValid();
         state = GameState.PLAYING;
+        isVictory = false;
 
         // Remove countdown
         if(countdown != null) {
@@ -286,6 +294,10 @@ public class GameManager {
             return;
         }
 
+        if( ! isVictory) {
+            broadcast("game.end");
+        }
+
         // Reset players, score, king and state.
         scoreTimer.cancel();
         scoreTimer = null;
@@ -295,13 +307,13 @@ public class GameManager {
             king.setKing(false);
             king = null;
         }
-        throne.reset();
+        throne.resetCeremony();
         throne = null;
         state = GameState.WAITING;
+        isVictory = false;
 
         // Message and go back to spawn
         //TODO message, TP players, ...
-        broadcast("game.end");
     }
 
     public void broadcast(String entry, Object... args) {
@@ -327,24 +339,35 @@ public class GameManager {
     }
 
     private void victory(RocPlayer player) {
-        //TODO !
+        broadcast("game.end-victory", player.getName(), player.getScore());
 
-        // Cancel timer
-        throne.reset();
+        // Cancel stuff
+        throne.resetCeremony();
         scoreTimer.cancel();
+
+        // set victory
+        isVictory = true;
+
+        // In X seconds, stop and restart
+        ReignOfCubes2.runTaskLater(this::stop, 7);
     }
 
-    public List<RocPlayer> playersList() {
-        return StreamSupport.stream(players.spliterator(), false).toList();
+    public Stream<RocPlayer> players() {
+        return StreamSupport.stream(players.spliterator(), false);
     }
 
     public Optional<RocPlayer> findPlayer(String playerName) {
-        return StreamSupport.stream(players.spliterator(), false)
+        return players()
                 .filter(p -> p.getName().equalsIgnoreCase(playerName))
                 .findFirst();
     }
 
     public final Cheat cheat = new Cheat();
+
+    public int getOnlinePlayersCount() {
+        return (int) players().filter(p -> p.getPlayer().isOnline()).count();
+    }
+
     public class Cheat {
         public void forceKing(@Nullable RocPlayer player) {
             if(player == null) {
@@ -364,6 +387,7 @@ public class GameManager {
             } else {
                 player.addScore(score - currentScore, ScoreAddReason.ADMINISTRATOR);
             }
+            ranking.update(player);
         }
     }
 }

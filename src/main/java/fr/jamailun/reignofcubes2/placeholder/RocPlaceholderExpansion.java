@@ -47,7 +47,7 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
             case "game_status" -> player.i18n("tab.game-state." + game.getState());
             case "map" -> config() == null ? NONE : config().getName();
             case "map_author" -> config() == null ? NONE : config().getAuthor();
-            case "online" -> String.valueOf(game.getPlayersCount());
+            case "online" -> String.valueOf(game.getOnlinePlayersCount());
             case "is_playing" -> bool(game.isPlaying());
             case "is_countdown" -> bool(game.isCountdown());
 
@@ -76,10 +76,13 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
             }
 
             // properties
-            case "title" -> ""; //TODO titles ! :)
+            //TODO more titles !!
+            case "title" -> getRank(player) == 1 ? "&d&l[Top 1]" : "";
             case "score" -> String.valueOf(player.getScore());
             case "is_king" -> player.isKing() ? "1" : "0";
             case "king" -> player.isKing() ? player.i18n("tab.player.you") : game.hasKing() ? game.getKing().getName() : player.i18n("tab.player.none");
+            case "king_color" -> player.isKing() ? "GREEN" : "BLUE";
+            case "rank" -> String.valueOf(getRank(player));
 
             // prefix
             case "prefix_tag" -> player.isKing() ? player.i18n("tab.prefix.king.tag") : player.i18n("tab.prefix.player.tag");
@@ -110,7 +113,7 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
         } catch(NumberFormatException ignored) {
             return "§4bad_rank_number";
         }
-        Optional<RocPlayer> ranking = game.getRanking().getRank(index);
+        Optional<RocPlayer> ranking = game.getRanking().getElementAtRank(index);
         if(ranking.isEmpty()) {
             return "";
         }
@@ -122,6 +125,12 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
             rankerName = "&6" + rankerName;
         }
         return player.i18n("tab.ranking.entry", (index+1), rankerName, ranker.getScore());
+    }
+
+    private int getRank(RocPlayer player) {
+        if(!game.isPlaying() || player.getScore() == 0)
+            return -1;
+        return game.getRanking().getRankOf(player).orElse(-1) + 1;
     }
 
 

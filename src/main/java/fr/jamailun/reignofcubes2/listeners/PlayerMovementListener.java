@@ -33,7 +33,7 @@ public class PlayerMovementListener extends RocListener {
 
         // Is now inside ?
         else {
-            if(inside)
+            if(inside && throne.isCooldownOk(player.getUUID()))
                 throne.enters(player);
         }
 

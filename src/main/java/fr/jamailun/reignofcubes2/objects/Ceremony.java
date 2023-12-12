@@ -16,6 +16,7 @@ public class Ceremony {
     private final static double TICK_RATE = 0.5d;
     private final double duration;
     private double elapsed = 0;
+    private boolean success = false;
 
     public Ceremony(GameManager game, RocPlayer player) {
         this.game = game;
@@ -36,8 +37,8 @@ public class Ceremony {
         elapsed += TICK_RATE;
         ReignOfCubes2.info("[CEREMONY] " + elapsed + "/" + duration);
         if(elapsed >= duration) {
+            success = true;
             game.ceremonyIsOver(player);
-            stop();
         }
     }
 
@@ -45,7 +46,7 @@ public class Ceremony {
         if(!task.isCancelled()) {
             task.cancel();
             ReignOfCubes2.info("[CEREMONY] Stopped.");
-            if( ! player.isKing()) {
+            if( ! success) {
                 game.broadcast("ceremony.fail", player.getName());
             }
         }

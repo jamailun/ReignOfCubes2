@@ -54,10 +54,18 @@ public class Ranking<T> {
         ranking.clear();
     }
 
-    public Optional<T> getRank(int index) {
+    public Optional<T> getElementAtRank(int index) {
         if(index < 0 || index >= size())
             return Optional.empty();
         return Optional.of(ranking.get(index).element);
+    }
+
+    public Optional<Integer> getRankOf(T elem) {
+        for(int i = 0; i < ranking.size(); i++) {
+            if(ranking.get(i).element.equals(elem))
+                return Optional.of(i);
+        }
+        return Optional.empty();
     }
 
     private Optional<Entry> find(T element) {

@@ -20,6 +20,7 @@ public class GameRules {
     private double crownDurationSteal = -1;
 
     private double spawnSafeDistance = -1;
+    private double throneCooldown = -1;
 
     private int scoreGoal = -1;
     private int scoreKingPerSecond = -1;
@@ -48,6 +49,7 @@ public class GameRules {
 
         // other
         rules.spawnSafeDistance = config.getDouble("spawn-safe-distance", DEFAULT);
+        rules.throneCooldown = config.getDouble("throne-cooldown", DEFAULT);
 
         // scoring
         ConfigurationSection scoring = config.getConfigurationSection("scoring");
@@ -72,6 +74,7 @@ public class GameRules {
         config.set("crown-duration-steal", crownDurationSteal);
 
         config.set("spawn-safe-distance", spawnSafeDistance);
+        config.set("throne-cooldown", throneCooldown);
 
         ConfigurationSection scoring = config.createSection("scoring");
         scoring.set("goal", scoreGoal);
@@ -85,7 +88,7 @@ public class GameRules {
     public boolean isValid() {
         return (playerCountMin > 0 && playerCountMax > playerCountMin)
                 && (crownDuration > 0 && crownDurationSteal > 0)
-                && (spawnSafeDistance >= 0)
+                && (spawnSafeDistance >= 0 && throneCooldown >= 0)
                 && (
                     scoreGoal > 0 && scoreKingPerSecond >= 0 && scoreKingBonus >= 0 &&
                     scoreKillFlat >= 0 && scoreKillSteal >= 0 && scoreDeathPenalty >= 0
@@ -100,7 +103,9 @@ public class GameRules {
         // crown
         rules.crownDuration = 25;
         rules.crownDurationSteal = 60;
+        // Others
         rules.spawnSafeDistance = 12;
+        rules.throneCooldown = 1.5;
         // score
         rules.scoreGoal = 1000;
         rules.scoreKingBonus = 50;
@@ -116,6 +121,7 @@ public class GameRules {
                 + prefix + "§7players = " + niceInt(playerCountMin) + " -> " + niceInt(playerCountMax)
                 + prefix + "§7crown-duration = " + niceDouble(crownDuration) + "§7, when stealing: " + niceDouble(crownDurationSteal)
                 + prefix + "§7spawn.safe-distance = " + niceDouble(spawnSafeDistance)
+                + prefix + "§7spawn.throne-cooldown = " + niceDouble(throneCooldown)
                 + prefix + "§7scoring.goal = " + niceInt(scoreGoal)
                 + prefix + "§7scoring.king = +" + niceInt(scoreKingBonus) + "§7, per-second: " + niceInt(scoreKingPerSecond)
                 + prefix + "§7scoring.kill = +" + niceInt(scoreKillFlat) + "§7, and steal: " + niceDouble(scoreKillSteal)
