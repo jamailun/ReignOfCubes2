@@ -4,6 +4,7 @@ import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
 import fr.jamailun.reignofcubes2.objects.Ceremony;
+import fr.jamailun.reignofcubes2.objects.GameCountdown;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
@@ -47,10 +48,18 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
             case "map" -> config() == null ? NONE : config().getName();
             case "map_author" -> config() == null ? NONE : config().getAuthor();
             case "online" -> String.valueOf(game.getPlayersCount());
-            case "is_playing" -> game.isPlaying() ? "1" : "0";
+            case "is_playing" -> bool(game.isPlaying());
+            case "is_countdown" -> bool(game.isCountdown());
+
+            // Countdown
+            case "countdown" -> {
+                GameCountdown countdown = game.getCountdown();
+                if(countdown == null) yield "§cNo countdown.";
+                yield String.valueOf(countdown.getRemaining());
+            }
 
             // Ceremony
-            case "is_ceremony" -> (game.isPlaying() && game.getCeremony() != null) ? "1" : "0";
+            case "is_ceremony" -> bool(game.isPlaying() && game.getCeremony() != null);
             case "ceremony_text" -> {
                 Ceremony ceremony = game.getCeremony();
                 if(ceremony == null) yield "§cNo ceremony.";
@@ -133,5 +142,9 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
 
     private WorldConfiguration config() {
         return game.getWorldConfiguration();
+    }
+
+    private String bool(boolean bool) {
+        return bool ? "1" : "0";
     }
 }

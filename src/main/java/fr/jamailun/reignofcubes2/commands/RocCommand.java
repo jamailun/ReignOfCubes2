@@ -32,6 +32,7 @@ public class RocCommand implements CommandExecutor, TabCompleter {
     private final static Vector MODIFIER_B = new Vector(1, 1, 1);
 
     private final static List<String> args_0 = List.of("config", "start", "stop", "help", "reload", "show");
+    private final static List<String> args_1_start = List.of("game", "countdown");
     private final static List<String> args_1_reload = List.of("messages");
     private final static List<String> args_1_config = List.of("enable", "set-default", "list", "create", "delete", "edit", "edit.spawns", "show");
     private final static List<String> args_list = List.of("add", "remove", "list");
@@ -276,22 +277,46 @@ public class RocCommand implements CommandExecutor, TabCompleter {
         }
 
         if(arg.equalsIgnoreCase("start")) {
-            if(game().getState() == GameState.NOT_CONFIGURED) {
+            if(game().getState() == GameState.NOT_CONFIGURED)
                 return error(sender, "The game state must be configured first.");
+            if(args.length < 1) return missingArgument(sender, args_1_start);
+
+            // Start game
+            if(args[0].equalsIgnoreCase("game")) {
+                if(game().getState() == GameState.PLAYING) {
+                    return error(sender, "The game already started !");
+                }
+                info(sender, "Starting game.");
+                game().start();
+                return true;
             }
-            if(game().isPlaying()) {
-                return error(sender, "The game already started.");
+
+            // Start countdown
+            if(args[0].equalsIgnoreCase("countdown")) {
+                if(game().getState() == GameState.COUNT_DOWN)
+                    return error(sender, "The count-down already started !");
+                if(game().getState() == GameState.PLAYING)
+                    return error(sender, "The game already started !");
+                info(sender, "Starting count-down.");
+                game().startCountdown();
+                return true;
             }
-            game().start();
-            return info(sender, "Command executed.");
+
+            return unexpectedArgument(sender, args[0], args_1_start);
         }
 
         if(arg.equalsIgnoreCase("stop")) {
-            if(!game().isPlaying()) {
-                return error(sender, "Cannot stop a non-stopped game.");
+            if(game().isPlaying()) {
+                info(sender, "Stopping game.");
+                game().stop();
+                return true;
             }
-            game().stop();
-            return info(sender, "Command executed.");
+            if(game().isCountdown()) {
+                info(sender, "Stopping countdown.");
+                game().stopCountdown();
+                return true;
+            }
+            return error(sender, "Cannot stop a game in state §4"+game().getState()+"§c.");
         }
 
         if(arg.equalsIgnoreCase("reload")) {
@@ -300,7 +325,7 @@ public class RocCommand implements CommandExecutor, TabCompleter {
 
             if(arg.equalsIgnoreCase("messages")) {
                 Messages.reload();
-                return info(sender, "Messages configuration reloaded.");
+                return success(sender, "Messages configuration reloaded.");
             }
 
             return unexpectedArgument(sender, arg, args_1_reload);
@@ -315,7 +340,7 @@ public class RocCommand implements CommandExecutor, TabCompleter {
                 return error(sender, "Unknown configuration: " + name);
             WorldConfiguration config = configs().get(name);
             boolean result = config.debug.toggle((Player)sender);
-            return info(sender, "Debug has been toggled (" + result + ").");
+            return info(sender, "Debug showing has been toggled (" + result + ").");
         }
 
 
@@ -328,14 +353,18 @@ public class RocCommand implements CommandExecutor, TabCompleter {
             return args_0.stream().filter(a -> a.startsWith(args[0].toLowerCase())).toList();
         }
         else if(args.length == 2) {
+            String arg1 = args[1].toLowerCase();
             if(args[0].equalsIgnoreCase("config")) {
-                return args_1_config.stream().filter(a -> a.startsWith(args[1].toLowerCase())).toList();
+                return args_1_config.stream().filter(a -> a.startsWith(arg1)).toList();
             }
             else if(args[0].equalsIgnoreCase("reload")) {
-                return args_1_reload.stream().filter(a -> a.startsWith(args[1].toLowerCase())).toList();
+                return args_1_reload.stream().filter(a -> a.startsWith(arg1)).toList();
+            }
+            else if(args[0].equalsIgnoreCase("start")) {
+                return args_1_start.stream().filter(a -> a.startsWith(arg1)).toList();
             }
             else if(args[0].equalsIgnoreCase("show")) {
-                return configurationsNames().filter(a -> a.startsWith(args[1].toLowerCase())).toList();
+                return configurationsNames().filter(a -> a.startsWith(arg1)).toList();
             }
         }
         else if(args.length == 3) {
@@ -351,12 +380,13 @@ public class RocCommand implements CommandExecutor, TabCompleter {
             }
         }
         else if(args.length == 4) {
+            String arg3 = args[3].toLowerCase();
             if(args[0].equalsIgnoreCase("config")) {
                 if(args[1].equalsIgnoreCase("edit")) {
-                    return args_2_edit.stream().filter(a -> a.startsWith(args[3].toLowerCase())).toList();
+                    return args_2_edit.stream().filter(a -> a.startsWith(arg3)).toList();
                 }
                 else if(args[1].equalsIgnoreCase("edit.spawns")) {
-                    return args_list.stream().filter(a -> a.startsWith(args[3].toLowerCase())).toList();
+                    return args_list.stream().filter(a -> a.startsWith(arg3)).toList();
                 }
             }
         }
@@ -369,23 +399,25 @@ public class RocCommand implements CommandExecutor, TabCompleter {
     }
 
     private boolean unexpectedArgument(CommandSender sender, String arg, List<String> allowed) {
-        sender.sendMessage("§c invalid arg '" + arg + "'. Expected : " + Arrays.toString(allowed.toArray()));
-
-        return true;
+        return error(sender, "§c invalid arg '" + arg + "'. Expected : " + Arrays.toString(allowed.toArray()));
     }
 
     private boolean missingArgument(CommandSender sender, List<String> allowed) {
-        sender.sendMessage("§c argument missing. Expected : " + Arrays.toString(allowed.toArray()));
-        return true;
+        return error(sender, "§c argument missing. Expected : " + Arrays.toString(allowed.toArray()));
     }
 
     private boolean error(CommandSender sender, String message) {
-        sender.sendMessage("§c" + message);
+        sender.sendMessage("§4[§cERROR§4]§c " + message);
         return true;
     }
 
     private boolean info(CommandSender sender, String message) {
-        sender.sendMessage("§a" + message);
+        sender.sendMessage("§3[§fINFO§3]§7 " + message);
+        return true;
+    }
+
+    private boolean success(CommandSender sender, String message) {
+        sender.sendMessage("§2[§aSUCCESS§2]§f " + message);
         return true;
     }
 

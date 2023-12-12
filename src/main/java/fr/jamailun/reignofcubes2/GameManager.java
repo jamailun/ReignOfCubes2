@@ -4,6 +4,7 @@ import fr.jamailun.reignofcubes2.configuration.ConfigurationsList;
 import fr.jamailun.reignofcubes2.configuration.GameRules;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
 import fr.jamailun.reignofcubes2.objects.Ceremony;
+import fr.jamailun.reignofcubes2.objects.GameCountdown;
 import fr.jamailun.reignofcubes2.objects.Throne;
 import fr.jamailun.reignofcubes2.players.PlayersManager;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
@@ -21,7 +22,12 @@ import javax.annotation.Nullable;
 
 public class GameManager {
 
-    private final PlayersManager players = new PlayersManager();
+    //TODO:
+    // - début de partie avec assez de joueurs.
+    // - fin de partie avec score.
+    // - fin de partie avec plus que 1 ou moins joueurs.
+
+    private final PlayersManager players = new PlayersManager(this);
 
     @Getter private GameState state;
     @Getter private final ConfigurationsList configurationsList = new ConfigurationsList();
@@ -33,6 +39,9 @@ public class GameManager {
     // Score
     @Getter private final Ranking<RocPlayer> ranking = new Ranking<>(RocPlayer::getScore);
     private BukkitTask scoreTimer;
+
+    // Countdown
+    @Getter private GameCountdown countdown;
 
     GameManager() {
         loadConfiguration(configurationsList.getDefault());
@@ -68,13 +77,13 @@ public class GameManager {
 
     public void playerJoinsServer(Player p) {
         RocPlayer player = players.join(p);
-        broadcast("event.joined", p.getName());
-        //player.sendMessage("event.joined-direct");
+        broadcast("event.joined", player.getName());
 
         testShouldStartGame();
     }
 
     public void playerLeftServer(Player p) {
+        players.maybeLeave(p);
         if(!players.exists(p)) {
             return;
         }
@@ -95,12 +104,12 @@ public class GameManager {
     }
 
     private void testShouldStartGame() {
-        if(isPlaying()) return;
+        if(state != GameState.WAITING) return;
         if(worldConfiguration == null || ! worldConfiguration.isValid()) return;
         int minPlayers = getRules().getPlayerCountMin();
         if(players.size() >= minPlayers) {
             ReignOfCubes2.info("Enough players ! Will start the game now.");
-            start();
+            startCountdown();
         }
     }
 
@@ -179,6 +188,9 @@ public class GameManager {
     public boolean isPlaying() {
         return state == GameState.PLAYING;
     }
+    public boolean isCountdown() {
+        return state == GameState.COUNT_DOWN;
+    }
 
     public @Nullable RocPlayer toPlayer(@Nullable Player p) {
         if(p == null) return null;
@@ -204,15 +216,55 @@ public class GameManager {
         return worldConfiguration.getRules();
     }
 
-    public void start() {
+    private void testShouldStart() {
+        if(state != GameState.WAITING)
+            return;
+
+        if(players.size() >= getRules().getPlayerCountMin()) {
+            startCountdown();
+        }
+    }
+
+    public void startCountdown() {
+        if(isPlaying()) {
+            ReignOfCubes2.warning("Tried to start countdown... Game already started.");
+            return;
+        }
         assert state == GameState.WAITING;
+        state = GameState.COUNT_DOWN;
+        if(countdown != null) countdown.cancel();
+
+        // Start the countdown
+        countdown = new GameCountdown(this);
+    }
+
+    public void stopCountdown() {
+        if(state != GameState.COUNT_DOWN) {
+            ReignOfCubes2.warning("GameManager#stopCountdown() called in state " + state);
+            return;
+        }
+        if(countdown == null) {
+            ReignOfCubes2.warning("GameManager#stopCountdown() has a... null countdown ??");
+            return;
+        }
+        countdown.cancel();
+    }
+
+    public void start() {
+        assert state != GameState.NOT_CONFIGURED && state != GameState.PLAYING;
         assert worldConfiguration != null && worldConfiguration.isValid();
-        // 1) tp players to a spawn-point.
+        state = GameState.PLAYING;
+
+        // Remove countdown
+        if(countdown != null) {
+            countdown.cancel();
+        }
+
+        // TP players to a spawn-point.
         players.start(worldConfiguration.generateSpawns());
         players.updateRanking(ranking);
-        // 2) set state
-        state = GameState.PLAYING;
-        // 3) Start score timer
+
+        // Start score timer
         scoreTimer = ReignOfCubes2.runTaskTimer(() -> {
             if(hasKing()) {
                 king.addScore(getRules().getScoreKingPerSecond(), ScoreAddReason.KING_EVERY_SECOND);
@@ -220,29 +272,30 @@ public class GameManager {
             }
         }, 1);
 
-        //TODO message
-        Bukkit.broadcastMessage("§2§l > game started.");
+        broadcast("game.start");
     }
 
     public void stop() {
-        if(!isPlaying()) {
-            ReignOfCubes2.warning("Tried to stop the game... Was already the case.");
+        // Not playing ? Why are we here ??
+        if(state != GameState.PLAYING) {
+            ReignOfCubes2.warning("Useless GameManager#stop(), because state is " + state);
             return;
         }
 
+        // Reset players, score, king and state.
         scoreTimer.cancel();
         scoreTimer = null;
         players.clearOfflines();
         ranking.clear();
-
-        Bukkit.broadcastMessage("§4§l > game stopped.");
         if(king != null) {
             king.setKing(false);
             king = null;
         }
-
         state = GameState.WAITING;
+
+        // Message and go back to spawn
         //TODO message, TP players, ...
+        broadcast("game.end");
     }
 
     public void broadcast(String entry, Object... args) {

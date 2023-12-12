@@ -1,5 +1,6 @@
 package fr.jamailun.reignofcubes2.players;
 
+import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.utils.Ranking;
 import org.bukkit.Location;
@@ -13,7 +14,12 @@ import java.util.*;
  */
 public class PlayersManager implements Iterable<RocPlayer> {
 
+    private final GameManager game;
     private final Map<UUID, RocPlayer> players = new HashMap<>();
+
+    public PlayersManager(GameManager game) {
+        this.game = game;
+    }
 
     public RocPlayer join(Player player) {
         UUID uuid = player.getUniqueId();
@@ -23,6 +29,13 @@ public class PlayersManager implements Iterable<RocPlayer> {
         RocPlayer rp = new RocPlayer(player);
         players.put(uuid, rp);
         return rp;
+    }
+
+    public void maybeLeave(Player player) {
+        // Only remove when NOT playing !
+        if(game.isPlaying())
+            return;
+        players.remove(player.getUniqueId());
     }
 
     public void clearOfflines() {

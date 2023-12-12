@@ -19,13 +19,17 @@ messages:
       kill-bonus: "Bonus de kill"
       death-penalty: "Pénalité de mort"
       buy-kit: "Achat de kit"
+    countdown:
+      start: "<green>[<b>><!b>] <yellow>Il y a assez de joueurs. Début du compte à rebours."
+      message: "<green>[<b>><!b>] <yellow>La partie commence dans <green>{0}<yellow> seconde{1}."
+      cancelled-force: "<red>[<b>><!b>] <white>Début de partie annulé par <gray>{0}<white>."
+      cancelled-players: "<red>[<b>><!b>] <white>Pas assez de joueurs pour commencer la partie."
     game:
       start: "<green>[<b>><!b>] <gold>La partie commence !"
       end: "<dark_gray>[<b>><!b>] <red>Fin de la partie."
     event:
-      joined: "<yellow><b>[<green>+<yellow>] <gold>{0}<white> a rejoint la partie."
-      left: "<yellow><b>[<red>-<yellow>] <gold>{0}<white> a quitté la partie."
-      joined-direct: "Bienvenue dans RoC."
+      joined: "<yellow>[<green>+<yellow>] <yellow>{0}<white> a rejoint la partie."
+      left: "<yellow>[<red>-<yellow>] <yellow>{0}<white> a quitté la partie."
       left-king: "<gray><b>[<dark_red>👑<gray>]<!b> <yellow>Le joueur Le roi <gold>{0}<yellow> est parti. <b>La couronne est à prendre !"
       death:
         killed: "<gray>[<red>☠<gray>] <white> Le joueur <yellow>{1}<white> a tué <gray>{0}<white>."
@@ -53,6 +57,7 @@ messages:
       game-state:
         NOT_CONFIGURED: "&cNon configuré"
         WAITING: "&eEn attente"
+        COUNT_DOWN: "&bDémarrage"
         PLAYING: "&aEn cours"
       bars:
         ceremony: "&eCouronnement de &a{0}"
