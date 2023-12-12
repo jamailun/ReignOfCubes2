@@ -19,14 +19,18 @@ messages:
       kill-bonus: "Bonus de kill"
       death-penalty: "Pénalité de mort"
       buy-kit: "Achat de kit"
+      administrator: "Décision d'un administrateur"
     countdown:
       start: "<green>[<b>><!b>] <yellow>Il y a assez de joueurs. Début du compte à rebours."
+      start-force: "<green>[<b>><!b>] <yellow>Compte à rebours lancé par <white>{0}<yellow>."
       message: "<green>[<b>><!b>] <yellow>La partie commence dans <green>{0}<yellow> seconde{1}."
       cancelled-force: "<red>[<b>><!b>] <white>Début de partie annulé par <gray>{0}<white>."
       cancelled-players: "<red>[<b>><!b>] <white>Pas assez de joueurs pour commencer la partie."
     game:
       start: "<green>[<b>><!b>] <gold>La partie commence !"
       end: "<dark_gray>[<b>><!b>] <red>Fin de la partie."
+      cancelled: "<dark_gray>[<b>><!b>] <red>Partie annulée par <white>{0}<red>"
+      end-victory: "<dark_green><b>[<gold>VICTOIRE<dark_green>] <yellow>Félicitations à <light_purple>{0}<yellow> qui a gagné !<!b> Il remporte la partie avec <green>{1}<yellow> points !"
     event:
       joined: "<yellow>[<green>+<yellow>] <yellow>{0}<white> a rejoint la partie."
       left: "<yellow>[<red>-<yellow>] <yellow>{0}<white> a quitté la partie."

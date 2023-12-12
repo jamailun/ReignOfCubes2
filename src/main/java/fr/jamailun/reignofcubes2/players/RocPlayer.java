@@ -1,8 +1,10 @@
 package fr.jamailun.reignofcubes2.players;
 
+import fr.jamailun.reignofcubes2.events.ScoreGainedEvent;
 import fr.jamailun.reignofcubes2.messages.Messages;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -34,6 +36,9 @@ public class RocPlayer {
         score += delta;
         if(reason.hasMessage())
             sendMessage("score.base.gain", String.valueOf(delta), reason.toString(language));
+
+        ScoreGainedEvent event = new ScoreGainedEvent(this, delta, reason);
+        Bukkit.getPluginManager().callEvent(event);
     }
 
     public boolean hasScore(int score) {

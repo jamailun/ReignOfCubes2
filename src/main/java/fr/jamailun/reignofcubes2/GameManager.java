@@ -19,6 +19,9 @@ import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 public class GameManager {
 
@@ -292,6 +295,8 @@ public class GameManager {
             king.setKing(false);
             king = null;
         }
+        throne.reset();
+        throne = null;
         state = GameState.WAITING;
 
         // Message and go back to spawn
@@ -313,4 +318,52 @@ public class GameManager {
         return throne.getCeremony();
     }
 
+    public void checkVictory(@Nonnull RocPlayer player) {
+        assert isPlaying();
+
+        if(player.getScore() >= getRules().getScoreGoal()) {
+            victory(player);
+        }
+    }
+
+    private void victory(RocPlayer player) {
+        //TODO !
+
+        // Cancel timer
+        throne.reset();
+        scoreTimer.cancel();
+    }
+
+    public List<RocPlayer> playersList() {
+        return StreamSupport.stream(players.spliterator(), false).toList();
+    }
+
+    public Optional<RocPlayer> findPlayer(String playerName) {
+        return StreamSupport.stream(players.spliterator(), false)
+                .filter(p -> p.getName().equalsIgnoreCase(playerName))
+                .findFirst();
+    }
+
+    public final Cheat cheat = new Cheat();
+    public class Cheat {
+        public void forceKing(@Nullable RocPlayer player) {
+            if(player == null) {
+                setKing(null);
+                return;
+            }
+            setKing(player);
+        }
+
+        public void forceScore(@Nonnull RocPlayer player, int score) {
+            if(score < 0) score = 0;
+            int currentScore = player.getScore();
+            if(score == currentScore) return;
+
+            if(currentScore > score) {
+                player.removeScore(currentScore - score, ScoreRemoveReason.ADMINISTRATOR);
+            } else {
+                player.addScore(score - currentScore, ScoreAddReason.ADMINISTRATOR);
+            }
+        }
+    }
 }

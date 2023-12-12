@@ -9,6 +9,7 @@ import fr.jamailun.reignofcubes2.configuration.ConfigurationsList;
 import fr.jamailun.reignofcubes2.configuration.GameRules;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
 import fr.jamailun.reignofcubes2.messages.Messages;
+import fr.jamailun.reignofcubes2.players.RocPlayer;
 import fr.jamailun.reignofcubes2.utils.WorldEditHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -31,10 +33,11 @@ public class RocCommand implements CommandExecutor, TabCompleter {
     private final static Vector MODIFIER_A = new Vector(0, 0, 0);
     private final static Vector MODIFIER_B = new Vector(1, 1, 1);
 
-    private final static List<String> args_0 = List.of("config", "start", "stop", "help", "reload", "show");
+    private final static List<String> args_0 = List.of("config", "start", "stop", "help", "reload", "show", "cheat");
     private final static List<String> args_1_start = List.of("game", "countdown");
     private final static List<String> args_1_reload = List.of("messages");
     private final static List<String> args_1_config = List.of("enable", "set-default", "list", "create", "delete", "edit", "edit.spawns", "show");
+    private final static List<String> args_1_cheat = List.of("clear.king", "set.king", "set.score");
     private final static List<String> args_list = List.of("add", "remove", "list");
 
     private final static List<String> args_2_edit = List.of(
@@ -88,8 +91,7 @@ public class RocCommand implements CommandExecutor, TabCompleter {
                     return error(sender, "Configuration " + name + " is not valid.");
                 info(sender, "Enabling configuration " + config + "...");
                 if(game().loadConfiguration(config)) {
-                    //TODO message ?
-                    return info(sender, "Configuration has been enabled successful.");
+                    return success(sender, "Configuration has been enabled successful.");
                 }
                 return error(sender, "Configuration change failed. Check the logs.");
             }
@@ -105,8 +107,8 @@ public class RocCommand implements CommandExecutor, TabCompleter {
                 WorldConfiguration config = configs().get(name);
                 if(!config.isValid())
                     return error(sender, "Configuration " + name + " is not valid.");
-                info(sender, "Setting configuration " + config + " as default.");
                 configs().setDefault(config);
+                success(sender, "Set configuration " + config + " as default.");
                 return true;
             }
 
@@ -145,6 +147,7 @@ public class RocCommand implements CommandExecutor, TabCompleter {
                 return info(sender, "Configuration " + name + " successfully created. Edit it to use it.");
             }
 
+            // Delete a configuration
             if(arg.equalsIgnoreCase("delete")) {
                 //TODO delete a configuration
                 return error(sender, "TODO");
@@ -227,6 +230,7 @@ public class RocCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
 
+            // Edit the spawns of a configuration
             if(arg.equalsIgnoreCase("edit.spawns")) {
                 if(args.length < 2) return error(sender, "Specify the config and the mode.");
                 String configName = args[0];
@@ -287,6 +291,7 @@ public class RocCommand implements CommandExecutor, TabCompleter {
                     return error(sender, "The game already started !");
                 }
                 info(sender, "Starting game.");
+                game().broadcast("game.cancelled", sender.getName());
                 game().start();
                 return true;
             }
@@ -298,6 +303,7 @@ public class RocCommand implements CommandExecutor, TabCompleter {
                 if(game().getState() == GameState.PLAYING)
                     return error(sender, "The game already started !");
                 info(sender, "Starting count-down.");
+                game().broadcast("countdown.start-force", sender.getName());
                 game().startCountdown();
                 return true;
             }
@@ -308,11 +314,13 @@ public class RocCommand implements CommandExecutor, TabCompleter {
         if(arg.equalsIgnoreCase("stop")) {
             if(game().isPlaying()) {
                 info(sender, "Stopping game.");
+                game().broadcast("game.cancelled", sender.getName());
                 game().stop();
                 return true;
             }
             if(game().isCountdown()) {
                 info(sender, "Stopping countdown.");
+                game().broadcast("countdown.cancelled-force", sender.getName());
                 game().stopCountdown();
                 return true;
             }
@@ -343,6 +351,41 @@ public class RocCommand implements CommandExecutor, TabCompleter {
             return info(sender, "Debug showing has been toggled (" + result + ").");
         }
 
+        if(arg.equalsIgnoreCase("cheat")) {
+            if(!game().isPlaying()) return error(sender, "Cannot cheat before the game starts.");
+            if(args.length < 1) return missingArgument(sender, args_1_cheat);
+            arg = args[0];
+            args = next(args);
+
+            if(arg.equalsIgnoreCase("set.king")) {
+                // clear
+                if(args.length < 1) {
+                    game().cheat.forceKing(null);
+                    return info(sender, "King cleared");
+                }
+                RocPlayer target = getPlayer(sender, args[0]);
+                if(target == null) return true;
+                game().cheat.forceKing(target);
+                return info(sender, "King set.");
+            }
+
+            if(arg.equalsIgnoreCase("set.score")) {
+                if(args.length < 2)
+                    return error(sender, "/" + label + " cheat set.score <player> <score>");
+                RocPlayer target = getPlayer(sender, args[0]);
+                if(target == null) return true;
+                int score;
+                try {
+                    score = Integer.parseInt(args[1]);
+                } catch(NumberFormatException ignored) {
+                    return error(sender, "Invalid number: '" + args[1] + "'.");
+                }
+                game().cheat.forceScore(target, score);
+                return info(sender, "Score of "+target.getName()+" set to "+score+".");
+            }
+
+            return unexpectedArgument(sender, args[0], args_1_cheat);
+        }
 
         return unexpectedArgument(sender, arg, args_0);
     }
@@ -363,11 +406,15 @@ public class RocCommand implements CommandExecutor, TabCompleter {
             else if(args[0].equalsIgnoreCase("start")) {
                 return args_1_start.stream().filter(a -> a.startsWith(arg1)).toList();
             }
+            else if(args[0].equalsIgnoreCase("cheat")) {
+                return args_1_cheat.stream().filter(a -> a.startsWith(arg1)).toList();
+            }
             else if(args[0].equalsIgnoreCase("show")) {
                 return configurationsNames().filter(a -> a.startsWith(arg1)).toList();
             }
         }
         else if(args.length == 3) {
+            String arg2 = args[2].toLowerCase();
             if(args[0].equalsIgnoreCase("config")) {
                 if(     args[1].equalsIgnoreCase("edit")
                         || args[1].equalsIgnoreCase("edit.spawns")
@@ -375,7 +422,14 @@ public class RocCommand implements CommandExecutor, TabCompleter {
                         || args[1].equalsIgnoreCase("show")
                         || args[0].equalsIgnoreCase("enable")
                 ) {
-                    return configurationsNames().filter(a -> a.startsWith(args[2].toLowerCase())).toList();
+                    return configurationsNames().filter(a -> a.startsWith(arg2)).toList();
+                }
+            }
+            if(args[0].equalsIgnoreCase("cheat")) {
+                if(     args[1].equalsIgnoreCase("set.king")
+                        || args[1].equalsIgnoreCase("set.score")
+                ) {
+                    return playersNames().filter(a -> a.startsWith(arg2)).toList();
                 }
             }
         }
@@ -460,6 +514,9 @@ public class RocCommand implements CommandExecutor, TabCompleter {
     private Stream<String> configurationsNames() {
         return configs().list().stream().map(WorldConfiguration::getName);
     }
+    private Stream<String> playersNames() {
+        return game().playersList().stream().map(RocPlayer::getName);
+    }
 
     private String niceVector(Vector vector) {
         return "(" + vector.getX() + "," + vector.getY() + "," + vector.getZ() + ")";
@@ -473,6 +530,15 @@ public class RocCommand implements CommandExecutor, TabCompleter {
             ReignOfCubes2.error("Could not save " + config.getName() + ": " + e.getMessage());
             return error(sender,"Could not save " + config.getName() + ": " + e.getMessage());
         }
+    }
+
+    protected RocPlayer getPlayer(CommandSender sender, String playerName) {
+        Optional<RocPlayer> player = game().findPlayer(playerName);
+        if(player.isEmpty()) {
+            error(sender, "Invalid player-name: '" + playerName + "'.");
+            return null;
+        }
+        return player.get();
     }
 
 }

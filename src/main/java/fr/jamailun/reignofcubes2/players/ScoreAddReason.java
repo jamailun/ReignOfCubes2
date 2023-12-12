@@ -7,7 +7,8 @@ public enum ScoreAddReason {
     KING_FLAT_BONUS("score.king-bonus"),
     KING_EVERY_SECOND(null),
     KILL_FLAT("score.kill-bonus"),
-    KILL_STEAL("score.kill-steal");
+    KILL_STEAL("score.kill-steal"),
+    ADMINISTRATOR("score.administrator");
 
     private final String entry;
     ScoreAddReason(String entry) {

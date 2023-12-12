@@ -45,6 +45,7 @@ public final class ReignOfCubes2 extends JavaPlugin {
         new PlayerDeathListener(this);
         new DisabledActionsListener(this);
         new PlayerRespawnListener(this);
+        new RocScoreListener(this);
 
         // Commands
         new RocCommand(this);
