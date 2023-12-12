@@ -116,7 +116,7 @@ public class ItemBuilder {
      */
     public ItemBuilder setName(String name){
         ItemMeta im = item.getItemMeta();
-        im.setDisplayName(name);
+        im.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
         item.setItemMeta(im);
         return this;
     }
@@ -179,18 +179,30 @@ public class ItemBuilder {
         item.addEnchantments(enchantments);
         return this;
     }
+
+    public ItemBuilder addUnsafeEnchantments(Map<Enchantment, Integer> enchantments){
+        for(Map.Entry<Enchantment, Integer> enchantment : enchantments.entrySet()) {
+            addUnsafeEnchantment(enchantment.getKey(), enchantment.getValue());
+        }
+        return this;
+    }
+
     /**
-     * @author jamailun
      * Sets an item as Unbreakable
      */
     public ItemBuilder setUnbreakable() {
+        return setUnbreakable(true);
+    }
+
+    public ItemBuilder setUnbreakable(boolean unbreakable) {
         if(item.hasItemMeta()) {
             ItemMeta meta = item.getItemMeta();
-            meta.setUnbreakable(true);
+            meta.setUnbreakable(unbreakable);
             item.setItemMeta(meta);
         }
         return this;
     }
+
     /**
      * Re-sets the lore.
      * @param lore The lore to set it to.
@@ -317,9 +329,6 @@ public class ItemBuilder {
         return item;
     }
 
-    /**
-     * @author jamailun
-     */
     public ItemBuilder addItemFlag(ItemFlag... flags) {
         ItemMeta im = item.getItemMeta();
         im.addItemFlags(flags);
