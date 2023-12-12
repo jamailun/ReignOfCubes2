@@ -103,7 +103,14 @@ public class GameManager {
             throne.leaves(player);
         }
 
+        // After one second, test if no/one player are remaining.
+        ReignOfCubes2.runTaskLater(this::testGameOverMissingPlayers, 1);
+    }
+
+    private void testGameOverMissingPlayers() {
+        if(!isPlaying()) return;
         int remainingPlayers = getOnlinePlayersCount();
+        ReignOfCubes2.info("A player left. Remaining online = " + remainingPlayers);
         if(isPlaying() && remainingPlayers <= 1) {
             if(remainingPlayers == 0) {
                 ReignOfCubes2.info("No players remaining. Stopping game.");
@@ -285,6 +292,7 @@ public class GameManager {
         }, 1);
 
         broadcast("game.start");
+        ReignOfCubes2.info("Game started.");
     }
 
     public void stop() {
@@ -314,6 +322,7 @@ public class GameManager {
 
         // Message and go back to spawn
         //TODO message, TP players, ...
+        ReignOfCubes2.info("Game stopped.");
     }
 
     public void broadcast(String entry, Object... args) {
@@ -339,7 +348,12 @@ public class GameManager {
     }
 
     private void victory(RocPlayer player) {
-        broadcast("game.end-victory", player.getName(), player.getScore());
+        if(player == null) {
+            ReignOfCubes2.warning("Unexpected NULL player for victory.");
+        } else {
+            broadcast("game.end-victory", player.getName(), player.getScore());
+            ReignOfCubes2.info("Player " + player.getName() + " won.");
+        }
 
         // Cancel stuff
         throne.resetCeremony();
