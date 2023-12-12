@@ -125,6 +125,10 @@ public class Messages {
         p.sendMessage(cmp);
     }
 
+    public static Component formatComponent(String language, String entry, Object... args) {
+        return instance().messageFormatter.deserialize(format(language, entry, args));
+    }
+
     private static String niceFormat(String string, Object... values) {
         assert string != null;
         if(values == null) return string;
