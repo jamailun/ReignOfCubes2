@@ -248,6 +248,7 @@ public class GameManager {
             return;
         }
         countdown.cancel();
+        state = GameState.WAITING;
     }
 
     public void start() {

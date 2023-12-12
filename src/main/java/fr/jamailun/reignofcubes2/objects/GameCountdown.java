@@ -22,7 +22,7 @@ public class GameCountdown {
 
     public GameCountdown(GameManager game) {
         this.game = game;
-        secondsRemaining = 30;
+        secondsRemaining = 31;
         countdownTask = ReignOfCubes2.runTaskTimer(this::countdownTick, 1);
         game.broadcast("countdown.start");
     }
