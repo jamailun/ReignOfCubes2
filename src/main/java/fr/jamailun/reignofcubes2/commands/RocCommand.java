@@ -8,10 +8,13 @@ import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.configuration.ConfigurationsList;
 import fr.jamailun.reignofcubes2.configuration.GameRules;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
+import fr.jamailun.reignofcubes2.configuration.kits.Kit;
+import fr.jamailun.reignofcubes2.gui.AdminKitsGUI;
 import fr.jamailun.reignofcubes2.messages.Messages;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import fr.jamailun.reignofcubes2.utils.WorldEditHandler;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.*;
 import org.bukkit.entity.Entity;
@@ -21,24 +24,26 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+/**
+ * I'll clean this mess up. One day.
+ */
 public class RocCommand implements CommandExecutor, TabCompleter {
 
     private final static Vector MODIFIER_A = new Vector(0, 0, 0);
     private final static Vector MODIFIER_B = new Vector(1, 1, 1);
 
-    private final static List<String> args_0 = List.of("config", "start", "stop", "help", "reload", "show", "cheat");
+    private final static List<String> args_0 = List.of("config", "start", "stop", "help", "reload", "show", "cheat", "kits");
     private final static List<String> args_1_start = List.of("game", "countdown");
     private final static List<String> args_1_reload = List.of("messages");
+    private final static List<String> args_1_kits = List.of("gui", "from-inventory.new", "from-inventory.update", "give", "delete", "edit");
     private final static List<String> args_1_config = List.of("enable", "set-default", "list", "create", "delete", "edit", "edit.spawns", "show");
-    private final static List<String> args_1_cheat = List.of("clear.king", "set.king", "set.score");
+    private final static List<String> args_1_cheat = List.of("set.king", "set.score");
     private final static List<String> args_list = List.of("add", "remove", "list");
+    private final static List<String> args_2_kits_edit = List.of("cost", "icon.type", "name");
 
     private final static List<String> args_2_edit = List.of(
             "players.min", "players.max",
@@ -388,6 +393,90 @@ public class RocCommand implements CommandExecutor, TabCompleter {
             return unexpectedArgument(sender, args[0], args_1_cheat);
         }
 
+        if(arg.equalsIgnoreCase("kits")) {
+            if(!(sender instanceof Player)) return error(sender, "Cannot use 'kits' subcommand as a console.");
+            RocPlayer player = game().toPlayer((Player) sender);
+            if(player == null) return error(sender, "Tu n'es pas dans le jeu. déso");
+
+            if(args.length < 1) return missingArgument(sender, args_1_kits);
+            arg = args[0];
+            args = next(args);
+            if(!args_1_kits.contains(arg.toLowerCase())) return unexpectedArgument(sender, arg, args_1_kits);
+
+            // GUI
+            if(arg.equalsIgnoreCase("gui")) {
+                new AdminKitsGUI(player);
+                return info(sender, "GUI ouverte.");
+            }
+
+            //  "give", "delete", "edit"
+            if(arg.equalsIgnoreCase("from-inventory.new")) {
+                if(args.length < 2) return error(sender, "Argument missing. Syntax: \"/"+label+", kits " + arg + " §4<id> <display name>§c.\"");
+                String id = args[0];
+                String name = absorbRemaining(1, args);
+
+                Kit kit = ReignOfCubes2.getKits().create(id, name);
+                if(kit == null) {
+                    return error(sender, "The id '§4"+id+"§c' already exists.");
+                }
+
+                kit.loadFromInventory(player);
+                kit.save();
+
+                return success(sender, "Kit created successfully. Edit it before using it.");
+            }
+
+            // Kit
+            if(args.length < 1) return error(sender, "You must specify what kit to use for this command.");
+            String kitId = args[0];
+            Kit kit = ReignOfCubes2.getKits().getKit(kitId);
+            if(kit == null) return error(sender, "Unknown kit id : '" + kitId + "'.");
+
+            // == actions as a console
+            if(arg.equalsIgnoreCase("edit")) {
+                if(args.length < 2) return error(sender, "Specify value to change, and the new value.");
+                switch(args[0].toLowerCase()) {
+                    case "cost" -> {
+                        setInt(sender, args[1], kit::setCost, "Cost changed successfully.");
+                    }
+                    case "icon.type" -> {
+                        try {
+                            kit.setIconType(Material.valueOf(args[1]));
+                        } catch(IllegalArgumentException e) {
+                            return error(sender, "Invalid material type: §4"+args[1]);
+                        }
+                    }
+                    case "name" -> {
+                        String newValue = absorbRemaining(1, args);
+                        kit.setDisplayName(newValue);
+                    }
+                    default -> {
+                        return unexpectedArgument(sender, args[1], args_2_kits_edit);
+                    }
+                }
+                kit.save();
+                return success(sender, "Kit saved successfully.");
+            }
+
+            if(arg.equalsIgnoreCase("delete")) {
+                ReignOfCubes2.getKits().delete(kit);
+                return error(sender, "TODO");
+            }
+
+            if(arg.equalsIgnoreCase("from-inventory.update")) {
+                kit.loadFromInventory(player);
+                kit.save();
+                return success(sender, "Content of kit " + kitId + " updated.");
+            }
+
+            if(arg.equalsIgnoreCase("give")) {
+                kit.equip(player);
+                return success(sender, "Kit equipped.");
+            }
+
+            return error(sender, "Je sais pas coder. J'ai oublié '" + arg + "'.");
+        }
+
         return unexpectedArgument(sender, arg, args_0);
     }
 
@@ -413,6 +502,9 @@ public class RocCommand implements CommandExecutor, TabCompleter {
             else if(args[0].equalsIgnoreCase("show")) {
                 return configurationsNames().filter(a -> a.startsWith(arg1)).toList();
             }
+            else if(args[0].equalsIgnoreCase("kits")) {
+                return args_1_kits.stream().filter(a -> a.startsWith(arg1)).toList();
+            }
         }
         else if(args.length == 3) {
             String arg2 = args[2].toLowerCase();
@@ -424,6 +516,15 @@ public class RocCommand implements CommandExecutor, TabCompleter {
                         || args[0].equalsIgnoreCase("enable")
                 ) {
                     return configurationsNames().filter(a -> a.startsWith(arg2)).toList();
+                }
+            }
+            if(args[0].equalsIgnoreCase("kits")) {
+                if(     args[1].equalsIgnoreCase("from-inventory.update")
+                        || args[1].equalsIgnoreCase("give")
+                        || args[1].equalsIgnoreCase("delete")
+                        || args[1].equalsIgnoreCase("edit")
+                ) {
+                    return kitsIds().filter(k -> k.startsWith(arg2)).toList();
                 }
             }
             if(args[0].equalsIgnoreCase("cheat")) {
@@ -442,6 +543,11 @@ public class RocCommand implements CommandExecutor, TabCompleter {
                 }
                 else if(args[1].equalsIgnoreCase("edit.spawns")) {
                     return args_list.stream().filter(a -> a.startsWith(arg3)).toList();
+                }
+            }
+            if(args[0].equalsIgnoreCase("kits")) {
+                if(args[1].equalsIgnoreCase("edit")) {
+                    return args_2_kits_edit.stream().filter(a -> a.startsWith(arg3)).toList();
                 }
             }
         }
@@ -518,6 +624,9 @@ public class RocCommand implements CommandExecutor, TabCompleter {
     private Stream<String> playersNames() {
         return game().players().map(RocPlayer::getName);
     }
+    private Stream<String> kitsIds() {
+        return ReignOfCubes2.getKits().getKits().stream().map(Kit::getId);
+    }
 
     private String niceVector(Vector vector) {
         return "(" + vector.getX() + "," + vector.getY() + "," + vector.getZ() + ")";
@@ -540,6 +649,13 @@ public class RocCommand implements CommandExecutor, TabCompleter {
             return null;
         }
         return player.get();
+    }
+
+    protected String absorbRemaining(int offset, String[] args) {
+        StringJoiner sj = new StringJoiner(" ");
+        for(int i = offset; i < args.length; i++)
+            sj.add(args[i]);
+        return sj.toString();
     }
 
 }

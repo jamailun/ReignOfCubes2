@@ -1,6 +1,7 @@
 package fr.jamailun.reignofcubes2.utils;
 
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.configuration.KitsConfiguration;
 import fr.jamailun.reignofcubes2.messages.Messages;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import lombok.Getter;
@@ -17,26 +18,39 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+@Getter
 public abstract class MenuGUI {
 
-    protected final static ItemStack EMPTY_SLOT = new ItemBuilder(Material.LIGHT_GRAY_STAINED_GLASS_PANE).setName(" ").toItemStack();
+    protected final static ItemStack EMPTY_ITEM = new ItemBuilder(Material.LIGHT_GRAY_STAINED_GLASS_PANE).setName(" ").toItemStack();
+    protected final static ItemStack EMPTY_ITEM_DARK = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).setName(" ").toItemStack();
+    protected final static ItemStack QUIT_ITEM = new ItemBuilder(Material.BARRIER).setName("§7Quitter").toItemStack();
+    protected final static ItemStack BACK_ITEM = new ItemBuilder(Material.ARROW).setName("§eRetour").toItemStack();
 
-    @Getter private final int size;
-    @Getter private final Component title;
-    @Getter private final RocPlayer viewer;
+    private final int size;
+    private final Component title;
+    private final RocPlayer viewer;
 
-    @Getter private final Inventory inventory;
-    @Getter private final Map<Integer, Runnable> options = new HashMap<>();
+    private final Inventory inventory;
+    private final Map<Integer, Runnable> options = new HashMap<>();
 
-    public MenuGUI(int lines, String titleEntry, RocPlayer viewer) {
+    public MenuGUI(int lines, RocPlayer viewer, String title) {
+        this(lines, viewer, title, false);
+    }
+
+    public MenuGUI(int lines, RocPlayer viewer, String title, boolean titleIsRaw) {
         assert lines > 0 && (lines <= 9 || lines % 9 == 0) : "Invalid MenuGUI size ("+lines+")";
         this.size = (lines < 9) ? lines * 9 : lines;
         this.viewer = viewer;
-        title = Messages.formatComponent(viewer.getLanguage(), titleEntry);
+        if(titleIsRaw) {
+            String fromLegacy = ComponentApiHelper.convertLegacy(title);
+            this.title = Messages.parseComponent(fromLegacy);
+        } else {
+            this.title = Messages.formatComponent(viewer.getLanguage(), title);
+        }
 
         // Create inventory
-        inventory = Bukkit.createInventory(viewer.getPlayer(), size, title);
-        fill(EMPTY_SLOT);
+        inventory = Bukkit.createInventory(viewer.getPlayer(), size, this.title);
+        fill(EMPTY_ITEM);
     }
 
     protected void open() {
@@ -82,7 +96,6 @@ public abstract class MenuGUI {
         fill(0, size, item);
     }
 
-    public void onOpen() {}
 
     public final void handleClick(InventoryClickEvent e) {
         if(options.containsKey(e.getSlot())) {
@@ -92,9 +105,22 @@ public abstract class MenuGUI {
         onClick(e);
     }
 
-    public abstract void onClick(InventoryClickEvent e);
-
+    public void onOpen() {}
+    public void onClick(InventoryClickEvent e) {}
     public void afterClose(boolean internal) {}
+
+
+    protected final KitsConfiguration kits() {
+        return ReignOfCubes2.getKits();
+    }
+
+    protected final void setDefaultFooter() {
+        int min = size - 9;
+        for(int i = min; i < min - 1; i++) {
+            set(i, EMPTY_ITEM_DARK);
+        }
+        set(size-1, QUIT_ITEM, () -> getPlayer().getPlayer().closeInventory());
+    }
 
 
     public final static class MenuGUIManager {
@@ -129,8 +155,6 @@ public abstract class MenuGUI {
                 }
             }
         }
-
-
 
     }
 

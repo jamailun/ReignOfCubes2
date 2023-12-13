@@ -1,8 +1,10 @@
 package fr.jamailun.reignofcubes2.configuration.kits;
 
+import fr.jamailun.reignofcubes2.configuration.KitsConfiguration;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import fr.jamailun.reignofcubes2.utils.ItemBuilder;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Material;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -11,26 +13,34 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+
 public class Kit extends Configurable {
 
-    @Getter private String id;
-    private String displayName;
+    private final KitsConfiguration.KitsConfigurationSaver saver;
+    @Getter private final String id;
+    @Getter @Setter private String displayName;
 
 
-    private Material iconType;
-    @Getter private int cost;
+    @Getter @Setter private Material iconType;
+    @Getter @Setter private int cost;
     private final Set<KitItem> items = new HashSet<>();
-    //Map<SlotDefinition, ItemConfiguration> items = new HashMap<>();
+
+    public Kit(KitsConfiguration.KitsConfigurationSaver saver, String id) {
+        this.id = id;
+        this.saver = saver;
+    }
 
     @SuppressWarnings("unchecked")
-    public static Kit deserialize(@NotNull Map<String, Object> map) {
-        Kit kit = new Kit();
+    public static Kit deserialize(@NotNull Map<String, Object> map, KitsConfiguration.KitsConfigurationSaver saver) {
+        // Id
+        String id = (String) map.get("id");
 
-        // Basic
-        kit.id = (String) map.get("id");
+        // Create kit basics
+        Kit kit = new Kit(saver, id);
         kit.displayName = (String) map.get("name");
         kit.cost = (int) map.get("cost");
 
+        // icon
         kit.iconType = loadMaterial("kit-"+kit.id, (String)map.get("icon-type"));
         if(kit.iconType == null)
             kit.iconType = Material.BARRIER;
@@ -64,6 +74,10 @@ public class Kit extends Configurable {
         }
     }
 
+    public void save() {
+        saver.save(this);
+    }
+
     public int size() {
         return items.size();
     }
@@ -81,6 +95,13 @@ public class Kit extends Configurable {
         for(KitItem item : items) {
             item.equip(inventory);
         }
+    }
+
+    public List<KitItem> listItems(boolean equipment) {
+        return items.stream()
+                .filter(i -> i.isEquipment() == equipment)
+                .sorted(KitItem::compareTo)
+                .toList();
     }
 
     @Override

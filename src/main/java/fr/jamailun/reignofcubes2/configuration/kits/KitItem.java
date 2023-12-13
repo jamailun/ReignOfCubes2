@@ -1,15 +1,16 @@
 package fr.jamailun.reignofcubes2.configuration.kits;
 
+import lombok.Getter;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-public class KitItem extends Configurable {
+public class KitItem extends Configurable implements Comparable<KitItem> {
 
     private SlotDefinition slot;
-    private ItemStack item;
+    @Getter private ItemStack item;
 
     private KitItem() {}
 
@@ -36,11 +37,20 @@ public class KitItem extends Configurable {
         slot.equip(inventory, item);
     }
 
+    public boolean isEquipment() {
+        return slot.isEquipment();
+    }
+
     @Override
     public @NotNull Map<String, Object> serialize() {
         return Map.of(
                 "slot", slot.toString(),
                 "item", item.serialize()
         );
+    }
+
+    @Override
+    public int compareTo(@NotNull KitItem o) {
+        return slot.compareTo(o.slot);
     }
 }

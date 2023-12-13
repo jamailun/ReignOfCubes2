@@ -7,7 +7,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 public class ShopGUI extends MenuGUI {
 
     public ShopGUI(RocPlayer player) {
-        super(3, "gui.shop.title", player);
+        super(3, player, "gui.shop.title");
 
 
 

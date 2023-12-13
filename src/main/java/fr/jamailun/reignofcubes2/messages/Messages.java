@@ -121,12 +121,11 @@ public class Messages {
 
     public static void send(Player p, String l, String e, Object... a) {
         String msg = format(l, e, a);
-        Component cmp = instance().messageFormatter.deserialize(msg);
-        p.sendMessage(cmp);
+        p.sendMessage(parseComponent(msg));
     }
 
     public static Component formatComponent(String language, String entry, Object... args) {
-        return instance().messageFormatter.deserialize(format(language, entry, args));
+        return parseComponent(format(language, entry, args));
     }
 
     private static String niceFormat(String string, Object... values) {
@@ -137,6 +136,10 @@ public class Messages {
             string = string.replace("{" + i + "}", Objects.toString(values[i]));
         }
         return string;
+    }
+
+    public static Component parseComponent(String string) {
+        return instance().messageFormatter.deserialize(string);
     }
 
     public static void reload() {
