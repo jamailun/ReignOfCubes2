@@ -1,6 +1,7 @@
 package fr.jamailun.reignofcubes2;
 
 import fr.jamailun.reignofcubes2.commands.RocCommand;
+import fr.jamailun.reignofcubes2.configuration.KitsConfiguration;
 import fr.jamailun.reignofcubes2.listeners.*;
 import fr.jamailun.reignofcubes2.placeholder.RocPlaceholderExpansion;
 import io.papermc.paper.plugin.configuration.PluginMeta;
@@ -18,6 +19,7 @@ public final class ReignOfCubes2 extends JavaPlugin {
     private static ReignOfCubes2 INSTANCE;
 
     @Getter private GameManager gameManager;
+    private KitsConfiguration kitsConfiguration;
 
     @Override
     public void onEnable() {
@@ -28,6 +30,9 @@ public final class ReignOfCubes2 extends JavaPlugin {
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
+
+        // Load kits
+        kitsConfiguration = new KitsConfiguration(getFile("kits.yml"));
 
         // default config
         saveDefaultConfig();
@@ -100,4 +105,9 @@ public final class ReignOfCubes2 extends JavaPlugin {
     public static PluginMeta getMeta() {
         return INSTANCE.getPluginMeta();
     }
+
+    public static KitsConfiguration getKits() {
+        return INSTANCE.kitsConfiguration;
+    }
+
 }
