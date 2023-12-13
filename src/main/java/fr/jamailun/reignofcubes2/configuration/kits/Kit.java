@@ -6,7 +6,6 @@ import fr.jamailun.reignofcubes2.utils.ItemBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Material;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
@@ -49,8 +48,7 @@ public class Kit extends Configurable {
         List<Map<String, Object>> items = (List<Map<String,java.lang.Object>>) map.get("items");
         for(Map<String, Object> entry : items) {
             KitItem item = KitItem.deserialize(entry);
-            if(item != null)
-                kit.items.add(item);
+            kit.items.add(item);
         }
         return kit;
     }
@@ -59,19 +57,11 @@ public class Kit extends Configurable {
         PlayerInventory inventory = player.getPlayer().getInventory();
         items.clear();
 
-        for(EquipmentSlot slot : EquipmentSlot.values()) {
-            if(slot == EquipmentSlot.HAND) continue; //ignore main hand !
-            ItemStack item = inventory.getItem(slot);
-            if(item.getType() != Material.AIR) {
-                items.add(new KitItem(new SlotDefinition(slot), item));
-            }
-        }
-
         for(int slot = 0; slot < inventory.getMaxStackSize(); slot++) {
             ItemStack item = inventory.getItem(slot);
             if(item != null) {
-                player.getPlayer().sendMessage("§fslot=§e"+slot+"§f, item=§e"+item.getType().name().toLowerCase());
-                items.add(new KitItem(new SlotDefinition(slot), item));
+                player.getPlayer().sendMessage("§fslot=§a"+slot+"§f, item=§e"+item.getType().name().toLowerCase());
+                items.add(new KitItem(slot, item));
             }
         }
     }
@@ -96,7 +86,10 @@ public class Kit extends Configurable {
 
         for(KitItem item : items) {
             item.equip(inventory);
+            player.getPlayer().sendMessage("§f[>] slot=§e"+item.getSlot()+"§f, item=§a" + item.getItem().getType());
         }
+
+        player.getPlayer().updateInventory();
     }
 
     public List<KitItem> listItems(boolean equipment) {

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -287,6 +288,11 @@ public class ItemBuilder {
         if(line.isEmpty())
             return this;
         ItemMeta im = item.getItemMeta();
+        if(im == null) {
+            ReignOfCubes2.error("Invalid item... NO item meta ! " + item);
+            return this;
+        }
+
         List<String> lore = new ArrayList<>();
         if(im.hasLore())
             lore = new ArrayList<>(im.getLore());
