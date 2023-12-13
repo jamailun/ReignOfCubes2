@@ -22,7 +22,7 @@ import java.util.Set;
 public abstract class MenuGUI {
 
     protected final static ItemStack EMPTY_ITEM = new ItemBuilder(Material.LIGHT_GRAY_STAINED_GLASS_PANE).setName(" ").toItemStack();
-    protected final static ItemStack EMPTY_ITEM_DARK = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).setName(" ").toItemStack();
+    protected final static ItemStack EMPTY_ITEM_DARK = new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setName(" ").toItemStack();
     protected final static ItemStack QUIT_ITEM = new ItemBuilder(Material.BARRIER).setName("§7Quitter").toItemStack();
     protected final static ItemStack BACK_ITEM = new ItemBuilder(Material.ARROW).setName("§eRetour").toItemStack();
 
@@ -41,6 +41,8 @@ public abstract class MenuGUI {
         assert lines > 0 && (lines <= 9 || lines % 9 == 0) : "Invalid MenuGUI size ("+lines+")";
         this.size = (lines < 9) ? lines * 9 : lines;
         this.viewer = viewer;
+        MenuGUIManager.GUIS.add(this);
+
         if(titleIsRaw) {
             String fromLegacy = ComponentApiHelper.convertLegacy(title);
             this.title = Messages.parseComponent(fromLegacy);
@@ -106,7 +108,9 @@ public abstract class MenuGUI {
     }
 
     public void onOpen() {}
-    public void onClick(InventoryClickEvent e) {}
+    public void onClick(InventoryClickEvent e) {
+        e.setCancelled(true);
+    }
     public void afterClose(boolean internal) {}
 
 
@@ -115,8 +119,7 @@ public abstract class MenuGUI {
     }
 
     protected final void setDefaultFooter() {
-        int min = size - 9;
-        for(int i = min; i < min - 1; i++) {
+        for(int i = size - 9; i < size - 1; i++) {
             set(i, EMPTY_ITEM_DARK);
         }
         set(size-1, QUIT_ITEM, () -> getPlayer().getPlayer().closeInventory());

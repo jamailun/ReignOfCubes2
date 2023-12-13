@@ -35,11 +35,20 @@ public class KitsConfiguration {
         kits.clear();
         ConfigurationSection config = YamlConfiguration.loadConfiguration(file);
 
-        for(Map<?,?> mapRaw : config.getMapList("")) {
-            ReignOfCubes2.info("DEBUG. map = " + mapRaw);
-            Map<String, Object> map = (Map<String, Object>) mapRaw;
-            Kit kit = Kit.deserialize(map, saver);
+        for(String key : config.getKeys(false)) {
+            ConfigurationSection section = config.getConfigurationSection(key);
+            if(section == null) {
+                ReignOfCubes2.error("[KitsConfiguration] Expected configuration section for key : "+key);
+                continue;
+            }
+            Map<String, Object> map = new HashMap<>();
+            for(String sectionKey : section.getKeys(false)) {
+                debug("[" + sectionKey + "> " + (section.get(sectionKey) == null ? "null" : section.get(sectionKey).getClass()));
+                map.put(sectionKey, section.get(sectionKey));
+            }
+            debug("DEBUG("+key+"). raw = " + map);
 
+            Kit kit = Kit.deserialize(map, saver);
             kits.put(kit.getId(), kit);
         }
 
@@ -47,10 +56,12 @@ public class KitsConfiguration {
     }
 
     public Kit create(String id, String displayName) {
+        if(getKit(id) != null) return null;
         Kit kit = new Kit(saver, id);
         kit.setDisplayName(displayName);
         kit.setIconType(Material.GRASS_BLOCK);
         kit.setCost(-1);
+        kits.put(id, kit);
         return kit;
     }
 
@@ -72,27 +83,39 @@ public class KitsConfiguration {
 
     private void applyChanges() {
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+        debug("Starting applying changes. Kits = " + kits.size());
 
-        // Clear
-        config.set("", null);
+        // Erase old data
+        for(String key : config.getKeys(false)) {
+            if(getKit(key) == null) {
+                debug("erasing: " + key);
+                config.set(key, null);
+            }
+        }
 
-        // set data
-        for(String id : kits.keySet()) {
-            config.set(id, kits.get(id).serialize());
+        // Write new data
+        for(Kit kit : kits.values()) {
+            debug("writing: " + kit.getId());
+            config.set(kit.getId(), kit.serialize());
         }
 
         // Save in FS
         try {
+            debug("saving: " + file);
             config.save(file);
         } catch(IOException e) {
             throw new RuntimeException("Cannot save kits", e);
         }
     }
 
+    private void debug(String msg) {
+        ReignOfCubes2.info("[Kits:debug] " + msg);
+    }
+
     public class KitsConfigurationSaver {
         protected KitsConfigurationSaver() {}
 
-        public void save(Kit kit) {
+        public void save(Kit ignored) {
             applyChanges();
         }
     }

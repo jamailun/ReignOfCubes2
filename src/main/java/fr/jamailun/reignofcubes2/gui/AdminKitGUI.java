@@ -6,6 +6,7 @@ import fr.jamailun.reignofcubes2.players.RocPlayer;
 import fr.jamailun.reignofcubes2.utils.ItemBuilder;
 import fr.jamailun.reignofcubes2.utils.MenuGUI;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 public class AdminKitGUI extends MenuGUI {
 
@@ -16,15 +17,17 @@ public class AdminKitGUI extends MenuGUI {
         int slot = 1;
         set(0, new ItemBuilder(Material.OAK_SIGN).setName("Armure:").toItemStack());
         for(KitItem item : kit.listItems(true)) {
-            set(slot, item.getItem(), () -> clickedOnItem(item));
+            ItemStack is = new ItemBuilder(item.getItem()).addLoreLine("Slot: §e"+item.slotString()).toItemStack();
+            set(slot, is, () -> clickedOnItem(item));
             slot ++;
         }
 
         // Armor
         set(9, new ItemBuilder(Material.OAK_SIGN).setName("Objets:").toItemStack());
         slot = 10;
-        for(KitItem item : kit.listItems(true)) {
-            set(slot, item.getItem(), () -> clickedOnItem(item));
+        for(KitItem item : kit.listItems(false)) {
+            ItemStack is = new ItemBuilder(item.getItem()).addLoreLine("Slot: §e"+item.slotString()).toItemStack();
+            set(slot, is, () -> clickedOnItem(item));
             slot ++;
         }
 

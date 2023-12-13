@@ -60,6 +60,7 @@ public class Kit extends Configurable {
         items.clear();
 
         for(EquipmentSlot slot : EquipmentSlot.values()) {
+            if(slot == EquipmentSlot.HAND) continue; //ignore main hand !
             ItemStack item = inventory.getItem(slot);
             if(item.getType() != Material.AIR) {
                 items.add(new KitItem(new SlotDefinition(slot), item));
@@ -69,6 +70,7 @@ public class Kit extends Configurable {
         for(int slot = 0; slot < inventory.getMaxStackSize(); slot++) {
             ItemStack item = inventory.getItem(slot);
             if(item != null) {
+                player.getPlayer().sendMessage("§fslot=§e"+slot+"§f, item=§e"+item.getType().name().toLowerCase());
                 items.add(new KitItem(new SlotDefinition(slot), item));
             }
         }
@@ -106,6 +108,12 @@ public class Kit extends Configurable {
 
     @Override
     public @NotNull Map<String, Object> serialize() {
-        return null;
+        return Map.of(
+                "id", id,
+                "name", displayName,
+                "cost", cost,
+                "icon-type", iconType.name(),
+                "items", items.stream().map(KitItem::serialize).toList()
+        );
     }
 }

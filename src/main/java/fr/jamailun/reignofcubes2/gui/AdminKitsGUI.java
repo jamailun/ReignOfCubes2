@@ -11,7 +11,7 @@ import java.util.List;
 public class AdminKitsGUI extends MenuGUI {
 
     public AdminKitsGUI(RocPlayer player) {
-        super(5, player, "gui.admin.kits.title");
+        super(6, player, "gui.admin.kits.title");
 
         List<Kit> kits = kits().getKits();
         if(kits.isEmpty()) {

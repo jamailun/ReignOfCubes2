@@ -460,7 +460,7 @@ public class RocCommand implements CommandExecutor, TabCompleter {
 
             if(arg.equalsIgnoreCase("delete")) {
                 ReignOfCubes2.getKits().delete(kit);
-                return error(sender, "TODO");
+                return success(sender, "Kit deleted.");
             }
 
             if(arg.equalsIgnoreCase("from-inventory.update")) {

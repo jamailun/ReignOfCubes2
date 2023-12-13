@@ -49,6 +49,10 @@ public class KitItem extends Configurable implements Comparable<KitItem> {
         );
     }
 
+    public String slotString() {
+        return slot.toString();
+    }
+
     @Override
     public int compareTo(@NotNull KitItem o) {
         return slot.compareTo(o.slot);
