@@ -5,6 +5,7 @@ import fr.jamailun.reignofcubes2.players.RocPlayer;
 import fr.jamailun.reignofcubes2.utils.ItemBuilder;
 import fr.jamailun.reignofcubes2.utils.MenuGUI;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -28,7 +29,10 @@ public class AdminKitsGUI extends MenuGUI {
     private void displayKits(List<Kit> kits) {
         int slot = 0;
         for(Kit kit : kits) {
-            set(slot, kit.toIcon(), () -> clickOnKit(kit));
+            ItemStack is = new ItemBuilder(kit.toIcon())
+                    .addLoreLine("Cost: " + (kit.getCost()<0?"§c4invalid":"§a"+kit.getCost()))
+                    .toItemStack();
+            set(slot, is, () -> clickOnKit(kit));
             slot++;
         }
     }

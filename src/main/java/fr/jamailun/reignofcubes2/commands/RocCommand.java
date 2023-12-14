@@ -2,10 +2,8 @@ package fr.jamailun.reignofcubes2.commands;
 
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
-import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.GameState;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
-import fr.jamailun.reignofcubes2.configuration.ConfigurationsList;
 import fr.jamailun.reignofcubes2.configuration.GameRules;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
 import fr.jamailun.reignofcubes2.configuration.kits.Kit;
@@ -31,7 +29,7 @@ import java.util.stream.Stream;
 /**
  * I'll clean this mess up. One day.
  */
-public class RocCommand implements CommandExecutor, TabCompleter {
+public class RocCommand extends AbstractCommand {
 
     private final static Vector MODIFIER_A = new Vector(0, 0, 0);
     private final static Vector MODIFIER_B = new Vector(1, 1, 1);
@@ -54,9 +52,8 @@ public class RocCommand implements CommandExecutor, TabCompleter {
             "scoring.kill.flat", "scoring.kill.steal", "scoring.death-penalty"
     );
 
-    protected final ReignOfCubes2 plugin;
     public RocCommand(ReignOfCubes2 plugin) {
-        this.plugin = plugin;
+        super(plugin, "roc");
         PluginCommand cmd = Bukkit.getPluginCommand("roc");
         assert cmd != null;
         cmd.setExecutor(this);
@@ -554,85 +551,17 @@ public class RocCommand implements CommandExecutor, TabCompleter {
         return Collections.emptyList();
     }
 
-    private boolean sendHelp(CommandSender sender) {
+    @Override
+    protected boolean sendHelp(CommandSender sender) {
         sender.sendMessage("§a TODO help menu");
         return true;
     }
 
-    private boolean unexpectedArgument(CommandSender sender, String arg, List<String> allowed) {
-        return error(sender, "§c invalid arg '" + arg + "'. Expected : " + Arrays.toString(allowed.toArray()));
-    }
-
-    private boolean missingArgument(CommandSender sender, List<String> allowed) {
-        return error(sender, "§c argument missing. Expected : " + Arrays.toString(allowed.toArray()));
-    }
-
-    private boolean error(CommandSender sender, String message) {
-        sender.sendMessage("§4[§cERROR§4]§c " + message);
-        return true;
-    }
-
-    private boolean info(CommandSender sender, String message) {
-        sender.sendMessage("§3[§fINFO§3]§7 " + message);
-        return true;
-    }
-
-    private boolean success(CommandSender sender, String message) {
-        sender.sendMessage("§2[§aSUCCESS§2]§f " + message);
-        return true;
-    }
-
-    private @NotNull String[] next(@NotNull String[] source) {
-        if(source.length == 0) return new String[0];
-        String[] target = new String[source.length - 1];
-        System.arraycopy(source, 1, target, 0, target.length);
-        return target;
-    }
-
-    protected GameManager game() {
-        return plugin.getGameManager();
-    }
-
-    protected ConfigurationsList configs() {
-        return game().getConfigurationsList();
-    }
-
-    private boolean setInt(CommandSender sender, String value, Consumer<Integer> consumer, String success) {
-        try {
-            int v = Integer.parseInt(value);
-            consumer.accept(v);
-            return info(sender, success);
-        } catch(NumberFormatException ignored) {
-            error(sender, "Invalid integer value: '"+value+"'");
-            return false;
-        }
-    }
-    private boolean setDouble(CommandSender sender, String value, Consumer<Double> consumer, String success) {
-        try {
-            double v = Double.parseDouble(value);
-            consumer.accept(v);
-            return info(sender, success);
-        } catch(NumberFormatException ignored) {
-            error(sender, "Invalid integer value: '"+value+"'");
-            return false;
-        }
-    }
-
-    private Stream<String> configurationsNames() {
-        return configs().list().stream().map(WorldConfiguration::getName);
-    }
-    private Stream<String> playersNames() {
-        return game().players().map(RocPlayer::getName);
-    }
-    private Stream<String> kitsIds() {
-        return ReignOfCubes2.getKits().getKits().stream().map(Kit::getId);
-    }
-
-    private String niceVector(Vector vector) {
+    protected String niceVector(Vector vector) {
         return "(" + vector.getX() + "," + vector.getY() + "," + vector.getZ() + ")";
     }
 
-    protected boolean saveConfiguration(CommandSender sender, WorldConfiguration config) {
+    private boolean saveConfiguration(CommandSender sender, WorldConfiguration config) {
         try{
             config.save();
             return true;
@@ -642,20 +571,5 @@ public class RocCommand implements CommandExecutor, TabCompleter {
         }
     }
 
-    protected RocPlayer getPlayer(CommandSender sender, String playerName) {
-        Optional<RocPlayer> player = game().findPlayer(playerName);
-        if(player.isEmpty()) {
-            error(sender, "Invalid player-name: '" + playerName + "'.");
-            return null;
-        }
-        return player.get();
-    }
-
-    protected String absorbRemaining(int offset, String[] args) {
-        StringJoiner sj = new StringJoiner(" ");
-        for(int i = offset; i < args.length; i++)
-            sj.add(args[i]);
-        return sj.toString();
-    }
 
 }

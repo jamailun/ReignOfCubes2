@@ -10,8 +10,10 @@ depend: [ WorldEdit, PlaceholderAPI ]
 
 commands:
   roc:
-    description: Ensemble des commandes de configuration du RoC.
+    description: All RoC command to configure the plugin.
     permission: roc.admin
+  shop:
+    description: Open the shop. Require being playing.
 
 permissions:
   roc.*:

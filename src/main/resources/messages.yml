@@ -14,12 +14,16 @@ messages:
         gain: "<light_purple>| Score: <green>+ {0}<gray> : <i>{1}."
         loose: "<light_purple>| Score: <dark_red>- {0}<gray> : <i>{1}."
         bilan: "<light_purple>| Nouveau score: <yellow>{0}<light_purple>."
-      king-bonus: "Bonus de couronnement"
-      kill-steal: "Vol de points"
-      kill-bonus: "Bonus de kill"
-      death-penalty: "Pénalité de mort"
-      buy-kit: "Achat de kit"
-      administrator: "Décision d'un administrateur"
+      reason:
+        king-bonus: "Bonus de couronnement"
+        kill-steal: "Vol de points"
+        kill-bonus: "Bonus de kill"
+        death-penalty: "Pénalité de mort"
+        buy-kit: "Achat de kit"
+        administrator: "Décision d'un administrateur"
+      messages:
+        too-poor: "<red>[<dark_red>$<red>] Pas assez de score pour acheter ce kit."
+        kit-bought: "<green>[<gold>$<green>] <white>Achat du kit effectué avec succès."
     countdown:
       start: "<green>[<b>><!b>] <yellow>Il y a assez de joueurs. Début du compte à rebours."
       start-force: "<green>[<b>><!b>] <yellow>Compte à rebours lancé par <white>{0}<yellow>."
@@ -75,4 +79,4 @@ messages:
     gui:
       shop:
         title: "<blue>Boutique"
-
+        cost_prefix: "Coût : "
