@@ -112,6 +112,13 @@ public class KitsConfiguration {
         ReignOfCubes2.info("[Kits:debug] " + msg);
     }
 
+    public Kit getDefaultKit() {
+        return kits.values().stream()
+                .filter(k -> k.getCost() == 0)
+                .findFirst()
+                .orElse(null);
+    }
+
     public class KitsConfigurationSaver {
         protected KitsConfigurationSaver() {}
 

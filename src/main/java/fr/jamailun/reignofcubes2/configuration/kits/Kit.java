@@ -6,6 +6,7 @@ import fr.jamailun.reignofcubes2.utils.ItemBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
@@ -58,6 +59,7 @@ public class Kit extends Configurable {
         items.clear();
 
         for(int slot = 0; slot < inventory.getMaxStackSize(); slot++) {
+            if(slot == 8) continue;
             ItemStack item = inventory.getItem(slot);
             if(item != null) {
                 player.getPlayer().sendMessage("§fslot=§a"+slot+"§f, item=§e"+item.getType().name().toLowerCase());
@@ -77,6 +79,7 @@ public class Kit extends Configurable {
     public ItemStack toIcon() {
         return new ItemBuilder(iconType)
                 .setName(displayName)
+                .hideAll()
                 .toItemStack();
     }
 

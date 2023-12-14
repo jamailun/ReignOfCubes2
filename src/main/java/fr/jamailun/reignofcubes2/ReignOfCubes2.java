@@ -1,6 +1,6 @@
 package fr.jamailun.reignofcubes2;
 
-import fr.jamailun.reignofcubes2.commands.RocCommand;
+import fr.jamailun.reignofcubes2.commands.*;
 import fr.jamailun.reignofcubes2.configuration.KitsConfiguration;
 import fr.jamailun.reignofcubes2.listeners.*;
 import fr.jamailun.reignofcubes2.placeholder.RocPlaceholderExpansion;
@@ -55,6 +55,7 @@ public final class ReignOfCubes2 extends JavaPlugin {
 
         // Commands
         new RocCommand(this);
+        new ShopCommand(this);
 
         // Placeholder API
         new RocPlaceholderExpansion(gameManager).register();

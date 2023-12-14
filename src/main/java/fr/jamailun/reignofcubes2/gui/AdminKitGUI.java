@@ -11,22 +11,23 @@ import org.bukkit.inventory.ItemStack;
 public class AdminKitGUI extends MenuGUI {
 
     public AdminKitGUI(RocPlayer player, Kit kit) {
-        super(5, player, "Kit = " + kit.getDisplayName(), true);
+        super(6, player, "Kit = " + kit.getDisplayName(), true);
 
         // Armor
         int slot = 1;
-        set(0, new ItemBuilder(Material.OAK_SIGN).setName("Armure:").toItemStack());
+        set(0, new ItemBuilder(Material.OAK_SIGN).setName("§bArmure:").toItemStack());
         for(KitItem item : kit.listItems(true)) {
-            ItemStack is = new ItemBuilder(item.getItem()).addLoreLine("Slot: §e"+item.slotString()).toItemStack();
-            set(slot, is, () -> clickedOnItem(item));
+            ItemBuilder ib = new ItemBuilder(item.getItem());
+            if(item.getSlot() == 40) ib.addLoreLine("§4Slot: §eOFF_HAND");
+            set(slot, ib.toItemStack(), () -> clickedOnItem(item));
             slot ++;
         }
 
         // Armor
-        set(9, new ItemBuilder(Material.OAK_SIGN).setName("Objets:").toItemStack());
+        set(9, new ItemBuilder(Material.OAK_SIGN).setName("§bObjets:").toItemStack());
         slot = 10;
         for(KitItem item : kit.listItems(false)) {
-            ItemStack is = new ItemBuilder(item.getItem()).addLoreLine("Slot: §e"+item.slotString()).toItemStack();
+            ItemStack is = new ItemBuilder(item.getItem()).addLoreLine("§dSlot: §e"+item.slotString()).toItemStack();
             set(slot, is, () -> clickedOnItem(item));
             slot ++;
         }

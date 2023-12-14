@@ -1,5 +1,7 @@
 package fr.jamailun.reignofcubes2.players;
 
+import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.events.ScoreGainedEvent;
 import fr.jamailun.reignofcubes2.messages.Messages;
 import lombok.Getter;
@@ -9,6 +11,7 @@ import org.bukkit.GameMode;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -22,7 +25,7 @@ public class RocPlayer {
     private int score = 0;
     @Setter private boolean isKing = false;
     @Setter private String language = "fr";
-
+    @Setter private int lastMoneySpent = 0;
     @Setter private RocPlayer lastDamager;
 
     public RocPlayer(Player player) {
@@ -77,12 +80,26 @@ public class RocPlayer {
 
     public void reset() {
         score = 0;
+        lastMoneySpent = 0;
         isKing = false;
         lastDamager = null;
         player.getInventory().clear();
         player.setGameMode(GameMode.ADVENTURE);
-        player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getDefaultValue());
+        player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getDefaultValue());
         player.setSaturation(100);
+    }
+
+    public void respawned() {
+        lastMoneySpent = 0;
+
+        // Equip default kit
+        Kit defaultKit = ReignOfCubes2.getKits().getDefaultKit();
+        if(defaultKit == null) {
+            ReignOfCubes2.error("No default kit !");
+            return;
+        }
+
+        defaultKit.equip(this);
     }
 
     @Override

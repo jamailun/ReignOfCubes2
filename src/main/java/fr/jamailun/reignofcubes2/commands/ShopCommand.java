@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ShopCommand extends AbstractCommand {
 
-    protected ShopCommand(ReignOfCubes2 plugin) {
+    public ShopCommand(ReignOfCubes2 plugin) {
         super(plugin, "shop");
     }
 

@@ -80,3 +80,7 @@ messages:
       shop:
         title: "<blue>Boutique"
         cost_prefix: "Coût : "
+        too-rich: "Tu as déjà acheté mieux."
+      admin:
+        kits:
+          title: "<blue>Configuration des kits"

@@ -23,8 +23,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 /**
  * I'll clean this mess up. One day.
@@ -54,12 +52,6 @@ public class RocCommand extends AbstractCommand {
 
     public RocCommand(ReignOfCubes2 plugin) {
         super(plugin, "roc");
-        PluginCommand cmd = Bukkit.getPluginCommand("roc");
-        assert cmd != null;
-        cmd.setExecutor(this);
-        cmd.setTabCompleter(this);
-
-        ReignOfCubes2.info("Command 'roc' enabled.");
     }
 
     @Override
@@ -431,24 +423,27 @@ public class RocCommand extends AbstractCommand {
 
             // == actions as a console
             if(arg.equalsIgnoreCase("edit")) {
-                if(args.length < 2) return error(sender, "Specify value to change, and the new value.");
-                switch(args[0].toLowerCase()) {
+                if(args.length < 3) return error(sender, "Specify value to change, and the new value.");
+                switch(args[1].toLowerCase()) {
                     case "cost" -> {
-                        setInt(sender, args[1], kit::setCost, "Cost changed successfully.");
+                        setInt(sender, args[2], kit::setCost, "Cost changed successfully.");
+                        break;
                     }
                     case "icon.type" -> {
                         try {
-                            kit.setIconType(Material.valueOf(args[1]));
+                            kit.setIconType(Material.valueOf(args[2].toUpperCase()));
                         } catch(IllegalArgumentException e) {
-                            return error(sender, "Invalid material type: §4"+args[1]);
+                            return error(sender, "Invalid material type: §4"+args[2]);
                         }
+                        break;
                     }
                     case "name" -> {
-                        String newValue = absorbRemaining(1, args);
+                        String newValue = absorbRemaining(2, args);
                         kit.setDisplayName(newValue);
+                        break;
                     }
                     default -> {
-                        return unexpectedArgument(sender, args[1], args_2_kits_edit);
+                        return unexpectedArgument(sender, args[2], args_2_kits_edit);
                     }
                 }
                 kit.save();
@@ -545,6 +540,21 @@ public class RocCommand extends AbstractCommand {
             if(args[0].equalsIgnoreCase("kits")) {
                 if(args[1].equalsIgnoreCase("edit")) {
                     return args_2_kits_edit.stream().filter(a -> a.startsWith(arg3)).toList();
+                }
+            }
+        }
+        else if(args.length == 5) {
+            String arg4 = args[4].toLowerCase();
+
+            if(args[0].equalsIgnoreCase("kits")) {
+                if(args[1].equalsIgnoreCase("edit")) {
+                    if(args[3].equalsIgnoreCase("icon.type")) {
+                        return Arrays.stream(Material.values())
+                                .map(Enum::name)
+                                .filter(m -> !m.startsWith("LEGACY_"))
+                                .map(String::toLowerCase)
+                                .filter(m -> m.startsWith(arg4)).toList();
+                    }
                 }
             }
         }

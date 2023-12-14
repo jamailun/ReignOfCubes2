@@ -25,7 +25,7 @@ public final class ComponentApiHelper {
         put('b', "<aqua>");
         put('c', "<red>");
         put('d', "<light_purple>");
-        put('e', "<aqua>");
+        put('e', "<yellow>");
         put('f', "<white>");
 
         put('k', "<obf>"); // obfuscated

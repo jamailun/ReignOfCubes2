@@ -342,6 +342,10 @@ public class ItemBuilder {
         return this;
     }
 
+    public ItemBuilder hideAll() {
+        return addItemFlag(ItemFlag.values());
+    }
+
     public ItemBuilder setPotionColor(Color color) {
         PotionMeta meta = (PotionMeta) item.getItemMeta();
         meta.setColor(color);
