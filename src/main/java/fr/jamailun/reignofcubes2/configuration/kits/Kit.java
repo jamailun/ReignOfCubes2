@@ -1,12 +1,15 @@
 package fr.jamailun.reignofcubes2.configuration.kits;
 
+import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.configuration.KitsConfiguration;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import fr.jamailun.reignofcubes2.utils.ItemBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemFlag;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
@@ -14,9 +17,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 
-public class Kit extends Configurable {
+@SerializableAs("Kit")
+public class Kit implements Cloneable, ConfigurationSerializable {
 
-    private final KitsConfiguration.KitsConfigurationSaver saver;
+    @Setter private KitsConfiguration.KitsConfigurationSaver saver;
     @Getter private final String id;
     @Getter @Setter private String displayName;
 
@@ -25,32 +29,34 @@ public class Kit extends Configurable {
     @Getter @Setter private int cost;
     private final Set<KitItem> items = new HashSet<>();
 
-    public Kit(KitsConfiguration.KitsConfigurationSaver saver, String id) {
+    public Kit(String id) {
         this.id = id;
-        this.saver = saver;
+        iconType = Material.GRASS_BLOCK;
     }
 
     @SuppressWarnings("unchecked")
-    public static Kit deserialize(@NotNull Map<String, Object> map, KitsConfiguration.KitsConfigurationSaver saver) {
+    public static Kit deserialize(@NotNull Map<String, Object> map) {
         // Id
         String id = (String) map.get("id");
 
         // Create kit basics
-        Kit kit = new Kit(saver, id);
+        Kit kit = new Kit(id);
         kit.displayName = (String) map.get("name");
         kit.cost = (int) map.get("cost");
 
         // icon
-        kit.iconType = loadMaterial("kit-"+kit.id, (String)map.get("icon-type"));
-        if(kit.iconType == null)
+        String iconType = (String)map.get("icon-type");
+        try {
+            kit.iconType = Material.valueOf(iconType);
+        } catch(IllegalArgumentException e) {
+            ReignOfCubes2.error("Invalid icon TYPE '" + iconType + "'.");
             kit.iconType = Material.BARRIER;
+        }
 
         // Items
-        List<Map<String, Object>> items = (List<Map<String,java.lang.Object>>) map.get("items");
-        for(Map<String, Object> entry : items) {
-            KitItem item = KitItem.deserialize(entry);
-            kit.items.add(item);
-        }
+        List<KitItem> items = (List<KitItem>) map.get("items");
+        kit.items.addAll(items);
+
         return kit;
     }
 
@@ -63,12 +69,18 @@ public class Kit extends Configurable {
             ItemStack item = inventory.getItem(slot);
             if(item != null) {
                 player.getPlayer().sendMessage("§fslot=§a"+slot+"§f, item=§e"+item.getType().name().toLowerCase());
-                items.add(new KitItem(slot, item));
+                KitItem ki = new KitItem(slot, item);
+                items.add(ki);
+
+                if(ki.getItem().getType() == Material.AIR) {
+                    ReignOfCubes2.error("[!] Item of slot " + ki.getSlot() + " has been corrupted in kit " + id);
+                }
             }
         }
     }
 
     public void save() {
+        assert saver != null;
         saver.save(this);
     }
 
@@ -104,12 +116,27 @@ public class Kit extends Configurable {
 
     @Override
     public @NotNull Map<String, Object> serialize() {
-        return Map.of(
-                "id", id,
-                "name", displayName,
-                "cost", cost,
-                "icon-type", iconType.name(),
-                "items", items.stream().map(KitItem::serialize).toList()
-        );
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("id", id);
+        map.put("name", displayName);
+        map.put("cost", cost);
+        map.put("icon-type", iconType.name());
+        map.put("items", List.copyOf(items));
+        return map;
+    }
+
+    public void __debug(KitItem ki) {
+        items.add(ki);
+    }
+
+    @Override
+    public Kit clone() {
+        Kit clone = new Kit(id);
+        clone.saver = saver;
+        clone.displayName = displayName;
+        clone.cost = cost;
+        clone.iconType = iconType;
+        clone.items.addAll(items);
+        return clone;
     }
 }

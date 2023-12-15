@@ -14,7 +14,8 @@ import fr.jamailun.reignofcubes2.utils.WorldEditHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.command.*;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -22,7 +23,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * I'll clean this mess up. One day.
@@ -34,7 +37,7 @@ public class RocCommand extends AbstractCommand {
 
     private final static List<String> args_0 = List.of("config", "start", "stop", "help", "reload", "show", "cheat", "kits");
     private final static List<String> args_1_start = List.of("game", "countdown");
-    private final static List<String> args_1_reload = List.of("messages");
+    private final static List<String> args_1_reload = List.of("messages", "kits");
     private final static List<String> args_1_kits = List.of("gui", "from-inventory.new", "from-inventory.update", "give", "delete", "edit");
     private final static List<String> args_1_config = List.of("enable", "set-default", "list", "create", "delete", "edit", "edit.spawns", "show");
     private final static List<String> args_1_cheat = List.of("set.king", "set.score");
@@ -329,6 +332,11 @@ public class RocCommand extends AbstractCommand {
             if(arg.equalsIgnoreCase("messages")) {
                 Messages.reload();
                 return success(sender, "Messages configuration reloaded.");
+            }
+
+            if(arg.equalsIgnoreCase("kits")) {
+                ReignOfCubes2.getKits().reload();
+                return success(sender, "Kits configuration reloaded.");
             }
 
             return unexpectedArgument(sender, arg, args_1_reload);

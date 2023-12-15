@@ -2,15 +2,18 @@ package fr.jamailun.reignofcubes2.configuration.kits;
 
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import lombok.Getter;
-import org.bukkit.Material;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
+@SerializableAs("KitItem")
 @Getter
-public class KitItem extends Configurable implements Comparable<KitItem> {
+public class KitItem implements Cloneable, ConfigurationSerializable, Comparable<KitItem> {
 
     private int slot;
     private ItemStack item;
@@ -22,16 +25,11 @@ public class KitItem extends Configurable implements Comparable<KitItem> {
         this.item = item;
     }
 
-    @SuppressWarnings("unchecked")
     public static KitItem deserialize(@NotNull Map<String, Object> map) {
         KitItem config = new KitItem();
 
         config.slot = (int) map.get("slot");
-
-        Map<String, Object> item = (Map<String, Object>) map.get("item");
-        ReignOfCubes2.info("[debug] slot=" + config.slot+", map.get(item)=" + map.get("item"));
-        config.item = ItemStack.deserialize(item);
-        ReignOfCubes2.info("[debug] item=>" + config.item);
+        config.item = (ItemStack) map.get("item");
 
         return config;
     }
@@ -46,10 +44,10 @@ public class KitItem extends Configurable implements Comparable<KitItem> {
 
     @Override
     public @NotNull Map<String, Object> serialize() {
-        return Map.of(
-                "slot", slot,
-                "item", item.serialize()
-        );
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("slot", slot);
+        map.put("item", item);
+        return map;
     }
 
     public String slotString() {
@@ -59,5 +57,13 @@ public class KitItem extends Configurable implements Comparable<KitItem> {
     @Override
     public int compareTo(@NotNull KitItem o) {
         return slot - o.slot;
+    }
+
+    @Override
+    public KitItem clone() {
+        KitItem clone = new KitItem();
+        clone.item = item.clone();
+        clone.slot = slot;
+        return clone;
     }
 }

@@ -30,26 +30,18 @@ public class KitsConfiguration {
         reload();
     }
 
-    @SuppressWarnings("unchecked")
     public void reload() {
         kits.clear();
         ConfigurationSection config = YamlConfiguration.loadConfiguration(file);
 
         for(String key : config.getKeys(false)) {
-            ConfigurationSection section = config.getConfigurationSection(key);
-            if(section == null) {
-                ReignOfCubes2.error("[KitsConfiguration] Expected configuration section for key : "+key);
+            Kit k = config.getSerializable(key, Kit.class);
+            if(k == null) {
+                ReignOfCubes2.error("Null key ! obj="+config.get(key));
                 continue;
             }
-            Map<String, Object> map = new HashMap<>();
-            for(String sectionKey : section.getKeys(false)) {
-                debug("[" + sectionKey + "> " + (section.get(sectionKey) == null ? "null" : section.get(sectionKey).getClass()));
-                map.put(sectionKey, section.get(sectionKey));
-            }
-            debug("DEBUG("+key+"). raw = " + map);
-
-            Kit kit = Kit.deserialize(map, saver);
-            kits.put(kit.getId(), kit);
+            k.setSaver(saver);
+            kits.put(k.getId(), k);
         }
 
         ReignOfCubes2.info("KitsConfiguration loaded " + kits.size() + " kits.");
@@ -57,7 +49,8 @@ public class KitsConfiguration {
 
     public Kit create(String id, String displayName) {
         if(getKit(id) != null) return null;
-        Kit kit = new Kit(saver, id);
+        Kit kit = new Kit(id);
+        kit.setSaver(saver);
         kit.setDisplayName(displayName);
         kit.setIconType(Material.GRASS_BLOCK);
         kit.setCost(-1);
@@ -95,8 +88,8 @@ public class KitsConfiguration {
 
         // Write new data
         for(Kit kit : kits.values()) {
+            config.set(kit.getId(), kit);
             debug("writing: " + kit.getId());
-            config.set(kit.getId(), kit.serialize());
         }
 
         // Save in FS

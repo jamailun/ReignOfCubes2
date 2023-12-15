@@ -2,12 +2,15 @@ package fr.jamailun.reignofcubes2;
 
 import fr.jamailun.reignofcubes2.commands.*;
 import fr.jamailun.reignofcubes2.configuration.KitsConfiguration;
+import fr.jamailun.reignofcubes2.configuration.kits.Kit;
+import fr.jamailun.reignofcubes2.configuration.kits.KitItem;
 import fr.jamailun.reignofcubes2.listeners.*;
 import fr.jamailun.reignofcubes2.placeholder.RocPlaceholderExpansion;
 import io.papermc.paper.plugin.configuration.PluginMeta;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
@@ -20,6 +23,12 @@ public final class ReignOfCubes2 extends JavaPlugin {
 
     @Getter private GameManager gameManager;
     private KitsConfiguration kitsConfiguration;
+
+    // Register serializable
+    static {
+        ConfigurationSerialization.registerClass(Kit.class, "Kit");
+        ConfigurationSerialization.registerClass(KitItem.class, "KitItem");
+    }
 
     @Override
     public void onEnable() {

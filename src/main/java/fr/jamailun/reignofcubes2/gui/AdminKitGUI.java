@@ -40,6 +40,6 @@ public class AdminKitGUI extends MenuGUI {
     }
 
     private void clickedOnItem(KitItem item) {
-
+        //TODO faire quelque chose ?
     }
 }
