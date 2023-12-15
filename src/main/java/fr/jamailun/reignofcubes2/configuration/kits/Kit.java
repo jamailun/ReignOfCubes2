@@ -38,6 +38,7 @@ public class Kit implements Cloneable, ConfigurationSerializable {
     public static Kit deserialize(@NotNull Map<String, Object> map) {
         // Id
         String id = (String) map.get("id");
+        ReignOfCubes2.info("[Kit-debug] Kit id=" + id);
 
         // Create kit basics
         Kit kit = new Kit(id);
@@ -55,6 +56,7 @@ public class Kit implements Cloneable, ConfigurationSerializable {
 
         // Items
         List<KitItem> items = (List<KitItem>) map.get("items");
+        assert items != null : "Null 'items' for Kit id="+id;
         kit.items.addAll(items);
 
         return kit;

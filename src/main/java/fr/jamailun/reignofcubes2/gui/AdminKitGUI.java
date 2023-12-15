@@ -34,7 +34,14 @@ public class AdminKitGUI extends MenuGUI {
 
         // Footer
         setDefaultFooter();
-        set(getSize()-9, BACK_ITEM, () -> new AdminKitsGUI(getPlayer()));
+        set(getSize() - 9, BACK_ITEM, () -> new AdminKitsGUI(getPlayer()));
+        set(getSize() - 7,
+                new ItemBuilder(Material.GOLD_BLOCK).setName("&aGive kit").toItemStack(),
+                () -> {
+                    kit.equip(player);
+                    player.getPlayer().closeInventory();
+                }
+        );
 
         open();
     }
