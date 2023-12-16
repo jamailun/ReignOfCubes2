@@ -16,7 +16,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-
 @SerializableAs("Kit")
 public class Kit implements Cloneable, ConfigurationSerializable {
 

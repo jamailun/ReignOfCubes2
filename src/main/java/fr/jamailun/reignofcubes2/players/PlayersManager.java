@@ -85,6 +85,8 @@ public class PlayersManager implements Iterable<RocPlayer> {
             player.reset();
             // Teleport
             player.getPlayer().teleport(spawn.next());
+            // Signal respawn (to give the kit)
+            player.respawned();
         }
     }
 
