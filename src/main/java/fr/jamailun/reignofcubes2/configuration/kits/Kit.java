@@ -7,7 +7,6 @@ import fr.jamailun.reignofcubes2.utils.ItemBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.inventory.ItemStack;
@@ -102,7 +101,7 @@ public class Kit implements Cloneable, ConfigurationSerializable {
 
         for(KitItem item : items) {
             item.equip(inventory);
-            player.getPlayer().sendMessage("§f[>] slot=§e"+item.getSlot()+"§f, item=§a" + item.getItem().getType());
+            //player.getPlayer().sendMessage("§f[>] slot=§e"+item.getSlot()+"§f, item=§a" + item.getItem().getType());
         }
 
         player.getPlayer().updateInventory();
@@ -124,10 +123,6 @@ public class Kit implements Cloneable, ConfigurationSerializable {
         map.put("icon-type", iconType.name());
         map.put("items", List.copyOf(items));
         return map;
-    }
-
-    public void __debug(KitItem ki) {
-        items.add(ki);
     }
 
     @Override
