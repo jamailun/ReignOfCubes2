@@ -296,7 +296,7 @@ public class ItemBuilder {
         List<String> lore = new ArrayList<>();
         if(im.hasLore())
             lore = new ArrayList<>(im.getLore());
-        lore.add(ChatColor.GRAY + line);
+        lore.add(ChatColor.GRAY + ChatColor.translateAlternateColorCodes('&', line));
         im.setLore(lore);
         item.setItemMeta(im);
         return this;

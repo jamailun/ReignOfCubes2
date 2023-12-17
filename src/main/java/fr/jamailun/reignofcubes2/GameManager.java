@@ -77,9 +77,21 @@ public class GameManager {
     }
 
     public void playerJoinsServer(Player p) {
+        if(isPlaying()) {
+            //TODO join in game !
+            // -> spectator.
+        }
+
         RocPlayer player = players.join(p);
         broadcast("event.joined", player.getName());
 
+        // Go to lobby on join
+        if(worldConfiguration != null && worldConfiguration.isValid()) {
+            p.teleport(worldConfiguration.getLobby());
+        }
+
+
+        // Test if the game should start.
         testShouldStartGame();
     }
 
@@ -321,8 +333,8 @@ public class GameManager {
         isVictory = false;
 
         // Message and go back to spawn
-        //TODO message, TP players, ...
         ReignOfCubes2.info("Game stopped.");
+        players.backToLobby();
     }
 
     public void broadcast(String entry, Object... args) {

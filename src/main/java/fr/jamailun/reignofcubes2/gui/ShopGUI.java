@@ -48,10 +48,11 @@ public class ShopGUI extends MenuGUI {
         getPlayer().removeScore(cost, ScoreRemoveReason.BUY_KIT);
         kit.equip(getPlayer());
         getPlayer().sendMessage("score.messages.kit-bought");
+        getPlayer().getPlayer().closeInventory();
     }
 
     private String printCost(RocPlayer player, Kit kit) {
-        String color = player.hasScore(kit.getCost()) ? "&4" : "&e";
+        String color = player.hasScore(kit.getCost()) ? "&e" : "&4";
         return color + kit.getCost();
     }
 

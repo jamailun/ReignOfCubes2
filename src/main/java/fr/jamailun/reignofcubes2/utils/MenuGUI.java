@@ -101,6 +101,7 @@ public abstract class MenuGUI {
 
     public final void handleClick(InventoryClickEvent e) {
         if(options.containsKey(e.getSlot())) {
+            e.setCancelled(alwaysCancels());
             options.get(e.getSlot()).run();
             return;
         }
@@ -125,6 +126,9 @@ public abstract class MenuGUI {
         set(size-1, QUIT_ITEM, () -> getPlayer().getPlayer().closeInventory());
     }
 
+    protected boolean alwaysCancels() {
+        return true;
+    }
 
     public final static class MenuGUIManager {
         private MenuGUIManager() {}

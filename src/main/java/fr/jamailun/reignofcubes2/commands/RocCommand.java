@@ -12,6 +12,7 @@ import fr.jamailun.reignofcubes2.messages.Messages;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import fr.jamailun.reignofcubes2.utils.WorldEditHandler;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -35,7 +36,7 @@ public class RocCommand extends AbstractCommand {
     private final static Vector MODIFIER_A = new Vector(0, 0, 0);
     private final static Vector MODIFIER_B = new Vector(1, 1, 1);
 
-    private final static List<String> args_0 = List.of("config", "start", "stop", "help", "reload", "show", "cheat", "kits");
+    private final static List<String> args_0 = List.of("config", "start", "stop", "help", "reload", "show", "cheat", "kits", "tp.lobby");
     private final static List<String> args_1_start = List.of("game", "countdown");
     private final static List<String> args_1_reload = List.of("messages", "kits");
     private final static List<String> args_1_kits = List.of("gui", "from-inventory.new", "from-inventory.update", "give", "delete", "edit");
@@ -47,6 +48,7 @@ public class RocCommand extends AbstractCommand {
     private final static List<String> args_2_edit = List.of(
             "players.min", "players.max",
             "throne.pos_a", "throne.pos_b", "throne.pos", "throne.cooldown",
+            "lobby",
             "crowning-duration", "crowning-duration.steal",
             "spawn.safe-distance",
             "scoring.goal", "scoring.king.bonus", "scoring.king.per-second",
@@ -168,36 +170,48 @@ public class RocCommand extends AbstractCommand {
                     return error(sender, "Unknown configuration: " + configName);
                 WorldConfiguration config = configs().get(configName);
 
-                if(property.equals("throne.pos_a") || property.equals("throne.pos_b") || property.equals("throne.pos")) {
+                if(     property.equals("throne.pos_a")
+                        || property.equals("throne.pos_b")
+                        || property.equals("throne.pos")
+                        || property.equals("lobby")
+                ) {
                     if(!(sender instanceof Entity)) {
                         return error(sender, "You must be a player to change the throne position.");
                     }
                     Vector vector = ((Player)sender).getLocation().toVector();
-                    if(property.equals("throne.pos_a")) {
-                        vector = new Vector(
-                                Math.floor(vector.getX()),
-                                Math.floor(vector.getY()),
-                                Math.floor(vector.getZ())
-                        );
-                        config.setThroneA(vector.add(MODIFIER_A));
-                        info(sender, "Position of throne has been updated to "+niceVector(vector)+" for §6" + configName);
-                    } else if(property.equals("throne.pos_b")) {
-                        vector = new Vector(
-                                Math.floor(vector.getX()),
-                                Math.ceil(vector.getY()),
-                                Math.floor(vector.getZ())
-                        );
-                        config.setThroneB(vector.add(MODIFIER_B));
-                        info(sender, "Position of throne has been updated to "+niceVector(vector)+" for §6" + configName);
-                    } else {
-                        Region region = WorldEditHandler.getSelectedRegion(sender.getName());
-                        if(region == null) return error(sender, "Select a zone with WE to use this.");
-                        Vector3 min = region.getMinimumPoint().toVector3();
-                        Vector3 max = region.getMaximumPoint().toVector3();
-                        config.setThroneA(new Vector(min.getX(), min.getY(), min.getZ()).add(MODIFIER_A));
-                        config.setThroneB(new Vector(max.getX(), max.getY(), max.getZ()).add(MODIFIER_B));
-                        info(sender, "Position of throne has been updated for §6" + configName
-                                + "§a to §e" + min + "§a ; §e" + max);
+                    switch (property) {
+                        case "lobby" -> {
+                            config.setLobby(vector);
+                            info(sender, "Position of lobby has been updated to " + niceVector(vector) + " for §6" + configName);
+                        }
+                        case "throne.pos_a" -> {
+                            vector = new Vector(
+                                    Math.floor(vector.getX()),
+                                    Math.floor(vector.getY()),
+                                    Math.floor(vector.getZ())
+                            );
+                            config.setThroneA(vector.add(MODIFIER_A));
+                            info(sender, "Position of throne has been updated to " + niceVector(vector) + " for §6" + configName);
+                        }
+                        case "throne.pos_b" -> {
+                            vector = new Vector(
+                                    Math.floor(vector.getX()),
+                                    Math.ceil(vector.getY()),
+                                    Math.floor(vector.getZ())
+                            );
+                            config.setThroneB(vector.add(MODIFIER_B));
+                            info(sender, "Position of throne has been updated to " + niceVector(vector) + " for §6" + configName);
+                        }
+                        default -> {
+                            Region region = WorldEditHandler.getSelectedRegion(sender.getName());
+                            if (region == null) return error(sender, "Select a zone with WE to use this.");
+                            Vector3 min = region.getMinimumPoint().toVector3();
+                            Vector3 max = region.getMaximumPoint().toVector3();
+                            config.setThroneA(new Vector(min.getX(), min.getY(), min.getZ()).add(MODIFIER_A));
+                            config.setThroneB(new Vector(max.getX(), max.getY(), max.getZ()).add(MODIFIER_B));
+                            info(sender, "Position of throne has been updated for §6" + configName
+                                    + "§a to §e" + min + "§a ; §e" + max);
+                        }
                     }
                     return saveConfiguration(sender, config);
                 }
@@ -276,6 +290,24 @@ public class RocCommand extends AbstractCommand {
             }
 
             return unexpectedArgument(sender, arg, args_1_config);
+        }
+
+        if(arg.equalsIgnoreCase("tp.lobby")) {
+            if(game().isPlaying()) {
+                return error(sender, "Cannot interrupt game while playing. Stop-it first.");
+            }
+            WorldConfiguration config = game().getWorldConfiguration();
+            if(config == null || ! config.isValid())
+                return error(sender, "Invalid configuration. Either on-set or invalid.");
+            Location lobby = game().getWorldConfiguration().getLobby();
+            game().players()
+                    .filter(RocPlayer::isValid)
+                    .map(RocPlayer::getPlayer)
+                    .forEach(p -> {
+                        info(p, "Téléporté au lobby par " + sender.getName());
+                        p.teleport(lobby);
+                    });
+            return info(sender, "All players teleported to lobby.");
         }
 
         if(arg.equalsIgnoreCase("start")) {
@@ -433,26 +465,22 @@ public class RocCommand extends AbstractCommand {
             if(arg.equalsIgnoreCase("edit")) {
                 if(args.length < 3) return error(sender, "Specify value to change, and the new value.");
                 switch(args[1].toLowerCase()) {
-                    case "cost" -> {
+                    case "cost":
                         setInt(sender, args[2], kit::setCost, "Cost changed successfully.");
                         break;
-                    }
-                    case "icon.type" -> {
+                    case "icon.type":
                         try {
                             kit.setIconType(Material.valueOf(args[2].toUpperCase()));
                         } catch(IllegalArgumentException e) {
                             return error(sender, "Invalid material type: §4"+args[2]);
                         }
                         break;
-                    }
-                    case "name" -> {
+                    case "name":
                         String newValue = absorbRemaining(2, args);
                         kit.setDisplayName(newValue);
                         break;
-                    }
-                    default -> {
+                    default:
                         return unexpectedArgument(sender, args[2], args_2_kits_edit);
-                    }
                 }
                 kit.save();
                 return success(sender, "Kit saved successfully.");
@@ -513,7 +541,7 @@ public class RocCommand extends AbstractCommand {
                         || args[1].equalsIgnoreCase("edit.spawns")
                         || args[1].equalsIgnoreCase("set-default")
                         || args[1].equalsIgnoreCase("show")
-                        || args[0].equalsIgnoreCase("enable")
+                        || args[1].equalsIgnoreCase("enable")
                 ) {
                     return configurationsNames().filter(a -> a.startsWith(arg2)).toList();
                 }

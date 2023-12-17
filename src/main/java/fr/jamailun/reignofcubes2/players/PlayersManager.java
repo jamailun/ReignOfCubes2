@@ -93,4 +93,15 @@ public class PlayersManager implements Iterable<RocPlayer> {
     public void updateRanking(Ranking<RocPlayer> ranking) {
         ranking.update(players.values());
     }
+
+    public void backToLobby() {
+        assert game.getWorldConfiguration().isValid();
+        Location lobby = game.getWorldConfiguration().getLobby();
+
+        for(RocPlayer player : players.values()) {
+            if(player.isValid()) {
+                player.getPlayer().teleport(lobby);
+            }
+        }
+    }
 }

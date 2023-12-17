@@ -28,6 +28,7 @@ public class WorldConfiguration {
     @Getter private final String name, author, worldName;
     private List<Vector> spawns = new ArrayList<>();
     @Setter private Vector throneA, throneB;
+    @Setter private Vector lobby;
     @Getter private GameRules rules;
 
     public static WorldConfiguration load(File file) throws BadWorldConfigurationException {
@@ -50,6 +51,9 @@ public class WorldConfiguration {
             configuration.throneA = throne.getVector("pos_a");
             configuration.throneB = throne.getVector("pos_b");
         }
+
+        // Load lobby
+        configuration.lobby = config.getVector("lobby");
 
         // Load spawns
         configuration.spawns = getVectorsList(config, "spawns");
@@ -85,9 +89,16 @@ public class WorldConfiguration {
             th.set("pos_b", throneB);
         }
 
+        // Lobby
+        if(lobby != null) {
+            config.set("lobby", lobby);
+        }
+
+
         // spawns
-        if(spawns != null)
+        if(spawns != null) {
             setVectorsList(config, "spawns", spawns);
+        }
 
         // rules
         ConfigurationSection rulesSection = config.createSection("rules");
@@ -98,6 +109,7 @@ public class WorldConfiguration {
 
     public boolean isValid() {
         return (throneA != null && throneB != null)
+                && lobby != null
                 && (!spawns.isEmpty())
                 && rules.isValid();
     }
@@ -107,6 +119,13 @@ public class WorldConfiguration {
         World world = Bukkit.getWorld(worldName);
         assert world != null;
         return new Throne(game, throneA, throneB);
+    }
+
+    public Location getLobby() {
+        assert lobby != null;
+        World world = Bukkit.getWorld(worldName);
+        assert world != null;
+        return lobby.toLocation(world);
     }
 
     public List<Location> generateSpawns() {
@@ -162,6 +181,7 @@ public class WorldConfiguration {
                 + "world = " + (Bukkit.getWorld(worldName) != null ? "§a" : "§c") + worldName + endl
                 + "§l" + "valid = " + (isValid() ? "§atrue" : "§cfalse") + endl
                 + "throne = " + niceVector(throneA) + " -> " +  niceVector(throneB) + endl
+                + "lobby = " + niceVector(throneA) + endl
                 + "spawns = §7" + Arrays.toString(spawns == null ? new Object[0] : spawns.toArray()) + endl
                 + "rules = §7" + rules.nicePrint("\n    ", "\n  ")
                 + "§r\n}";
@@ -223,6 +243,12 @@ public class WorldConfiguration {
                 for(Vector v : spawns) {
                     Location l = v.toLocation(player.getWorld());
                     ParticlesPlayer.playCircleXZ(player, l, 1, Math.toRadians(6), Particle.DRAGON_BREATH);
+                }
+
+                //lobby
+                if(lobby != null) {
+                    Location l = lobby.toLocation(player.getWorld());
+                    ParticlesPlayer.playCircleXZ(player, l, 2, Math.toRadians(12), Particle.ELECTRIC_SPARK);
                 }
             },1);
             showing.put(uuid, task);

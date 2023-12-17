@@ -75,7 +75,7 @@ public class RocPlayer {
     }
 
     public boolean isValid() {
-        return player.isValid() && ! player.isDead() && player.isOnline();
+        return player.isValid() && player.isOnline();
     }
 
     public void reset() {
