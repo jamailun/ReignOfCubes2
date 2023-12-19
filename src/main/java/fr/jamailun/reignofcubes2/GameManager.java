@@ -2,6 +2,7 @@ package fr.jamailun.reignofcubes2;
 
 import fr.jamailun.reignofcubes2.configuration.ConfigurationsList;
 import fr.jamailun.reignofcubes2.configuration.GameRules;
+import fr.jamailun.reignofcubes2.configuration.SoundsLibrary;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
 import fr.jamailun.reignofcubes2.objects.Ceremony;
 import fr.jamailun.reignofcubes2.objects.GameCountdown;
@@ -13,6 +14,7 @@ import fr.jamailun.reignofcubes2.players.ScoreRemoveReason;
 import fr.jamailun.reignofcubes2.utils.Ranking;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
@@ -84,6 +86,7 @@ public class GameManager {
 
         RocPlayer player = players.join(p);
         broadcast("event.joined", player.getName());
+        playSound(SoundsLibrary.PLAYER_JOINED);
 
         // Go to lobby on join
         if(worldConfiguration != null && worldConfiguration.isValid()) {
@@ -154,8 +157,11 @@ public class GameManager {
             if(victim.isKing()) {
                 setKing(null);
                 broadcast("event.king.death", victim.getName());
+                victim.playSound(SoundsLibrary.DEAD_AS_KING);
+                playSound(SoundsLibrary.KING_KILLED);
             } else {
                 broadcast("event.death.alone", victim.getName());
+                victim.playSound(SoundsLibrary.DEAD);
             }
             victim.removeScore(getRules().getScoreDeathPenalty(), ScoreRemoveReason.DEATH_PENALTY);
             ranking.update(victim);
@@ -165,12 +171,18 @@ public class GameManager {
         // broadcast + king switch
         if(killer.isKing()) {
             broadcast("event.death.killed-as-king", victim.getName(), killer.getName());
-            //TODO points bonus if king ?
+            victim.playSound(SoundsLibrary.DEAD);
+            killer.playSound(SoundsLibrary.KILLED_AS_KING);
         } else if(victim.isKing()) {
             broadcast("event.death.killed-king", victim.getName(), killer.getName());
             setKing(killer);
+            victim.playSound(SoundsLibrary.DEAD_AS_KING);
+            killer.playSound(SoundsLibrary.KILLED_KING);
+            playSound(SoundsLibrary.KING_KILLED);
         } else {
             broadcast("event.death.killed", victim.getName(), killer.getName());
+            victim.playSound(SoundsLibrary.DEAD);
+            killer.playSound(SoundsLibrary.KILLED);
         }
 
         // Points
@@ -194,6 +206,7 @@ public class GameManager {
                 broadcast("event.king.death", king.getName());
                 king.setKing(false);
                 king = null;
+                //TODO sound
             }
             return;
         }
@@ -388,11 +401,19 @@ public class GameManager {
                 .findFirst();
     }
 
-    public final Cheat cheat = new Cheat();
-
     public int getOnlinePlayersCount() {
         return (int) players().filter(p -> p.getPlayer().isOnline()).count();
     }
+
+    public void playSound(SoundsLibrary.SoundEntry entry) {
+        playSound(entry.sound(), 5f, entry.pitch());
+    }
+
+    public void playSound(Sound sound, float volume, float pitch) {
+        players().forEach(p -> p.playSound(sound, volume, pitch));
+    }
+
+    public final Cheat cheat = new Cheat();
 
     public class Cheat {
         public void forceKing(@Nullable RocPlayer player) {

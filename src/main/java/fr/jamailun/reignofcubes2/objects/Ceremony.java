@@ -2,6 +2,7 @@ package fr.jamailun.reignofcubes2.objects;
 
 import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.configuration.SoundsLibrary;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -39,6 +40,11 @@ public class Ceremony {
         if(elapsed >= duration) {
             success = true;
             game.ceremonyIsOver(player);
+            game.playSound(SoundsLibrary.KING_CROWNED);
+        } else {
+            // Play a 'ding'
+            double pitch = (elapsed * (1.9d)/duration) + 0.1d;
+            game.playSound(SoundsLibrary.CEREMONY_DING, 5f, (float) pitch);
         }
     }
 

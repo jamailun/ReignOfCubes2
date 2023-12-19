@@ -121,7 +121,10 @@ public class Kit implements Cloneable, ConfigurationSerializable {
         map.put("name", displayName);
         map.put("cost", cost);
         map.put("icon-type", iconType.name());
-        map.put("items", List.copyOf(items));
+        map.put("items", items.stream()
+                        .sorted(Comparator.comparing(KitItem::getSlot))
+                        .toList()
+        );
         return map;
     }
 

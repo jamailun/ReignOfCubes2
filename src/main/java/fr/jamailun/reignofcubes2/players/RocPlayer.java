@@ -1,6 +1,7 @@
 package fr.jamailun.reignofcubes2.players;
 
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.configuration.SoundsLibrary;
 import fr.jamailun.reignofcubes2.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.events.ScoreGainedEvent;
 import fr.jamailun.reignofcubes2.messages.Messages;
@@ -8,6 +9,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 
@@ -110,5 +113,14 @@ public class RocPlayer {
             return rp.getUUID().equals(getUUID());
         }
         return false;
+    }
+
+    public void playSound(Sound sound, float volume, float pitch) {
+        if(!isValid()) return;
+        player.playSound(player.getLocation(), sound, volume, pitch);
+    }
+
+    public void playSound(SoundsLibrary.SoundEntry entry) {
+        playSound(entry.sound(), 5f, entry.pitch());
     }
 }

@@ -3,6 +3,7 @@ package fr.jamailun.reignofcubes2.objects;
 import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.GameState;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.configuration.SoundsLibrary;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.List;
@@ -53,6 +54,15 @@ public class GameCountdown {
         // Start if needed
         if(secondsRemaining == 0) {
             game.start();
+        } else {
+            // play tick
+            if(secondsRemaining > 20) {
+                game.playSound(SoundsLibrary.GAME_COUNTER_TICK_LOW);
+            } else if(secondsRemaining > 10) {
+                game.playSound(SoundsLibrary.GAME_COUNTER_TICK_MIDDLE);
+            } else {
+                game.playSound(SoundsLibrary.GAME_COUNTER_TICK_HIGH);
+            }
         }
     }
 
