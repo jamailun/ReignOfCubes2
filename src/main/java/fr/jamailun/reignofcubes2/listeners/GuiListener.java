@@ -21,10 +21,11 @@ public class GuiListener extends RocListener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
-        if(Objects.equals(e.getClickedInventory(), e.getWhoClicked().getInventory()) && e.getSlot() == 8) {
-            e.setCancelled(true);
-            Bukkit.getConsoleSender().sendMessage("§7click on slot 8 !");
-            return;
+        if(Objects.equals(e.getClickedInventory(), e.getWhoClicked().getInventory())) {
+            if(e.getSlot() == 8 || e.getHotbarButton() == 8) {
+                e.setCancelled(true);
+                return;
+            }
         }
 
         MenuGUI.MenuGUIManager.handleClick(e);
