@@ -2,6 +2,7 @@ package fr.jamailun.reignofcubes2;
 
 import fr.jamailun.reignofcubes2.commands.*;
 import fr.jamailun.reignofcubes2.configuration.KitsConfiguration;
+import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
 import fr.jamailun.reignofcubes2.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.configuration.kits.KitItem;
 import fr.jamailun.reignofcubes2.listeners.*;
@@ -58,6 +59,7 @@ public final class ReignOfCubes2 extends JavaPlugin {
         new PlayerMovementListener(this);
         new PlayerDeathListener(this);
         new PlayerDamageListener(this);
+        new PlayerInteractionListener(this);
         new DisabledActionsListener(this);
         new PlayerRespawnListener(this);
         new PlayerSaturationChangedListener(this);
@@ -120,6 +122,10 @@ public final class ReignOfCubes2 extends JavaPlugin {
 
     public static KitsConfiguration getKits() {
         return INSTANCE.kitsConfiguration;
+    }
+
+    public static WorldConfiguration getCurrentConfig() {
+        return INSTANCE.gameManager.getWorldConfiguration();
     }
 
 }

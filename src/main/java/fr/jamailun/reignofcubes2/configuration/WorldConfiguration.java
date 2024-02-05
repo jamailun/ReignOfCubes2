@@ -14,6 +14,7 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
@@ -30,6 +31,7 @@ public class WorldConfiguration {
     @Setter private Vector throneA, throneB;
     @Setter private Vector lobby;
     @Getter private GameRules rules;
+    @Setter private ItemStack shopItem;
 
     public static WorldConfiguration load(File file) throws BadWorldConfigurationException {
         if(!file.exists())
@@ -61,6 +63,9 @@ public class WorldConfiguration {
         // Load rules
         ConfigurationSection rulesSection = config.getConfigurationSection("rules");
         configuration.rules = GameRules.load(rulesSection);
+
+        // Shop item
+        configuration.shopItem = config.getItemStack("shop-item");
 
         ReignOfCubes2.info("Loaded configuration " + configuration);
 
@@ -94,7 +99,6 @@ public class WorldConfiguration {
             config.set("lobby", lobby);
         }
 
-
         // spawns
         if(spawns != null) {
             setVectorsList(config, "spawns", spawns);
@@ -104,6 +108,10 @@ public class WorldConfiguration {
         ConfigurationSection rulesSection = config.createSection("rules");
         rules.write(rulesSection);
 
+        // Shop item
+        config.set("shop-item", shopItem);
+
+        //
         config.save(file);
     }
 
@@ -111,6 +119,7 @@ public class WorldConfiguration {
         return (throneA != null && throneB != null)
                 && lobby != null
                 && (!spawns.isEmpty())
+                && shopItem != null
                 && rules.isValid();
     }
 
@@ -145,6 +154,11 @@ public class WorldConfiguration {
 
     public List<Vector> spawnsList() {
         return spawns;
+    }
+
+    public ItemStack getShopItem() {
+        if(shopItem == null) return null;
+        return new ItemStack(shopItem);
     }
 
     @SuppressWarnings("unchecked")
@@ -183,6 +197,7 @@ public class WorldConfiguration {
                 + "throne = " + niceVector(throneA) + " -> " +  niceVector(throneB) + endl
                 + "lobby = " + niceVector(throneA) + endl
                 + "spawns = §7" + Arrays.toString(spawns == null ? new Object[0] : spawns.toArray()) + endl
+                + "shop-item = " + (shopItem == null ? "§cnone" : "§aok") + endl
                 + "rules = §7" + rules.nicePrint("\n    ", "\n  ")
                 + "§r\n}";
     }

@@ -19,6 +19,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -44,6 +45,7 @@ public class RocCommand extends AbstractCommand {
     private final static List<String> args_1_cheat = List.of("set.king", "set.score");
     private final static List<String> args_list = List.of("add", "remove", "list");
     private final static List<String> args_2_kits_edit = List.of("cost", "icon.type", "name");
+    private final static List<String> args_3_get_set = List.of("get", "set");
 
     private final static List<String> args_2_edit = List.of(
             "players.min", "players.max",
@@ -52,7 +54,8 @@ public class RocCommand extends AbstractCommand {
             "crowning-duration", "crowning-duration.steal",
             "spawn.safe-distance",
             "scoring.goal", "scoring.king.bonus", "scoring.king.per-second",
-            "scoring.kill.flat", "scoring.kill.steal", "scoring.death-penalty"
+            "scoring.kill.flat", "scoring.kill.steal", "scoring.death-penalty",
+            "shop-item"
     );
 
     public RocCommand(ReignOfCubes2 plugin) {
@@ -215,9 +218,29 @@ public class RocCommand extends AbstractCommand {
                     }
                     return saveConfiguration(sender, config);
                 }
+
                 if(args.length < 3)
                     return error(sender, "To change this property, specify a value");
                 String value = args[2];
+
+                if(property.equals("shop-item")) {
+                    if(! (sender instanceof Player p)) return error(sender, "Must be a player.");
+                    if(value.equals("get")) {
+                        ItemStack item = config.getShopItem();
+                        if(item == null) return error(sender, "No current item.");
+                        p.getInventory().addItem(item);
+                        return info(sender, "Current item added.");
+                    } else if(value.equals("set")) {
+                        ItemStack item = p.getInventory().getItemInMainHand();
+                        if(item.getType().isAir()) return error(sender, "Hold an item in hand.");
+                        config.setShopItem(item);
+                        if(saveConfiguration(sender, config)) {
+                            success(sender, "ShopItem changed successfully.");
+                        }
+                        return true;
+                    }
+                    return unexpectedArgument(sender, value, args_3_get_set);
+                }
 
                 GameRules rules = config.getRules();
                 String success = "Configuration §6"+configName+"§a has been updated successfully.";
@@ -584,12 +607,20 @@ public class RocCommand extends AbstractCommand {
 
             if(args[0].equalsIgnoreCase("kits")) {
                 if(args[1].equalsIgnoreCase("edit")) {
-                    if(args[3].equalsIgnoreCase("icon.type")) {
+                    if(args[3].equals("icon.type")) {
                         return Arrays.stream(Material.values())
                                 .map(Enum::name)
                                 .filter(m -> !m.startsWith("LEGACY_"))
                                 .map(String::toLowerCase)
-                                .filter(m -> m.startsWith(arg4)).toList();
+                                .filter(m -> m.startsWith(arg4))
+                                .toList();
+                    }
+                }
+            }
+            if(args[0].equals("config")) {
+                if(args[1].equalsIgnoreCase("edit")) {
+                    if(args[3].equalsIgnoreCase("shop-item")) {
+                        return args_3_get_set.stream().filter(a -> a.startsWith(arg4)).toList();
                     }
                 }
             }

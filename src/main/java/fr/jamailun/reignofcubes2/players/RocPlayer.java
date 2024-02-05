@@ -12,6 +12,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -99,10 +100,15 @@ public class RocPlayer {
         Kit defaultKit = ReignOfCubes2.getKits().getDefaultKit();
         if(defaultKit == null) {
             ReignOfCubes2.error("No default kit !");
-            return;
+        } else {
+            defaultKit.equip(this);
         }
 
-        defaultKit.equip(this);
+        // Add shop item
+        ItemStack is = ReignOfCubes2.getCurrentConfig().getShopItem();
+        if (is != null) {
+            getPlayer().getInventory().setItem(8, is);
+        }
     }
 
     @Override
