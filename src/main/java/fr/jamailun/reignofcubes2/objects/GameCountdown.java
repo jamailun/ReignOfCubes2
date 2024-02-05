@@ -46,15 +46,11 @@ public class GameCountdown {
         // Decrease time
         secondsRemaining --;
 
-        // Message
+        // Message & sound
         if(ALERT_AT.contains(secondsRemaining)) {
+            // message
             game.broadcast("countdown.message", secondsRemaining, secondsRemaining > 1 ? "s" : "");
-        }
 
-        // Start if needed
-        if(secondsRemaining == 0) {
-            game.start();
-        } else {
             // play tick
             if(secondsRemaining > 20) {
                 game.playSound(SoundsLibrary.GAME_COUNTER_TICK_LOW);
@@ -63,6 +59,13 @@ public class GameCountdown {
             } else {
                 game.playSound(SoundsLibrary.GAME_COUNTER_TICK_HIGH);
             }
+        }
+
+        // Start if needed
+        if(secondsRemaining == 0) {
+            game.start();
+            game.playSound(SoundsLibrary.GAME_STARTED_1);
+            game.playSound(SoundsLibrary.GAME_STARTED_2);
         }
     }
 

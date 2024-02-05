@@ -42,6 +42,7 @@ public class ShopGUI extends MenuGUI {
         // Check
         if(!getPlayer().hasScore(cost)) {
             getPlayer().sendMessage("score.messages.too-poor");
+            getPlayer().playSound(SoundsLibrary.TOO_POOR);
             return;
         }
 
