@@ -19,6 +19,7 @@ public class SoundsLibrary {
     public final static SoundEntry KING_KILLED = new SoundEntry(Sound.ENTITY_ENDER_DRAGON_DEATH, 0.92f);
 
 
+    public final static SoundEntry KIT_BOUGHT = new SoundEntry(Sound.ENTITY_PLAYER_LEVELUP, 0.9f);
 
     // Game counter
     public final static SoundEntry GAME_COUNTER_TICK_LOW = new SoundEntry(Sound.BLOCK_STONE_BUTTON_CLICK_OFF, 0.25f);

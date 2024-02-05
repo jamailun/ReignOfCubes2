@@ -1,6 +1,7 @@
 package fr.jamailun.reignofcubes2.gui;
 
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.configuration.SoundsLibrary;
 import fr.jamailun.reignofcubes2.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import fr.jamailun.reignofcubes2.players.ScoreRemoveReason;
@@ -45,6 +46,7 @@ public class ShopGUI extends MenuGUI {
         }
 
         // Buy it
+        getPlayer().playSound(SoundsLibrary.KIT_BOUGHT);
         getPlayer().removeScore(cost, ScoreRemoveReason.BUY_KIT);
         kit.equip(getPlayer());
         getPlayer().sendMessage("score.messages.kit-bought");
