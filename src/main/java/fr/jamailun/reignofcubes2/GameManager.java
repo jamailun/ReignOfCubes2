@@ -12,6 +12,7 @@ import fr.jamailun.reignofcubes2.players.RocPlayer;
 import fr.jamailun.reignofcubes2.players.ScoreAddReason;
 import fr.jamailun.reignofcubes2.players.ScoreRemoveReason;
 import fr.jamailun.reignofcubes2.utils.Ranking;
+import fr.jamailun.reignofcubes2.utils.WorldSetter;
 import lombok.Getter;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -72,6 +73,8 @@ public class GameManager {
         worldConfiguration = configuration;
         throne = worldConfiguration.generateThrone(this);
         world = Bukkit.getWorld(worldConfiguration.getWorldName());
+        assert world != null;
+        WorldSetter.configure(world);
         state = GameState.WAITING;
         return true;
     }
