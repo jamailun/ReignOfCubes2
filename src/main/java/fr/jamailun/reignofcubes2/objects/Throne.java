@@ -57,6 +57,7 @@ public class Throne {
             if(player.isKing()) {
                 player.sendMessage("throne.enters-as-king");
                 canStart = false;
+                //TODO give effects
             } else {
                 player.sendMessage("throne.enters-but-king");
             }

@@ -90,12 +90,24 @@ public class GameManager {
 
         // Go to lobby on join
         if(worldConfiguration != null && worldConfiguration.isValid()) {
-            p.teleport(worldConfiguration.getLobby());
+            makePlayerJoinsLobby(p);
         }
 
 
         // Test if the game should start.
         testShouldStartGame();
+    }
+
+    private void makePlayerJoinsLobby(Player p) {
+        // Teleport to lobby
+        p.teleport(worldConfiguration.getLobby());
+
+        // Clear inventory
+        p.getInventory().clear();
+
+        // Heal + saturation
+        p.setHealth(20);
+        p.setFoodLevel(20);
     }
 
     public void playerLeftServer(Player p) {

@@ -14,24 +14,6 @@ public class PlayerDeathListener extends RocListener {
     }
 
     @EventHandler
-    public void entityDamageEvent(EntityDamageByEntityEvent event) {
-        Entity victimEntity = event.getEntity();
-        Entity damagerEntity = event.getDamager();
-        if(victimEntity instanceof Player pv) {
-            RocPlayer victim = game().toPlayer(pv);
-            if(victim == null)
-                return;
-            if(damagerEntity instanceof Player pd) {
-                RocPlayer damager = game().toPlayer(pd);
-                if(damager == null)
-                    return;
-                victim.setLastDamager(damager);
-            }
-            //TODO PVE - last damager
-        }
-    }
-
-    @EventHandler
     public void playerKilledEvent(PlayerDeathEvent event) {
         Player v = event.getPlayer();
         RocPlayer victim = game().toPlayer(v);
