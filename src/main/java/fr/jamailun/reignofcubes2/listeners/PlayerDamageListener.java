@@ -26,7 +26,6 @@ public class PlayerDamageListener extends RocListener {
             // Attacker is a Player
             if(damagerEntity instanceof Player pd) {
                 RocPlayer damager = game().toPlayer(pd);
-                Bukkit.getConsoleSender().sendMessage("§e"+victim.getName() + " attacked by " + (damager==null?"null":damager.getName()));
                 if(playerAttacksPlayer(victim, damager)) {
                     event.setCancelled(true);
                 }

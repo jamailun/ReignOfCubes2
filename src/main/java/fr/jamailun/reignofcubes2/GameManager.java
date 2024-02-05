@@ -13,9 +13,7 @@ import fr.jamailun.reignofcubes2.players.ScoreAddReason;
 import fr.jamailun.reignofcubes2.players.ScoreRemoveReason;
 import fr.jamailun.reignofcubes2.utils.Ranking;
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -79,9 +77,16 @@ public class GameManager {
     }
 
     public void playerJoinsServer(Player p) {
+        // The game already started : try to rejoin
         if(isPlaying()) {
-            //TODO join in game !
-            // -> spectator.
+            // If existed, re-join the game
+            if(players.exists(p)) {
+                playerRejoins(p);
+                assert p.equals(players.get(p).getPlayer());
+                return;
+            }
+
+            //TODO handle spectator join !
         }
 
         RocPlayer player = players.join(p);
@@ -102,8 +107,9 @@ public class GameManager {
         // Teleport to lobby
         p.teleport(worldConfiguration.getLobby());
 
-        // Clear inventory
+        // Clear inventory & adventure mode
         p.getInventory().clear();
+        p.setGameMode(GameMode.ADVENTURE);
 
         // Heal + saturation
         p.setHealth(20);
@@ -328,6 +334,10 @@ public class GameManager {
             }
         }, 1);
 
+        // Sounds and messages
+        playSound(SoundsLibrary.GAME_STARTED_1);
+        playSound(SoundsLibrary.GAME_STARTED_2);
+
         broadcast("game.start");
         ReignOfCubes2.info("Game started.");
     }
@@ -425,8 +435,21 @@ public class GameManager {
         players().forEach(p -> p.playSound(sound, volume, pitch));
     }
 
-    public final Cheat cheat = new Cheat();
 
+    public void playerRejoins(Player p) {
+        assert players.exists(p) : "Not supposed to rejoin if doesn't exist before.";
+        RocPlayer player = players.get(p);
+        player.changePlayerInstance(p);
+
+        // clear stuff anyway, and teleport
+        p.teleport(getWorldConfiguration().getSafeSpawn(true));
+        player.respawned();
+    }
+
+    /**
+     * Public access to cheats. Allows disabling easily.
+     */
+    public final Cheat cheat = new Cheat();
     public class Cheat {
         public void forceKing(@Nullable RocPlayer player) {
             if(player == null) {

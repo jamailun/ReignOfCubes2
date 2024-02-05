@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -23,7 +22,7 @@ import java.util.UUID;
 @Getter
 public class RocPlayer {
 
-    private final Player player;
+    private Player player;
 
     private int score = 0;
     @Setter private boolean isKing = false;
@@ -94,6 +93,7 @@ public class RocPlayer {
 
     public void respawned() {
         lastMoneySpent = 0;
+        lastDamager = null;
 
         // Equip default kit
         Kit defaultKit = ReignOfCubes2.getKits().getDefaultKit();
@@ -118,6 +118,10 @@ public class RocPlayer {
     public void playSound(Sound sound, float volume, float pitch) {
         if(!isValid()) return;
         player.playSound(player.getLocation(), sound, volume, pitch);
+    }
+
+    public void changePlayerInstance(Player player) {
+        this.player = player;
     }
 
     public void playSound(SoundsLibrary.SoundEntry entry) {

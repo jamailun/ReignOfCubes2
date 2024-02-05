@@ -75,7 +75,7 @@ messages:
       ranking:
         score: "Score"
         title: "Classement :"
-        entry: "&e{0}) {1}&7 &b({2})"
+        entry: "&e{0}) {1}{2}&7 &b({3})"
     gui:
       shop:
         title: "<blue>Boutique"

@@ -124,7 +124,9 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
         } else if(ranker.isKing()) {
             rankerName = "&6" + rankerName;
         }
-        return player.i18n("tab.ranking.entry", (index+1), rankerName, ranker.getScore());
+        // Overrides color for AFK
+        String prefix = ranker.isValid() ? "" : "&7&o";
+        return player.i18n("tab.ranking.entry", (index+1), prefix, rankerName, ranker.getScore());
     }
 
     private int getRank(RocPlayer player) {

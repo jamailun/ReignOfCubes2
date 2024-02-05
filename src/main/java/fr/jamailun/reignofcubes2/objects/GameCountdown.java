@@ -64,8 +64,6 @@ public class GameCountdown {
         // Start if needed
         if(secondsRemaining == 0) {
             game.start();
-            game.playSound(SoundsLibrary.GAME_STARTED_1);
-            game.playSound(SoundsLibrary.GAME_STARTED_2);
         }
     }
 
