@@ -19,6 +19,9 @@ public class Ceremony {
     private double elapsed = 0;
     private boolean success = false;
 
+    private static final int dingFrequency = 2;
+    private int dingCounter = 0;
+
     public Ceremony(GameManager game, RocPlayer player) {
         this.game = game;
         this.player = player;
@@ -29,8 +32,10 @@ public class Ceremony {
 
         if(game.hasKing()) {
             game.broadcast("ceremony.start-steal", player.getName());
+            game.playSound(SoundsLibrary.CEREMONY_STARTS_STEAL);
         } else {
             game.broadcast("ceremony.start", player.getName());
+            game.playSound(SoundsLibrary.CEREMONY_STARTS);
         }
     }
 
@@ -41,10 +46,12 @@ public class Ceremony {
             success = true;
             game.ceremonyIsOver(player);
             game.playSound(SoundsLibrary.KING_CROWNED);
-        } else {
-            // Play a 'ding'
-            double pitch = (elapsed * (1.9d)/duration) + 0.1d;
-            game.playSound(SoundsLibrary.CEREMONY_DING, 5f, (float) pitch);
+            return;
+        }
+        // Play a 'ding' (every N ticks)
+        if((++dingCounter) % dingFrequency == 0) {
+            double pitch = (elapsed * (1.05d)/duration) + 0.05d;
+            player.playSound(SoundsLibrary.CEREMONY_DING, 0.9f, (float) pitch);
         }
     }
 
@@ -54,6 +61,7 @@ public class Ceremony {
             ReignOfCubes2.info("[CEREMONY] Stopped.");
             if( ! success) {
                 game.broadcast("ceremony.fail", player.getName());
+                game.playSound(SoundsLibrary.CEREMONY_FAILS);
             }
         }
     }

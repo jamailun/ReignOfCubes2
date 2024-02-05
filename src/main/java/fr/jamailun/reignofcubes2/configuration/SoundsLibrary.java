@@ -33,6 +33,9 @@ public class SoundsLibrary {
 
     // Ceremony
     public final static Sound CEREMONY_DING = Sound.ENTITY_EXPERIENCE_ORB_PICKUP;
+    public final static SoundEntry CEREMONY_STARTS = new SoundEntry(Sound.ENTITY_GHAST_HURT, 1.1f);
+    public final static SoundEntry CEREMONY_STARTS_STEAL = new SoundEntry(Sound.ENTITY_GHAST_WARN, 0.8f);
+    public final static SoundEntry CEREMONY_FAILS = new SoundEntry(Sound.ENTITY_GHAST_SCREAM, 0.75f);
 
     // ----
     public record SoundEntry(Sound sound, float pitch)
