@@ -7,6 +7,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
 public class DisabledActionsListener extends RocListener {
@@ -47,6 +48,12 @@ public class DisabledActionsListener extends RocListener {
         if(e.getPlayer().getGameMode() != GameMode.CREATIVE) {
             e.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void playerPickupArrow(PlayerPickupArrowEvent e) {
+        e.setCancelled(true);
+        e.getArrow().remove();
     }
 
 }

@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
@@ -96,15 +97,25 @@ public class Kit implements Cloneable, ConfigurationSerializable {
     }
 
     public void equip(RocPlayer player) {
-        PlayerInventory inventory = player.getPlayer().getInventory();
+        Player p = player.getPlayer();
+        PlayerInventory inventory = p.getInventory();
         inventory.clear();
 
+        // Add all items
         for(KitItem item : items) {
             item.equip(inventory);
             //player.getPlayer().sendMessage("§f[>] slot=§e"+item.getSlot()+"§f, item=§a" + item.getItem().getType());
         }
 
-        player.getPlayer().updateInventory();
+        // if in game ? add shop item !
+        if(ReignOfCubes2.isPlaying()) {
+            ItemStack is = ReignOfCubes2.getCurrentConfig().getShopItem();
+            if (is != null) {
+                p.getInventory().setItem(8, is);
+            }
+        }
+
+        p.updateInventory();
     }
 
     public List<KitItem> listItems(boolean equipment) {

@@ -128,4 +128,8 @@ public final class ReignOfCubes2 extends JavaPlugin {
         return INSTANCE.gameManager.getWorldConfiguration();
     }
 
+    public static boolean isPlaying() {
+        return INSTANCE.gameManager.isPlaying();
+    }
+
 }
