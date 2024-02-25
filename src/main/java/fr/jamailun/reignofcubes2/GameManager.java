@@ -382,6 +382,8 @@ public class GameManager {
         // Message and go back to spawn
         ReignOfCubes2.info("Game stopped.");
         players.backToLobby();
+
+        ReignOfCubes2.runTaskLater(this::testShouldStartGame, 2);
     }
 
     public void broadcast(String entry, Object... args) {

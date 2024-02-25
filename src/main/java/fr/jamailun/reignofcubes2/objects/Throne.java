@@ -97,9 +97,9 @@ public class Throne {
     }
 
     public void resetCeremony() {
+        playersInside.clear();
         if(ceremony != null) {
             stopCeremony();
-            ceremony = null;
         }
     }
 
