@@ -4,6 +4,7 @@ import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.jetbrains.annotations.Nullable;
@@ -27,6 +28,16 @@ public class PlayerDamageListener extends RocListener {
                 RocPlayer damager = game().toPlayer(pd);
                 if(playerAttacksPlayer(victim, damager)) {
                     event.setCancelled(true);
+                }
+            }
+            // Attacker is a Projectile
+            else if(damagerEntity instanceof Projectile pp) {
+                // get the shooter : it's a player
+                if(pp.getShooter() instanceof Player pd) {
+                    RocPlayer damager = game().toPlayer(pd);
+                    if(playerAttacksPlayer(victim, damager)) {
+                        event.setCancelled(true);
+                    }
                 }
             }
             //TODO PVE - last damager
