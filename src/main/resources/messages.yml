@@ -39,6 +39,7 @@ messages:
       alone: "<dark_gray>[<b>><!b>] <red>Tu es le dernier joueur connecté. Tu as donc gagné."
     event:
       joined: "<gray>[<green>+<gray>] <yellow>{0}<white> a rejoint la partie."
+      joined-spectator: "<gray>[<white>+<gray>] <yellow>{0}<white> a rejoint en temps que spectateur."
       left: "<gray>[<red>-<gray>] <yellow>{0}<white> a quitté la partie."
       left-king: "<gray><b>[<dark_red>👑<gray>]<!b> <yellow>Le joueur Le roi <gold>{0}<yellow> est parti. <b>La couronne est à prendre !"
       death:

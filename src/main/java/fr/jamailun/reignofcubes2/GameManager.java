@@ -4,6 +4,7 @@ import fr.jamailun.reignofcubes2.configuration.ConfigurationsList;
 import fr.jamailun.reignofcubes2.configuration.GameRules;
 import fr.jamailun.reignofcubes2.configuration.SoundsLibrary;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
+import fr.jamailun.reignofcubes2.messages.Messages;
 import fr.jamailun.reignofcubes2.objects.Ceremony;
 import fr.jamailun.reignofcubes2.objects.GameCountdown;
 import fr.jamailun.reignofcubes2.objects.Throne;
@@ -89,7 +90,15 @@ public class GameManager {
                 return;
             }
 
-            //TODO handle spectator join !
+            // A player connected while the game was on. Spectator !
+            p.setGameMode(GameMode.SPECTATOR);
+            p.teleport(players.iterator().next().getPlayer());
+
+            // Edge-case chelou
+            String msg = Messages.format("fr", "joined-spectator");
+            p.sendMessage(Messages.parseComponent(msg));
+            broadcast("event.joined-spectator");
+            return;
         }
 
         RocPlayer player = players.join(p);

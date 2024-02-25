@@ -4,6 +4,8 @@ import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
 import fr.jamailun.reignofcubes2.utils.Ranking;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -99,10 +101,15 @@ public class PlayersManager implements Iterable<RocPlayer> {
         assert game.getWorldConfiguration().isValid();
         Location lobby = game.getWorldConfiguration().getLobby();
 
-        for(RocPlayer player : players.values()) {
-            if(player.isValid()) {
-                player.getPlayer().teleport(lobby);
-            }
+        // tp ALL players instead
+        for(Player player : Bukkit.getOnlinePlayers()) {
+            player.teleport(lobby);
+
+            player.setGameMode(GameMode.ADVENTURE);
+            player.setHealth(20);
+            player.setSaturation(20);
+            player.setFoodLevel(20);
+            player.getInventory().clear();
         }
     }
 
