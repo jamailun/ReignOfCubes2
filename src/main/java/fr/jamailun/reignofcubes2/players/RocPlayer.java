@@ -20,16 +20,17 @@ import java.util.UUID;
 /**
  * Wrap players for the RoC game.
  */
-@Getter
+
 public class RocPlayer {
 
-    private Player player;
+    @Getter private Player player;
 
-    private int score = 0;
-    @Setter private boolean isKing = false;
-    @Setter private String language = "fr";
-    @Setter private int lastMoneySpent = 0;
-    @Setter private RocPlayer lastDamager;
+    @Getter private int score = 0;
+    @Getter @Setter private boolean isKing = false;
+    @Getter @Setter private String language = "fr";
+    @Getter @Setter private int lastMoneySpent = 0;
+    private RocPlayer lastDamager;
+    private long lastDamageTook = 0;
 
     public RocPlayer(Player player) {
         this.player = player;
@@ -109,6 +110,19 @@ public class RocPlayer {
         if (is != null) {
             getPlayer().getInventory().setItem(8, is);
         }
+    }
+
+    public void setLastDamager(RocPlayer damager) {
+        lastDamager = damager;
+        lastDamageTook = System.currentTimeMillis();
+    }
+
+    public RocPlayer getLastDamager() {
+        long now = System.currentTimeMillis();
+        if(now - lastDamageTook >= 6000) { // last 6 seconds ?
+            return lastDamager;
+        }
+        return null;
     }
 
     @Override
