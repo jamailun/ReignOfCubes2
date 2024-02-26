@@ -383,6 +383,8 @@ public class GameManager {
         ReignOfCubes2.info("Game stopped.");
         players.backToLobby();
 
+        // Reset throne
+        loadConfiguration(configurationsList.getDefault());
         ReignOfCubes2.runTaskLater(this::testShouldStartGame, 2);
     }
 
