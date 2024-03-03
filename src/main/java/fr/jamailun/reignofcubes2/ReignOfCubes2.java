@@ -7,6 +7,7 @@ import fr.jamailun.reignofcubes2.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.configuration.kits.KitItem;
 import fr.jamailun.reignofcubes2.listeners.*;
 import fr.jamailun.reignofcubes2.placeholder.RocPlaceholderExpansion;
+import fr.jamailun.reignofcubes2.players.RocPlayer;
 import io.papermc.paper.plugin.configuration.PluginMeta;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -130,6 +131,10 @@ public final class ReignOfCubes2 extends JavaPlugin {
 
     public static boolean isPlaying() {
         return INSTANCE.gameManager.isPlaying();
+    }
+
+    public static void updateRanks(RocPlayer player) {
+        INSTANCE.gameManager.getRanking().update(player);
     }
 
 }

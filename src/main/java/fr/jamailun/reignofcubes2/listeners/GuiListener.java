@@ -21,6 +21,9 @@ public class GuiListener extends RocListener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
+        if(!game().isPlaying())
+            return;
+
         if(Objects.equals(e.getClickedInventory(), e.getWhoClicked().getInventory())) {
             if(e.getSlot() == 8 || e.getHotbarButton() == 8) {
                 e.setCancelled(true);

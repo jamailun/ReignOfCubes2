@@ -16,11 +16,13 @@ import fr.jamailun.reignofcubes2.utils.Ranking;
 import fr.jamailun.reignofcubes2.utils.WorldSetter;
 import lombok.Getter;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -124,7 +126,7 @@ public class GameManager {
         p.setGameMode(GameMode.ADVENTURE);
 
         // Heal + saturation
-        p.setHealth(20);
+        p.setHealth(Objects.requireNonNull(p.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue());
         p.setFoodLevel(20);
     }
 
@@ -186,9 +188,7 @@ public class GameManager {
         if(killer == null) {
             if(victim.isKing()) {
                 setKing(null);
-                broadcast("event.king.death", victim.getName());
-                victim.playSound(SoundsLibrary.DEAD_AS_KING);
-                playSound(SoundsLibrary.KING_KILLED);
+                // le setKing va faire les sons dans ce cas
             } else {
                 broadcast("event.death.alone", victim.getName());
                 victim.playSound(SoundsLibrary.DEAD);
@@ -234,9 +234,11 @@ public class GameManager {
         if(player == null) {
             if(king != null) {
                 broadcast("event.king.death", king.getName());
+                king.playSound(SoundsLibrary.DEAD_AS_KING);
+                playSound(SoundsLibrary.KING_KILLED);
+
                 king.setKing(false);
                 king = null;
-                //TODO sound
             }
             return;
         }

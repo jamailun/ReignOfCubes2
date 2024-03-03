@@ -41,7 +41,7 @@ public class Ceremony {
 
     private void tick() {
         elapsed += TICK_RATE;
-        ReignOfCubes2.info("[CEREMONY] " + elapsed + "/" + duration);
+        //ReignOfCubes2.info("[CEREMONY] " + elapsed + "/" + duration);
         if(elapsed >= duration) {
             success = true;
             game.ceremonyIsOver(player);

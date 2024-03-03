@@ -52,6 +52,7 @@ public class ShopGUI extends MenuGUI {
         kit.equip(getPlayer());
         getPlayer().sendMessage("score.messages.kit-bought");
         getPlayer().getPlayer().closeInventory();
+        ReignOfCubes2.updateRanks(getPlayer());
     }
 
     private String printCost(RocPlayer player, Kit kit) {

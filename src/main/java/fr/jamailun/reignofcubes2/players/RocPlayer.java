@@ -89,7 +89,7 @@ public class RocPlayer {
         lastDamager = null;
         player.getInventory().clear();
         player.setGameMode(GameMode.ADVENTURE);
-        player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getDefaultValue());
+        player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue());
         player.setSaturation(100);
     }
 
@@ -110,6 +110,12 @@ public class RocPlayer {
         if (is != null) {
             getPlayer().getInventory().setItem(8, is);
         }
+
+        // Heal
+        ReignOfCubes2.runTaskLater(() -> {
+            player.updateInventory();
+            player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue());
+        }, 0.5);
     }
 
     public void setLastDamager(RocPlayer damager) {
