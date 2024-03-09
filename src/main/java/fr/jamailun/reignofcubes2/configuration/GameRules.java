@@ -78,7 +78,7 @@ public class GameRules {
         config.set("crown-duration", crownDuration);
         config.set("crown-duration-steal", crownDurationSteal);
 
-        pc.set("generator-frequency", generatorFrequency);
+        config.set("generator-frequency", generatorFrequency);
 
         config.set("spawn-safe-distance", spawnSafeDistance);
         config.set("throne-cooldown", throneCooldown);

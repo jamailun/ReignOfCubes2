@@ -691,6 +691,7 @@ public class RocCommand extends AbstractCommand {
     private boolean saveConfiguration(CommandSender sender, WorldConfiguration config) {
         try{
             config.save();
+            ReignOfCubes2.info("Configuration " + config.getName() + " saved successfully.");
             return true;
         } catch(IOException e) {
             ReignOfCubes2.error("Could not save " + config.getName() + ": " + e.getMessage());
