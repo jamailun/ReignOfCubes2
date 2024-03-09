@@ -41,9 +41,13 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
         }
 
         if(rocPlayer == null) {
-            if("prefix_tag".equals(param) || param.equals("prefix_tab"))
-                return "§7§o";
-            return "§4(none)";
+            return switch (param) {
+                case "prefix_tag", "prefix_tab" -> "§7§o";
+                case "score" -> Messages.format(lan, "tab.player.no-score");
+                case "is_king" -> "0";
+                case "king" -> game.hasKing() ? game.getKing().getName() : Messages.format(lan, "tab.player.none");
+                default -> "";
+            };
         }
 
         return getRequest(rocPlayer, param);

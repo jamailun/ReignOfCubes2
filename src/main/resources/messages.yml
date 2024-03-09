@@ -67,6 +67,7 @@ messages:
         you: "&2toi"
         none: "&7(personne)"
         king: "Roi"
+        no-score: "&7&o(Aucun)"
       game-state:
         NOT_CONFIGURED: "&cNon configuré"
         WAITING: "&eEn attente"
