@@ -3,6 +3,7 @@ package fr.jamailun.reignofcubes2.placeholder;
 import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
+import fr.jamailun.reignofcubes2.messages.Messages;
 import fr.jamailun.reignofcubes2.objects.Ceremony;
 import fr.jamailun.reignofcubes2.objects.GameCountdown;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
@@ -25,26 +26,33 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
 
     @Override
     public @Nullable String onPlaceholderRequest(Player player, @NotNull String param) {
-        if(player == null) return "§4§lnull";
         RocPlayer rocPlayer = game.toPlayer(player);
-        if(rocPlayer == null) {
-            ReignOfCubes2.error("Player is not a roc-player: " + player.getName());
-            return "§4not_a_player";
+        String lan = (rocPlayer == null ? "fr" : rocPlayer.getLanguage());
+        String common = getRequestAny(param, lan);
+
+        if(common != null)
+            return common;
+
+        if(param.toLowerCase().startsWith("i18n")) {
+            return handleI18n(param, lan);
         }
+        if(param.toLowerCase().startsWith("ranking")) {
+            return handleRanking(param, lan, rocPlayer);
+        }
+
+        if(rocPlayer == null) {
+            if("prefix_tag".equals(param) || param.equals("prefix_tab"))
+                return "§7§o";
+            return "§4(none)";
+        }
+
         return getRequest(rocPlayer, param);
     }
 
-    private @Nullable String getRequest(RocPlayer player, String param) {
-        if(param.toLowerCase().startsWith("ranking")) {
-            return handleRanking(player, param);
-        }
-        if(param.toLowerCase().startsWith("i18n")) {
-            return handleI18n(player, param);
-        }
-
+    private String getRequestAny(String param, String lan) {
         return switch (param.toLowerCase()) {
             // Configuration
-            case "game_status" -> player.i18n("tab.game-state." + game.getState());
+            case "game_status" -> Messages.format(lan, "tab.game-state." + game.getState());
             case "map" -> config() == null ? NONE : config().getName();
             case "map_author" -> config() == null ? NONE : config().getAuthor();
             case "online" -> String.valueOf(game.getOnlinePlayersCount());
@@ -54,7 +62,7 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
             // Countdown
             case "countdown" -> {
                 GameCountdown countdown = game.getCountdown();
-                if(countdown == null) yield "§cNo countdown.";
+                if (countdown == null) yield "§cNo countdown.";
                 yield String.valueOf(countdown.getRemaining());
             }
 
@@ -62,19 +70,24 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
             case "is_ceremony" -> bool(game.isPlaying() && game.getCeremony() != null);
             case "ceremony_text" -> {
                 Ceremony ceremony = game.getCeremony();
-                if(ceremony == null) yield "§cNo ceremony.";
-                yield player.i18n("tab.bars.ceremony", ceremony.getPlayerName());
+                if (ceremony == null) yield "§cNo ceremony.";
+                yield Messages.format(lan, "tab.bars.ceremony", ceremony.getPlayerName());
             }
             case "ceremony_ratio" -> {
                 Ceremony ceremony = game.getCeremony();
-                if(ceremony == null) yield "0";
+                if (ceremony == null) yield "0";
                 yield String.valueOf(ceremony.getRatio() * 100);
             }
-            case "ceremony_color" ->  {
+            case "ceremony_color" -> {
                 Ceremony ceremony = game.getCeremony();
                 yield ceremony == null ? "RED" : ceremony.getColor();
             }
+            default -> null;
+        };
+    }
 
+    private @Nullable String getRequest(RocPlayer player, String param) {
+        return switch (param.toLowerCase()) {
             // properties
             //TODO more titles !!
             case "title" -> getRank(player) == 1 ? "&d&l[Top 1]" : "";
@@ -95,13 +108,13 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
         };
     }
 
-    private String handleI18n(RocPlayer player, String param) {
+    private String handleI18n(String param, String lan) {
         String[] tokens = param.split(":", 2);
-        if(tokens.length < 2) return "§4bad_i18n";
-        return player.i18n(tokens[1]);
+        if(tokens.length < 2) return "§4??'"+param+"'??";
+        return Messages.format(lan, tokens[1]);
     }
 
-    private String handleRanking(RocPlayer player, String param) {
+    private String handleRanking(String param, String lan, @Nullable RocPlayer player) {
         if(!game.isPlaying()) {
             return "§4not_started";
         }
@@ -126,7 +139,7 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
         }
         // Overrides color for AFK
         String prefix = ranker.isValid() ? "" : "&7&o";
-        return player.i18n("tab.ranking.entry", (index+1), prefix, rankerName, ranker.getScore());
+        return Messages.format(lan, "tab.ranking.entry", (index+1), prefix, rankerName, ranker.getScore());
     }
 
     private int getRank(RocPlayer player) {
