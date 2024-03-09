@@ -336,7 +336,7 @@ public class GameManager {
         assert worldConfiguration != null && worldConfiguration.isValid();
         state = GameState.PLAYING;
         isVictory = false;
-        pickups.start();
+        pickups.start(worldConfiguration.getGeneratorsList(world), getRules().getGeneratorFrequency());
 
         // Remove countdown
         if(countdown != null) {

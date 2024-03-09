@@ -28,6 +28,7 @@ public class PlayerPickupListener extends RocListener {
             player.addScore(game().getRules().getScorePickup(), ScoreAddReason.PICKUP);
             event.setCancelled(true);
             item.remove();
+            ReignOfCubes2.updateRanks(player);
             //TODO firework & sound
         }
     }

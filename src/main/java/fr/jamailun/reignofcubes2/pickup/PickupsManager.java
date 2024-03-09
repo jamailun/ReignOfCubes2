@@ -42,7 +42,8 @@ public class PickupsManager {
         generators.remove(closest);
     }
 
-    public void start() {
+    public void start(List<Location> locations, double duration) {
+        regenerateAll(locations, duration);
         generators.forEach(PickupGenerator::start);
     }
 

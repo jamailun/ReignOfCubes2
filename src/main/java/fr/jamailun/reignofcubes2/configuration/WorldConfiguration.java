@@ -170,6 +170,10 @@ public class WorldConfiguration {
                 .toList();
     }
 
+    public List<Vector> listGenerators() {
+        return generators;
+    }
+
     public ItemStack getShopItem() {
         if(shopItem == null) return null;
         return new ItemStack(shopItem);
@@ -273,6 +277,12 @@ public class WorldConfiguration {
                 for(Vector v : spawns) {
                     Location l = v.toLocation(player.getWorld());
                     ParticlesPlayer.playCircleXZ(player, l, 1, Math.toRadians(6), Particle.DRAGON_BREATH);
+                }
+
+                // Generators
+                for(Vector v : generators) {
+                    Location l = v.toLocation(player.getWorld()).add(0, 0.1, 0);
+                    ParticlesPlayer.playCircleXZ(player, l, 1, Math.toRadians(6), Particle.TOTEM);
                 }
 
                 //lobby

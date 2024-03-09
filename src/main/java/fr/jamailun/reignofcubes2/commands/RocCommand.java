@@ -41,7 +41,7 @@ public class RocCommand extends AbstractCommand {
     private final static List<String> args_1_start = List.of("game", "countdown");
     private final static List<String> args_1_reload = List.of("messages", "kits");
     private final static List<String> args_1_kits = List.of("gui", "from-inventory.new", "from-inventory.update", "give", "delete", "edit");
-    private final static List<String> args_1_config = List.of("enable", "set-default", "list", "create", "delete", "edit", "edit.spawns", "show");
+    private final static List<String> args_1_config = List.of("enable", "set-default", "list", "create", "delete", "edit", "edit.spawns", "edit.generators", "show");
     private final static List<String> args_1_cheat = List.of("set.king", "set.score");
     private final static List<String> args_list = List.of("add", "remove", "list");
     private final static List<String> args_2_kits_edit = List.of("cost", "icon.type", "name");
@@ -52,9 +52,10 @@ public class RocCommand extends AbstractCommand {
             "throne.pos_a", "throne.pos_b", "throne.pos", "throne.cooldown",
             "lobby",
             "crowning-duration", "crowning-duration.steal",
-            "spawn.safe-distance",
+            "spawn.safe-distance", "generator-frequency",
             "scoring.goal", "scoring.king.bonus", "scoring.king.per-second",
             "scoring.kill.flat", "scoring.kill.steal", "scoring.death-penalty",
+            "scoring.pickup",
             "shop-item"
     );
 
@@ -249,6 +250,7 @@ public class RocCommand extends AbstractCommand {
                     case "players.max" -> setInt(sender, value, rules::setPlayerCountMax, success);
                     case "crowning-duration" -> setDouble(sender, value, rules::setCrownDuration, success);
                     case "crowning-duration.steal" -> setDouble(sender, value, rules::setCrownDurationSteal, success);
+                    case "generator-frequency" -> setDouble(sender, value, rules::setGeneratorFrequency, success);
                     case "spawn.safe-distance" -> setDouble(sender, value, rules::setSpawnSafeDistance, success);
                     case "throne.cooldown" -> setDouble(sender, value, rules::setThroneCooldown, success);
                     case "scoring.goal" -> setInt(sender, value, rules::setScoreGoal, success);
@@ -257,6 +259,7 @@ public class RocCommand extends AbstractCommand {
                     case "scoring.kill.flat" -> setInt(sender, value, rules::setScoreKillFlat, success);
                     case "scoring.kill.steal" -> setDouble(sender, value, rules::setScoreKillSteal, success);
                     case "scoring.death-penalty" -> setInt(sender, value, rules::setScoreDeathPenalty, success);
+                    case "scoring.pickup" -> setInt(sender, value, rules::setScorePickup, success);
                     default -> unexpectedArgument(sender, property, args_2_edit);
                 };
                 if(isSuccess) {
@@ -306,6 +309,53 @@ public class RocCommand extends AbstractCommand {
                     }
                     config.spawnsList().remove(index);
                     info(sender, "Removed a spawn-point to the configuration.");
+                    return saveConfiguration(sender, config);
+                }
+
+                return unexpectedArgument(sender, arg, args_list);
+            }
+
+            // Edit generators
+            if(arg.equalsIgnoreCase("edit.generators")) {
+                if(args.length < 2) return error(sender, "Specify the config and the mode.");
+                String configName = args[0];
+                arg = args[1].toLowerCase();
+                if(!configs().contains(configName))
+                    return error(sender, "Unknown configuration: " + configName);
+                WorldConfiguration config = configs().get(configName);
+
+                if(arg.equals("list")) {
+                    if(config.listGenerators().isEmpty()) {
+                        return info(sender, "§7No generators set for §6"+configName+"§7.");
+                    }
+                    info(sender, "§7generators ("+config.listGenerators().size()+") :");
+                    config.listGenerators().forEach(s -> info(sender, "§7- " + niceVector(s)));
+                    return true;
+                }
+
+                if(arg.equals("add")) {
+                    if(!(sender instanceof Entity)) {
+                        return error(sender, "Must be an entity to add a generator.");
+                    }
+                    config.listGenerators().add(((Entity)sender).getLocation().toVector());
+                    info(sender, "Added a generator to the configuration.");
+                    return saveConfiguration(sender, config);
+                }
+
+                if(arg.equals("remove")) {
+                    if(args.length < 3)
+                        return error(sender, "Specify the index of the generator to remove.");
+                    int index;
+                    try {
+                        index = Integer.parseInt(args[2]);
+                    } catch(NumberFormatException e) {
+                        return error(sender, "Invalid integer format: " + args[2]);
+                    }
+                    if(index < 0 || index >= config.listGenerators().size()) {
+                        return error(sender, "Invalid index. Should be positive and under " + config.listGenerators().size());
+                    }
+                    config.listGenerators().remove(index);
+                    info(sender, "Removed a generator from the configuration.");
                     return saveConfiguration(sender, config);
                 }
 
