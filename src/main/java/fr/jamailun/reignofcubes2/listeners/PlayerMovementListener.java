@@ -35,7 +35,11 @@ public class PlayerMovementListener extends RocListener {
 
         // get RoC wrapper.
         RocPlayer player = game().toPlayer(event.getPlayer());
-        if(player == null) return;
+        if(player == null) {
+            if(game().isPlaying())
+                event.getPlayer().setGameMode(GameMode.SPECTATOR);
+            return;
+        }
 
         // Test if is inside the throne.
         Throne throne = game().getThrone();

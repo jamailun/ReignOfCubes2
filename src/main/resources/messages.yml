@@ -33,14 +33,15 @@ messages:
       cancelled-players: "<red>[<b>><!b>] <white>Pas assez de joueurs pour commencer la partie."
     game:
       start: "<green>[<b>><!b>] <gold>La partie commence !"
-      start-force: "<green>[<b>><!b>] <white>{0}<gold> lance la partie."
+      start-force: "<gold>[<b>><!b>] L'administrateur <light_purple>{0}<gold> lance la partie."
       end: "<dark_gray>[<b>><!b>] <red>Fin de la partie."
       cancelled: "<dark_gray>[<b>><!b>] <red>Partie annulée par <white>{0}<red>"
       end-victory: "<dark_green><b>[<gold>VICTOIRE<dark_green>] <yellow>Félicitations à <light_purple>{0}<yellow> qui a gagné !<!b> Il remporte la partie avec <green>{1}<yellow> points !"
       alone: "<dark_gray>[<b>><!b>] <red>Tu es le dernier joueur connecté. Tu as donc gagné."
     event:
       joined: "<gray>[<green>+<gray>] <yellow>{0}<white> a rejoint la partie."
-      joined-spectator: "<gray>[<white>+<gray>] <yellow>{0}<white> a rejoint en temps que spectateur."
+      joined-spectator: "<gray>[<white>+<gray>] <green>{0}<white> a rejoint en tant que spectateur."
+      joined-spectator-self: "<gray>[<white>+<gray>] Tu rejoins la partie en tant que spectateur."
       left: "<gray>[<red>-<gray>] <yellow>{0}<white> a quitté la partie."
       left-king: "<gray><b>[<dark_red>👑<gray>]<!b> <yellow>Le joueur Le roi <gold>{0}<yellow> est parti. <b>La couronne est à prendre !"
       death:

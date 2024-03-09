@@ -99,13 +99,17 @@ public class GameManager {
             }
 
             // A player connected while the game was on. Spectator !
-            p.setGameMode(GameMode.SPECTATOR);
-            p.teleport(players.iterator().next().getPlayer());
+            ReignOfCubes2.info("joined : spectator.");
+            ReignOfCubes2.runTaskLater(() -> {
+                ReignOfCubes2.info("set gamemode !");
+                p.setGameMode(GameMode.SPECTATOR);
+                p.teleport(players.iterator().next().getPlayer());
+            }, 0.5);
 
-            // Edge-case chelou
-            String msg = Messages.format("fr", "joined-spectator");
+            // Join-messages
+            String msg = Messages.format("fr", "event.joined-spectator-self");
             p.sendMessage(Messages.parseComponent(msg));
-            broadcast("event.joined-spectator");
+            broadcast("event.joined-spectator", p.getName());
             return;
         }
 
@@ -469,6 +473,7 @@ public class GameManager {
         player.changePlayerInstance(p);
 
         // clear stuff anyway, and teleport
+        ReignOfCubes2.info("Player re-joined : " + p.getName() + ".");
         p.teleport(getWorldConfiguration().getSafeSpawn(true));
         player.respawned();
     }
