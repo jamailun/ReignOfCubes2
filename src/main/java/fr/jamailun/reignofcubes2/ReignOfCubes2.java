@@ -11,6 +11,7 @@ import fr.jamailun.reignofcubes2.players.RocPlayer;
 import io.papermc.paper.plugin.configuration.PluginMeta;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
@@ -25,6 +26,7 @@ public final class ReignOfCubes2 extends JavaPlugin {
 
     @Getter private GameManager gameManager;
     private KitsConfiguration kitsConfiguration;
+    private NamespacedKey marker;
 
     // Register serializable
     static {
@@ -136,6 +138,13 @@ public final class ReignOfCubes2 extends JavaPlugin {
 
     public static void updateRanks(RocPlayer player) {
         INSTANCE.gameManager.getRanking().update(player);
+    }
+
+    public static NamespacedKey marker() {
+        if(INSTANCE.marker == null) {
+            INSTANCE.marker = new NamespacedKey(INSTANCE, "marker");
+        }
+        return INSTANCE.marker;
     }
 
 }
