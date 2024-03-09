@@ -6,11 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,16 +16,14 @@ public class PickupGenerator {
 
     @Getter private final Location location;
     @Setter private double seconds;
-    private final NamespacedKey key;
 
     private BukkitTask task;
 
     private Item onGroundItem;
 
-    public PickupGenerator(Location location, double seconds, NamespacedKey key) {
+    public PickupGenerator(Location location, double seconds) {
         this.location = location;
         this.seconds = seconds;
-        this.key = key;
     }
 
     private void startWaiting() {
@@ -40,7 +36,6 @@ public class PickupGenerator {
         ItemMeta meta = item.getItemMeta();
         assert meta != null;
 
-        meta.getPersistentDataContainer().set(key, PersistentDataType.BOOLEAN, true);
         meta.displayName(Messages.parseComponent("<green>points"));
         item.setItemMeta(meta);
 

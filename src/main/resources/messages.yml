@@ -21,6 +21,7 @@ messages:
         death-penalty: "Pénalité de mort"
         buy-kit: "Achat de kit"
         administrator: "Décision d'un administrateur"
+        pickup: "Points ramassés"
       messages:
         too-poor: "<red>[<dark_red>$<red>] Pas assez de score pour acheter ce kit."
         kit-bought: "<green>[<gold>$<green>] <white>Achat du kit effectué avec succès."

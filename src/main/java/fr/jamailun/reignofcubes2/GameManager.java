@@ -18,6 +18,7 @@ import fr.jamailun.reignofcubes2.utils.WorldSetter;
 import lombok.Getter;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -31,7 +32,7 @@ import java.util.stream.StreamSupport;
 public class GameManager {
 
     private final PlayersManager players = new PlayersManager(this);
-    private final PickupsManager pickups;
+    private final PickupsManager pickups = new PickupsManager();
 
 
     @Getter private GameState state;
@@ -51,9 +52,8 @@ public class GameManager {
     // is over with a victory ?
     private boolean isVictory;
 
-    GameManager(ReignOfCubes2 plugin) {
+    GameManager() {
         loadConfiguration(configurationsList.getDefault());
-        pickups = new PickupsManager(plugin);
     }
 
     public boolean loadConfiguration(@Nullable WorldConfiguration configuration) {
@@ -498,5 +498,9 @@ public class GameManager {
             }
             ranking.update(player);
         }
+    }
+
+    public boolean didPickedUpItem(Item item) {
+        return pickups.tryPickupItem(item);
     }
 }

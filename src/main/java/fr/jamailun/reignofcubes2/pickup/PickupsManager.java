@@ -1,8 +1,7 @@
 package fr.jamailun.reignofcubes2.pickup;
 
-import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Item;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,10 +9,10 @@ import java.util.List;
 public class PickupsManager {
 
     private final List<PickupGenerator> generators = new ArrayList<>();
-    private final NamespacedKey key;
 
-    public PickupsManager(ReignOfCubes2 plugin) {
-        key = new NamespacedKey(plugin, "roc-score-item");
+    public boolean tryPickupItem(Item item) {
+        return generators.stream()
+                .anyMatch(g -> g.itemPickedUp(item));
     }
 
     public void regenerateAll(List<Location> locations, double duration) {
@@ -23,7 +22,7 @@ public class PickupsManager {
     }
 
     public void addGenerator(Location location, double duration) {
-        generators.add(new PickupGenerator(location, duration, key));
+        generators.add(new PickupGenerator(location, duration));
     }
 
     public void removeClosest(Location location) {

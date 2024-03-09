@@ -8,6 +8,7 @@ public enum ScoreAddReason {
     KING_EVERY_SECOND(null),
     KILL_FLAT("score.reason.kill-bonus"),
     KILL_STEAL("score.reason.kill-steal"),
+    PICKUP("score.reason.pickup"),
     ADMINISTRATOR("score.reason.administrator");
 
     private final String entry;

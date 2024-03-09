@@ -7,7 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.Listener;
 
-class RocListener implements Listener {
+abstract class RocListener implements Listener {
 
     private final ReignOfCubes2 plugin;
 
