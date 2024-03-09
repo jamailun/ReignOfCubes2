@@ -28,6 +28,7 @@ public class WorldConfiguration {
     private final File file;
     @Getter private final String name, author, worldName;
     private List<Vector> spawns = new ArrayList<>();
+    private List<Vector> generators = new ArrayList<>();
     @Setter private Vector throneA, throneB;
     @Setter private Vector lobby;
     @Getter private GameRules rules;
@@ -59,6 +60,7 @@ public class WorldConfiguration {
 
         // Load spawns
         configuration.spawns = getVectorsList(config, "spawns");
+        configuration.generators = getVectorsList(config, "generators");
 
         // Load rules
         ConfigurationSection rulesSection = config.getConfigurationSection("rules");
@@ -102,6 +104,10 @@ public class WorldConfiguration {
         // spawns
         if(spawns != null) {
             setVectorsList(config, "spawns", spawns);
+        }
+        // Generators
+        if(generators != null) {
+            setVectorsList(config, "generators", generators);
         }
 
         // rules
@@ -156,6 +162,14 @@ public class WorldConfiguration {
         return spawns;
     }
 
+    public List<Location> getGeneratorsList(World world) {
+        if(generators == null)
+            return Collections.emptyList();
+        return generators.stream()
+                .map(v -> v.toLocation(world))
+                .toList();
+    }
+
     public ItemStack getShopItem() {
         if(shopItem == null) return null;
         return new ItemStack(shopItem);
@@ -196,7 +210,8 @@ public class WorldConfiguration {
                 + "§l" + "valid = " + (isValid() ? "§atrue" : "§cfalse") + endl
                 + "throne = " + niceVector(throneA) + " -> " +  niceVector(throneB) + endl
                 + "lobby = " + niceVector(throneA) + endl
-                + "spawns = §7" + Arrays.toString(spawns == null ? new Object[0] : spawns.toArray()) + endl
+                + "spawns = §7" + spawns + endl
+                + "generators = §7" + generators + endl
                 + "shop-item = " + (shopItem == null ? "§cnone" : "§aok") + endl
                 + "rules = §7" + rules.nicePrint("\n    ", "\n  ")
                 + "§r\n}";

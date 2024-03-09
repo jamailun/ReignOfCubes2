@@ -53,7 +53,7 @@ public final class ReignOfCubes2 extends JavaPlugin {
 
     private void enableRoc() {
         // Game manager
-        gameManager = new GameManager();
+        gameManager = new GameManager(this);
 
         // Listeners
         new PlayerConnectionListener(this);

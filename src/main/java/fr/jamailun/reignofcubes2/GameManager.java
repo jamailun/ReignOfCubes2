@@ -8,6 +8,7 @@ import fr.jamailun.reignofcubes2.messages.Messages;
 import fr.jamailun.reignofcubes2.objects.Ceremony;
 import fr.jamailun.reignofcubes2.objects.GameCountdown;
 import fr.jamailun.reignofcubes2.objects.Throne;
+import fr.jamailun.reignofcubes2.pickup.PickupsManager;
 import fr.jamailun.reignofcubes2.players.PlayersManager;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import fr.jamailun.reignofcubes2.players.ScoreAddReason;
@@ -30,6 +31,8 @@ import java.util.stream.StreamSupport;
 public class GameManager {
 
     private final PlayersManager players = new PlayersManager(this);
+    private final PickupsManager pickups;
+
 
     @Getter private GameState state;
     @Getter private final ConfigurationsList configurationsList = new ConfigurationsList();
@@ -48,8 +51,9 @@ public class GameManager {
     // is over with a victory ?
     private boolean isVictory;
 
-    GameManager() {
+    GameManager(ReignOfCubes2 plugin) {
         loadConfiguration(configurationsList.getDefault());
+        pickups = new PickupsManager(plugin);
     }
 
     public boolean loadConfiguration(@Nullable WorldConfiguration configuration) {
@@ -67,6 +71,7 @@ public class GameManager {
             world = null;
             ranking.clear();
             state = GameState.NOT_CONFIGURED;
+            pickups.purgeAndClear();
             return true;
         }
         if(!configuration.isValid()) {
@@ -79,6 +84,7 @@ public class GameManager {
         assert world != null;
         WorldSetter.configure(world);
         state = GameState.WAITING;
+        pickups.regenerateAll(configuration.getGeneratorsList(world), getRules().getGeneratorFrequency());
         return true;
     }
 
@@ -330,6 +336,7 @@ public class GameManager {
         assert worldConfiguration != null && worldConfiguration.isValid();
         state = GameState.PLAYING;
         isVictory = false;
+        pickups.start();
 
         // Remove countdown
         if(countdown != null) {
@@ -380,6 +387,7 @@ public class GameManager {
         throne = null;
         state = GameState.WAITING;
         isVictory = false;
+        pickups.purgeAndStop();
 
         // Message and go back to spawn
         ReignOfCubes2.info("Game stopped.");
@@ -423,6 +431,7 @@ public class GameManager {
         // Cancel stuff
         throne.resetCeremony();
         scoreTimer.cancel();
+        pickups.purgeAndStop();
 
         // set victory
         isVictory = true;

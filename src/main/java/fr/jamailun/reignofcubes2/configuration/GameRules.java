@@ -19,6 +19,8 @@ public class GameRules {
     private double crownDuration = -1;
     private double crownDurationSteal = -1;
 
+    private double generatorFrequency = -1;
+
     private double spawnSafeDistance = -1;
     private double throneCooldown = -1;
 
@@ -28,8 +30,6 @@ public class GameRules {
     private int scoreKillFlat = -1;
     private double scoreKillSteal = -1;
     private int scoreDeathPenalty = -1;
-
-    public GameRules() {}
 
     public static @Nonnull GameRules load(@Nullable ConfigurationSection config) {
         if(config == null)
@@ -46,6 +46,9 @@ public class GameRules {
         // crown
         rules.crownDuration = config.getDouble("crown-duration", DEFAULT);
         rules.crownDurationSteal = config.getDouble("crown-duration-steal", DEFAULT);
+
+        // generator
+        rules.generatorFrequency = config.getDouble("generator-frequency", DEFAULT);
 
         // other
         rules.spawnSafeDistance = config.getDouble("spawn-safe-distance", DEFAULT);
@@ -73,6 +76,8 @@ public class GameRules {
         config.set("crown-duration", crownDuration);
         config.set("crown-duration-steal", crownDurationSteal);
 
+        pc.set("generator-frequency", generatorFrequency);
+
         config.set("spawn-safe-distance", spawnSafeDistance);
         config.set("throne-cooldown", throneCooldown);
 
@@ -89,6 +94,7 @@ public class GameRules {
         return (playerCountMin > 0 && playerCountMax > playerCountMin)
                 && (crownDuration > 0 && crownDurationSteal > 0)
                 && (spawnSafeDistance >= 0 && throneCooldown >= 0)
+                && (generatorFrequency > 1)
                 && (
                     scoreGoal > 0 && scoreKingPerSecond >= 0 && scoreKingBonus >= 0 &&
                     scoreKillFlat >= 0 && scoreKillSteal >= 0 && scoreDeathPenalty >= 0
@@ -106,6 +112,7 @@ public class GameRules {
         // Others
         rules.spawnSafeDistance = 12;
         rules.throneCooldown = 1.5;
+        rules.generatorFrequency = 30;
         // score
         rules.scoreGoal = 1000;
         rules.scoreKingBonus = 50;
@@ -122,6 +129,7 @@ public class GameRules {
                 + prefix + "§7crown-duration = " + niceDouble(crownDuration) + "§7, when stealing: " + niceDouble(crownDurationSteal)
                 + prefix + "§7spawn.safe-distance = " + niceDouble(spawnSafeDistance)
                 + prefix + "§7spawn.throne-cooldown = " + niceDouble(throneCooldown)
+                + prefix + "§7generator-frequency = " + niceDouble(generatorFrequency)
                 + prefix + "§7scoring.goal = " + niceInt(scoreGoal)
                 + prefix + "§7scoring.king = +" + niceInt(scoreKingBonus) + "§7, per-second: " + niceInt(scoreKingPerSecond)
                 + prefix + "§7scoring.kill = +" + niceInt(scoreKillFlat) + "§7, and steal: " + niceDouble(scoreKillSteal)
