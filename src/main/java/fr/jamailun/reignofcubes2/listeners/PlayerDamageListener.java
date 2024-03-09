@@ -12,18 +12,19 @@ import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FireworkExplodeEvent;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class PlayerDamageListener extends RocListener {
     public PlayerDamageListener(ReignOfCubes2 plugin) {
         super(plugin);
     }
 
+    // Stores UUID of firework that shall not deal damages
     private final Set<UUID> safeFireworks = new HashSet<>();
+    // Stores SHOOTERS protected from someone who deals them thorns damage
+    private final Map<UUID, UUID> safeThorns = new HashMap<>();
+    // Because firework damages are dealt poorly in the API, must look up for firweorks manually...
     private final static double SAFE_FW_RADIUS = 5;
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -35,7 +36,7 @@ public class PlayerDamageListener extends RocListener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void playerDamageLobby(EntityDamageEvent e) {
         if(!game().isPlaying()) {
             e.setCancelled(true);
@@ -44,7 +45,7 @@ public class PlayerDamageListener extends RocListener {
 
     // For some reason, Fireworks damage trigger 'EntityDamageByBlockEvent' with a null damager ???
     @EventHandler
-    public void aaa(EntityDamageByBlockEvent e) {
+    public void cancelFireworkDamages(EntityDamageByBlockEvent e) {
         if(e.getDamager() == null) {
             // Should be a firework... We MUST scan entities around
             // then find a firework in the 'safe' list.
@@ -55,11 +56,15 @@ public class PlayerDamageListener extends RocListener {
                     .findFirst()
                     .ifPresent(uuid -> e.setCancelled(true));
         }
-
     }
 
     @EventHandler
     public void entityDamageEvent(EntityDamageByEntityEvent event) {
+        if( ! game().isPlaying()) {
+            event.setCancelled(true);
+            return;
+        }
+
         Entity victimEntity = event.getEntity();
         Entity damagerEntity = event.getDamager();
 
@@ -71,39 +76,34 @@ public class PlayerDamageListener extends RocListener {
             // Attacker is a Player
             if(damagerEntity instanceof Player pd) {
                 RocPlayer damager = game().toPlayer(pd);
-                if(playerAttacksPlayer(victim, damager)) {
-                    event.setCancelled(true);
+                if(damager == null)
+                    return;
+
+                // Protect from thorns damage IF from projectile-revenge
+                if(event.getCause() == EntityDamageEvent.DamageCause.THORNS) {
+                    if(damager.getUUID().equals(safeThorns.get(victim.getUUID()))) {
+                        event.setCancelled(true);
+                        return;
+                    }
                 }
+
+                victim.setLastDamager(damager);
             }
             // Attacker is a Projectile
             else if(damagerEntity instanceof Projectile pp) {
                 // get the shooter : it's a player
                 if(pp.getShooter() instanceof Player pd) {
-                    RocPlayer damager = game().toPlayer(pd);
-                    if(playerAttacksPlayer(victim, damager)) {
-                        event.setCancelled(true);
-                    }
+                    RocPlayer shooter = game().toPlayer(pd);
+                    if(shooter == null)
+                        return;
+
+                    // We protect the shooter from potential
+                    safeThorns.put(shooter.getUUID(), victim.getUUID());
+                    ReignOfCubes2.runTaskLater(() -> safeThorns.remove(shooter.getUUID()), 0.3);
+
+                    victim.setLastDamager(shooter);
                 }
             }
-            //TODO PVE - last damager
         }
-    }
-
-    /**
-     * A player attacks another.
-     * @param victim the victim.
-     * @param damager the damager. Can be null.
-     * @return true if the venet should be cancelled.
-     */
-    private boolean playerAttacksPlayer(RocPlayer victim, @Nullable RocPlayer damager) {
-        // If the game hasn't started, cancel
-        if( ! game().isPlaying()) {
-            return true;
-        }
-
-        if(damager == null)
-            return false;
-        victim.setLastDamager(damager);
-        return false;
     }
 }
