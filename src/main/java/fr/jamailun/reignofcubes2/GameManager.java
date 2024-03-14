@@ -20,6 +20,8 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nonnull;
@@ -44,7 +46,7 @@ public class GameManager {
 
     // Score
     @Getter private final Ranking<RocPlayer> ranking = new Ranking<>(RocPlayer::getScore);
-    private BukkitTask scoreTimer;
+    private BukkitTask gameTimer;
 
     // Countdown
     @Getter private GameCountdown countdown;
@@ -352,9 +354,13 @@ public class GameManager {
         players.updateRanking(ranking);
 
         // Start score timer
-        scoreTimer = ReignOfCubes2.runTaskTimer(() -> {
+        gameTimer = ReignOfCubes2.runTaskTimer(() -> {
             if(hasKing()) {
                 king.addScore(getRules().getScoreKingPerSecond(), ScoreAddReason.KING_EVERY_SECOND);
+                king.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20, 0, false, false, true));
+                if(throne != null && throne.isAlreadyInside(king)) {
+                    king.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20, 0, false, false, true));
+                }
                 ranking.update(king);
             }
         }, 1);
@@ -379,8 +385,8 @@ public class GameManager {
         }
 
         // Reset players, score, king and state.
-        scoreTimer.cancel();
-        scoreTimer = null;
+        gameTimer.cancel();
+        gameTimer = null;
         players.clearOfflines();
         ranking.clear();
         if(king != null) {
@@ -434,7 +440,7 @@ public class GameManager {
 
         // Cancel stuff
         throne.resetCeremony();
-        scoreTimer.cancel();
+        gameTimer.cancel();
         pickups.purgeAndStop();
 
         // set victory
