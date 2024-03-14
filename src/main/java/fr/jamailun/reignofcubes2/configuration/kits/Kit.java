@@ -51,7 +51,6 @@ public class Kit {
     }
 
     public void reload() {
-        ReignOfCubes2.info("KEYS = " + config.getKeys(false));
         if(!(assertContains("name") && assertContains("cost") && assertContains("icon-type") && assertContains("items")))
             return;
 
@@ -115,7 +114,7 @@ public class Kit {
         try {
             config.set("name", displayName);
             config.set("cost", cost);
-            config.set("icon-type", iconType);
+            config.set("icon-type", iconType.name());
             config.set("items", items.stream().sorted(Comparator.comparing(KitItem::getSlot)).toList());
 
             config.save(file);

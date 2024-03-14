@@ -21,16 +21,15 @@ public class GuiListener extends RocListener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
-        if(!game().isPlaying())
-            return;
-
-        if(Objects.equals(e.getClickedInventory(), e.getWhoClicked().getInventory())) {
+        // Cancel shift item on last slot (when playing)
+        if(game().isPlaying() && Objects.equals(e.getClickedInventory(), e.getWhoClicked().getInventory())) {
             if(e.getSlot() == 8 || e.getHotbarButton() == 8) {
                 e.setCancelled(true);
                 return;
             }
         }
 
+        // Transfer event
         MenuGUI.MenuGUIManager.handleClick(e);
     }
 
