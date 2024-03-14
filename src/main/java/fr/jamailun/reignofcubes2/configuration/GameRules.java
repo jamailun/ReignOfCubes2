@@ -20,6 +20,7 @@ public class GameRules {
     private double crownDurationSteal = -1;
 
     private double generatorFrequency = -1;
+    private double killY = 0;
 
     private double spawnSafeDistance = -1;
     private double throneCooldown = -1;
@@ -48,8 +49,9 @@ public class GameRules {
         rules.crownDuration = config.getDouble("crown-duration", DEFAULT);
         rules.crownDurationSteal = config.getDouble("crown-duration-steal", DEFAULT);
 
-        // generator
+        // miscellaneous
         rules.generatorFrequency = config.getDouble("generator-frequency", DEFAULT);
+        rules.killY = config.getDouble("y-kill", 0);
 
         // other
         rules.spawnSafeDistance = config.getDouble("spawn-safe-distance", DEFAULT);
@@ -79,6 +81,7 @@ public class GameRules {
         config.set("crown-duration-steal", crownDurationSteal);
 
         config.set("generator-frequency", generatorFrequency);
+        config.set("y-kill", killY);
 
         config.set("spawn-safe-distance", spawnSafeDistance);
         config.set("throne-cooldown", throneCooldown);
@@ -117,6 +120,7 @@ public class GameRules {
         rules.spawnSafeDistance = 12;
         rules.throneCooldown = 1.5;
         rules.generatorFrequency = 30;
+        rules.killY = 0;
         // score
         rules.scoreGoal = 1000;
         rules.scoreKingBonus = 80;
@@ -135,6 +139,7 @@ public class GameRules {
                 + prefix + "§7spawn.safe-distance = " + niceDouble(spawnSafeDistance)
                 + prefix + "§7spawn.throne-cooldown = " + niceDouble(throneCooldown)
                 + prefix + "§7generator-frequency = " + niceDouble(generatorFrequency)
+                + prefix + "§7kill-Y = §e" + killY
                 + prefix + "§7scoring.goal = " + niceInt(scoreGoal)
                 + prefix + "§7scoring.king = +" + niceInt(scoreKingBonus) + "§7, per-second: " + niceInt(scoreKingPerSecond)
                 + prefix + "§7scoring.kill = +" + niceInt(scoreKillFlat) + "§7, and steal: " + niceDouble(scoreKillSteal)

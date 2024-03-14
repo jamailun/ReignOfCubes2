@@ -30,7 +30,7 @@ public class WorldConfiguration {
     private List<Vector> spawns = new ArrayList<>();
     private List<Vector> generators = new ArrayList<>();
     @Setter private Vector throneA, throneB;
-    @Setter private Vector lobby;
+    @Setter private Location lobby;
     @Getter private GameRules rules;
     @Setter private ItemStack shopItem;
 
@@ -56,7 +56,7 @@ public class WorldConfiguration {
         }
 
         // Load lobby
-        configuration.lobby = config.getVector("lobby");
+        configuration.lobby = config.getLocation("lobby");
 
         // Load spawns
         configuration.spawns = getVectorsList(config, "spawns");
@@ -138,9 +138,7 @@ public class WorldConfiguration {
 
     public Location getLobby() {
         assert lobby != null;
-        World world = Bukkit.getWorld(worldName);
-        assert world != null;
-        return lobby.toLocation(world);
+        return lobby;
     }
 
     public List<Location> generateSpawns() {
@@ -213,10 +211,10 @@ public class WorldConfiguration {
                 + "world = " + (Bukkit.getWorld(worldName) != null ? "§a" : "§c") + worldName + endl
                 + "§l" + "valid = " + (isValid() ? "§atrue" : "§cfalse") + endl
                 + "throne = " + niceVector(throneA) + " -> " +  niceVector(throneB) + endl
-                + "lobby = " + niceVector(throneA) + endl
+                + "lobby = " + (lobby==null?"§4null":niceVector(lobby.toVector())+"/"+lobby.getWorld().getName()) + endl
                 + "spawns = §7" + spawns + endl
                 + "generators = §7" + generators + endl
-                + "shop-item = " + (shopItem == null ? "§cnone" : "§aok") + endl
+                + "shop-item = " + (shopItem == null ? "§cnone" : "§a"+shopItem.getType()) + endl
                 + "rules = §7" + rules.nicePrint("\n    ", "\n  ")
                 + "§r\n}";
     }

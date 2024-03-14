@@ -52,7 +52,7 @@ public class RocCommand extends AbstractCommand {
             "throne.pos_a", "throne.pos_b", "throne.pos", "throne.cooldown",
             "lobby",
             "crowning-duration", "crowning-duration.steal",
-            "spawn.safe-distance", "generator-frequency",
+            "spawn.safe-distance", "generator-frequency", "kill-y",
             "scoring.goal", "scoring.king.bonus", "scoring.king.per-second",
             "scoring.kill.flat", "scoring.kill.steal", "scoring.death-penalty",
             "scoring.pickup",
@@ -158,6 +158,9 @@ public class RocCommand extends AbstractCommand {
 
             // Display the configuration
             if(arg.equalsIgnoreCase("show")) {
+                if(args.length < 1) {
+                    return error(sender, "Specify the configuration to show.");
+                }
                 String configName = args[0];
                 if(!configs().contains(configName))
                     return error(sender, "Unknown configuration: " + configName);
@@ -251,6 +254,7 @@ public class RocCommand extends AbstractCommand {
                     case "crowning-duration" -> setDouble(sender, value, rules::setCrownDuration, success);
                     case "crowning-duration.steal" -> setDouble(sender, value, rules::setCrownDurationSteal, success);
                     case "generator-frequency" -> setDouble(sender, value, rules::setGeneratorFrequency, success);
+                    case "kill-y" -> setDouble(sender, value, rules::setKillY, success);
                     case "spawn.safe-distance" -> setDouble(sender, value, rules::setSpawnSafeDistance, success);
                     case "throne.cooldown" -> setDouble(sender, value, rules::setThroneCooldown, success);
                     case "scoring.goal" -> setInt(sender, value, rules::setScoreGoal, success);
