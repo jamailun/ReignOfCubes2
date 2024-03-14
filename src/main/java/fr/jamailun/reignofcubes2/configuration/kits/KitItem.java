@@ -1,6 +1,5 @@
 package fr.jamailun.reignofcubes2.configuration.kits;
 
-import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import lombok.Getter;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;

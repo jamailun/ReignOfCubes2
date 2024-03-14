@@ -1,64 +1,95 @@
 package fr.jamailun.reignofcubes2.configuration.kits;
 
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
-import fr.jamailun.reignofcubes2.configuration.KitsConfiguration;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import fr.jamailun.reignofcubes2.utils.ItemBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Material;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.configuration.serialization.SerializableAs;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
-@SerializableAs("Kit")
-public class Kit implements Cloneable, ConfigurationSerializable {
+public class Kit {
 
-    @Setter private KitsConfiguration.KitsConfigurationSaver saver;
     @Getter private final String id;
     @Getter @Setter private String displayName;
-
-
     @Getter @Setter private Material iconType;
     @Getter @Setter private int cost;
     private final Set<KitItem> items = new HashSet<>();
 
-    public Kit(String id) {
-        this.id = id;
-        iconType = Material.GRASS_BLOCK;
+    private final File file;
+    private final YamlConfiguration config;
+
+    public Kit(File file) {
+        this.file = file;
+        if(!file.exists()) {
+            throw new RuntimeException("Kit file must exist ! " + file);
+        }
+        id = file.getName().replace(".yml", "");
+        ReignOfCubes2.info("Kit reading file " + file + ", ID is '" + id + "'.");
+        config = YamlConfiguration.loadConfiguration(file);
+        reload();
     }
 
-    @SuppressWarnings("unchecked")
-    public static Kit deserialize(@NotNull Map<String, Object> map) {
-        // Id
-        String id = (String) map.get("id");
-        ReignOfCubes2.info("[Kit-debug] Kit id=" + id);
+    public Kit(File folder, String id) {
+        file = new File(folder, id + ".yml");
+        this.id = id;
+        // create
+        try {
+            if(!file.exists())
+                file.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException("Could not create KIT file " + file, e);
+        }
+        config = YamlConfiguration.loadConfiguration(file);
+    }
+
+    public void reload() {
+        ReignOfCubes2.info("KEYS = " + config.getKeys(false));
+        if(!(assertContains("name") && assertContains("cost") && assertContains("icon-type") && assertContains("items")))
+            return;
 
         // Create kit basics
-        Kit kit = new Kit(id);
-        kit.displayName = (String) map.get("name");
-        kit.cost = (int) map.get("cost");
+        displayName = config.getString("name");
+        cost = config.getInt("cost");
 
         // icon
-        String iconType = (String)map.get("icon-type");
+        String iconTypeStr = config.getString("icon-type");
         try {
-            kit.iconType = Material.valueOf(iconType);
+            iconType = Material.valueOf(iconTypeStr);
         } catch(IllegalArgumentException e) {
-            ReignOfCubes2.error("Invalid icon TYPE '" + iconType + "'.");
-            kit.iconType = Material.BARRIER;
+            ReignOfCubes2.error("Invalid icon TYPE '" + iconTypeStr + "'.");
+            iconType = Material.BARRIER;
         }
 
         // Items
-        List<KitItem> items = (List<KitItem>) map.get("items");
-        assert items != null : "Null 'items' for Kit id="+id;
-        kit.items.addAll(items);
+        items.clear();
+        List<?> itemsList = config.getList("items");
+        if(itemsList == null) {
+            ReignOfCubes2.error("No 'items' list in kit-file.");
+            return;
+        }
+        for(Object entry : itemsList) {
+            if(entry instanceof KitItem item) {
+                items.add(item);
+            } else {
+                ReignOfCubes2.error("Unknown item type : " + entry + " | " + entry.getClass());
+            }
+        }
+    }
 
-        return kit;
+    private boolean assertContains(String key) {
+        if(!config.contains(key)) {
+            ReignOfCubes2.error("Kit " + file + " does NOT contains key '" + key +"'.");
+            return false;
+        }
+        return true;
     }
 
     public void loadFromInventory(RocPlayer player) {
@@ -80,9 +111,19 @@ public class Kit implements Cloneable, ConfigurationSerializable {
         }
     }
 
-    public void save() {
-        assert saver != null;
-        saver.save(this);
+    public boolean save() {
+        try {
+            config.set("name", displayName);
+            config.set("cost", cost);
+            config.set("icon-type", iconType);
+            config.set("items", items.stream().sorted(Comparator.comparing(KitItem::getSlot)).toList());
+
+            config.save(file);
+            return true;
+        } catch (IOException e) {
+            ReignOfCubes2.error("Could not save kit '" + id + "' : " + e.getMessage());
+            return false;
+        }
     }
 
     public int size() {
@@ -125,28 +166,10 @@ public class Kit implements Cloneable, ConfigurationSerializable {
                 .toList();
     }
 
-    @Override
-    public @NotNull Map<String, Object> serialize() {
-        Map<String, Object> map = new LinkedHashMap<>();
-        map.put("id", id);
-        map.put("name", displayName);
-        map.put("cost", cost);
-        map.put("icon-type", iconType.name());
-        map.put("items", items.stream()
-                        .sorted(Comparator.comparing(KitItem::getSlot))
-                        .toList()
-        );
-        return map;
-    }
-
-    @Override
-    public Kit clone() {
-        Kit clone = new Kit(id);
-        clone.saver = saver;
-        clone.displayName = displayName;
-        clone.cost = cost;
-        clone.iconType = iconType;
-        clone.items.addAll(items);
-        return clone;
+    public void archiveFile(File folder) {
+        File newFile = new File(folder, id + "." + UUID.randomUUID().toString().substring(20) + ".removed");
+        if( ! file.renameTo(newFile)) {
+            ReignOfCubes2.error("Could not rename kit file " + file + " to " + newFile);
+        }
     }
 }

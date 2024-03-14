@@ -14,7 +14,7 @@ public class StopSub extends NoArgSubCommand {
 
     @Override
     protected void executeNoArg(JamContext context) {
-        if(game().isPlaying()) {
+       /* if(game().isPlaying()) {
             info(sender, "Stopping game.");
             game().broadcast("game.cancelled", sender.getName());
             game().stop();
@@ -26,6 +26,6 @@ public class StopSub extends NoArgSubCommand {
             game().stopCountdown();
             return true;
         }
-        return error(sender, "Cannot stop a game in state §4"+game().getState()+"§c.");
+        return error(sender, "Cannot stop a game in state §4"+game().getState()+"§c.");*/
     }
 }

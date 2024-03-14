@@ -3,7 +3,6 @@ package fr.jamailun.reignofcubes2;
 import fr.jamailun.reignofcubes2.commands.*;
 import fr.jamailun.reignofcubes2.configuration.KitsConfiguration;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
-import fr.jamailun.reignofcubes2.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.configuration.kits.KitItem;
 import fr.jamailun.reignofcubes2.listeners.*;
 import fr.jamailun.reignofcubes2.placeholder.RocPlaceholderExpansion;
@@ -30,7 +29,6 @@ public final class ReignOfCubes2 extends JavaPlugin {
 
     // Register serializable
     static {
-        ConfigurationSerialization.registerClass(Kit.class, "Kit");
         ConfigurationSerialization.registerClass(KitItem.class, "KitItem");
     }
 
@@ -45,7 +43,7 @@ public final class ReignOfCubes2 extends JavaPlugin {
         }
 
         // Load kits
-        kitsConfiguration = new KitsConfiguration(getFile("kits.yml"));
+        kitsConfiguration = new KitsConfiguration(getFile("kits"));
 
         // default config
         saveDefaultConfig();
