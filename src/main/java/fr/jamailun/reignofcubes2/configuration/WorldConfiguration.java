@@ -225,6 +225,10 @@ public class WorldConfiguration {
                 + "}";
     }
 
+    /**
+     * Fancy toString().
+     * @return a Bukkit-colored String.
+     */
     public String nicePrint() {
         String end = "\n  ";
         String endl = "§r,"+end;
@@ -236,6 +240,7 @@ public class WorldConfiguration {
                 + "throne = " + niceVector(throneA) + " -> " +  niceVector(throneB) + endl
                 + "lobby = " + (lobby==null?"§4null":niceVector(lobby.toVector())+"/"+lobby.getWorld().getName()) + endl
                 + "spawns = §7" + spawns + endl
+                + "pickups = " + (pickupConfiguration.isEmpty()?"§c":"§a") + pickupConfiguration + endl
                 + "generators = §7" + generators + endl
                 + "shop-item = " + (shopItem == null ? "§cnone" : "§a"+shopItem.getType()) + endl
                 + "rules = §7" + rules.nicePrint("\n    ", "\n  ")

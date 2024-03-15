@@ -1,9 +1,15 @@
 package fr.jamailun.reignofcubes2.configuration.pickups;
 
+import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
 import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Firework;
+import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.NoSuchElementException;
@@ -65,4 +71,30 @@ public record PickupConfigEntry(String id, Material material, int score, double 
             throw new WorldConfiguration.BadWorldConfigurationException("Missing key '"+key+"' in pickupEntry '" + id +"'.");
     }
 
+    /**
+     * Spawn a colored-firework at location.
+     * @param location the location to spawn it.
+     */
+    public void spawnFirework(@NotNull Location location) {
+        Firework fw = location.getWorld().spawn(location, Firework.class);
+        FireworkMeta fwm = fw.getFireworkMeta();
+        fwm.setPower(0);
+        fwm.addEffect(
+                FireworkEffect.builder()
+                        .with(FireworkEffect.Type.BALL_LARGE)
+                        .withColor(color())
+                        .flicker(true)
+                        .trail(true)
+                        .withFade(color().mixColors(Color.WHITE))
+                        .build()
+        );
+        fw.setFireworkMeta(fwm);
+        fw.getPersistentDataContainer().set(ReignOfCubes2.marker(), PersistentDataType.BOOLEAN, true);
+        fw.detonate();
+    }
+
+    @Override
+    public String toString() {
+        return "{'"+id+"' "+material+", score="+score+", chance="+chance+", color="+color+"}";
+    }
 }

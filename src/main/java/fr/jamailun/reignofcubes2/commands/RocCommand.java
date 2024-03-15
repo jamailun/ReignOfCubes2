@@ -7,14 +7,12 @@ import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.configuration.GameRules;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
 import fr.jamailun.reignofcubes2.configuration.kits.Kit;
+import fr.jamailun.reignofcubes2.configuration.pickups.PickupConfigEntry;
 import fr.jamailun.reignofcubes2.gui.AdminKitsGUI;
 import fr.jamailun.reignofcubes2.messages.Messages;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import fr.jamailun.reignofcubes2.utils.WorldEditHandler;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -28,6 +26,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * I'll clean this mess up. One day.
@@ -41,7 +40,7 @@ public class RocCommand extends AbstractCommand {
     private final static List<String> args_1_start = List.of("game", "countdown");
     private final static List<String> args_1_reload = List.of("messages", "kits");
     private final static List<String> args_1_kits = List.of("gui", "from-inventory.new", "from-inventory.update", "give", "delete", "edit");
-    private final static List<String> args_1_config = List.of("enable", "set-default", "list", "create", "delete", "edit", "edit.spawns", "edit.generators", "show");
+    private final static List<String> args_1_config = List.of("enable", "set-default", "list", "create", "delete", "edit", "edit.spawns", "edit.generators", "edit.pickups", "show");
     private final static List<String> args_1_cheat = List.of("set.king", "set.score");
     private final static List<String> args_list = List.of("add", "remove", "list");
     private final static List<String> args_2_kits_edit = List.of("cost", "icon.type", "name");
@@ -364,6 +363,85 @@ public class RocCommand extends AbstractCommand {
                 return unexpectedArgument(sender, arg, args_list);
             }
 
+            //
+            if(arg.equalsIgnoreCase("edit.pickups")) {
+                if(args.length < 2) return error(sender, "Specify the config and the mode.");
+                String configName = args[0];
+                arg = args[1].toLowerCase();
+                if(!configs().contains(configName))
+                    return error(sender, "Unknown configuration: " + configName);
+                WorldConfiguration config = configs().get(configName);
+
+                if("list".equalsIgnoreCase(arg)) {
+                    if(config.getPickupConfiguration().isEmpty()) {
+                        return info(sender, "§7No pickup-entry set for §6"+configName+"§7.");
+                    }
+                    List<PickupConfigEntry> pickups = config.getPickupConfiguration().listEntries();
+                    info(sender, "§7Pick-up entries ("+pickups.size()+") :");
+                    pickups.forEach(p -> info(sender, "§7- §e" + p));
+                    return true;
+                }
+
+                if("color".equalsIgnoreCase(arg)) {
+                    if(!(sender instanceof Player))
+                        return error(sender, "You must be a player to do that.");
+                    if(args.length < 3)
+                        return error(sender, "Specify the ID of the generator to remove.");
+                    String id = args[2];
+                    PickupConfigEntry entry = config.getPickupConfiguration().listEntries()
+                            .stream()
+                            .filter(e -> e.id().equals(id))
+                            .findFirst()
+                            .orElse(null);
+                    if(entry == null) {
+                        return error(sender, "Unknown pickup-entry: '" + id + "'.");
+                    }
+                    entry.spawnFirework(((Player)sender).getLocation());
+                    return info(sender, "§oWhooooosh");
+                }
+
+                if(arg.equals("add")) {
+                    if(args.length < 7) {// 0,1 ; 2=id 3=mat 4=chance 5=score 6=color
+                        return error(sender, "Syntax : /"+label+" edit.pickups add §l<id> <material> <chance> <score> <color>");
+                    }
+                    String id = args[2];
+                    Material material;
+                    int score;
+                    double chance;
+                    Color color;
+                    try {
+                        material = Material.valueOf(args[3].toUpperCase());
+                    } catch(Exception e) { return error(sender, "Invalid material '" + args[3] + "'."); }
+                    try {
+                        score = Integer.parseInt(args[4]);
+                        if(score <= 0)
+                            return error(sender, "Score must be (strictly) positive !");
+                    } catch(Exception e) { return error(sender, "Invalid score (int) '" + args[4] + "'."); }
+                    try {
+                        chance = Double.parseDouble(args[5]);
+                    } catch(Exception e) { return error(sender, "Invalid chance (double) '" + args[5] + "'."); }
+                    try {
+                        color = parseColor(args[6]);
+                    } catch(Exception e) { return error(sender, "Invalid color (r,g,b) '" + args[5] + "' : " + e.getMessage()); }
+
+                    PickupConfigEntry entry = new PickupConfigEntry(id, material, score, chance, color);
+                    config.getPickupConfiguration().add(entry);
+                    success(sender, "Added a pickup-entry to the configuration.");
+                    return saveConfiguration(sender, config);
+                }
+
+                if(arg.equals("remove")) {
+                    if(args.length < 3)
+                        return error(sender, "Specify the ID of the generator to remove.");
+                    String id = args[2];
+                    config.getPickupConfiguration().remove(id);
+                    info(sender, "Removed a pickup-entry from the configuration.");
+                    return saveConfiguration(sender, config);
+                }
+
+                return unexpectedArgument(sender, arg, args_list);
+            }
+
             return unexpectedArgument(sender, arg, args_1_config);
         }
 
@@ -614,6 +692,8 @@ public class RocCommand extends AbstractCommand {
             if(args[0].equalsIgnoreCase("config")) {
                 if(     args[1].equalsIgnoreCase("edit")
                         || args[1].equalsIgnoreCase("edit.spawns")
+                        || args[1].equalsIgnoreCase("edit.generators")
+                        || args[1].equalsIgnoreCase("edit.pickups")
                         || args[1].equalsIgnoreCase("set-default")
                         || args[1].equalsIgnoreCase("show")
                         || args[1].equalsIgnoreCase("enable")
@@ -644,7 +724,9 @@ public class RocCommand extends AbstractCommand {
                 if(args[1].equalsIgnoreCase("edit")) {
                     return args_2_edit.stream().filter(a -> a.startsWith(arg3)).toList();
                 }
-                else if(args[1].equalsIgnoreCase("edit.spawns")) {
+                else if(args[1].equalsIgnoreCase("edit.spawns")
+                || args[1].equalsIgnoreCase("edit.generators")
+                || args[1].equalsIgnoreCase("edit.pickups")) {
                     return args_list.stream().filter(a -> a.startsWith(arg3)).toList();
                 }
             }
@@ -660,10 +742,7 @@ public class RocCommand extends AbstractCommand {
             if(args[0].equalsIgnoreCase("kits")) {
                 if(args[1].equalsIgnoreCase("edit")) {
                     if(args[3].equals("icon.type")) {
-                        return Arrays.stream(Material.values())
-                                .map(Enum::name)
-                                .filter(m -> !m.startsWith("LEGACY_"))
-                                .map(String::toLowerCase)
+                        return materials()
                                 .filter(m -> m.startsWith(arg4))
                                 .toList();
                     }
@@ -673,6 +752,11 @@ public class RocCommand extends AbstractCommand {
                 if(args[1].equalsIgnoreCase("edit")) {
                     if(args[3].equalsIgnoreCase("shop-item")) {
                         return args_3_get_set.stream().filter(a -> a.startsWith(arg4)).toList();
+                    }
+                }
+                else if(args[1].equalsIgnoreCase("edit.pickups")) {
+                    if(args[2].equalsIgnoreCase("add")) {
+                        return materials().filter(a -> a.startsWith(arg4)).toList();
                     }
                 }
             }
@@ -701,5 +785,26 @@ public class RocCommand extends AbstractCommand {
         }
     }
 
+    private Color parseColor(String arg) throws IllegalArgumentException {
+        String[] rgb = arg.split(",", 3);
+        if(rgb.length < 3)
+            throw new IllegalArgumentException("Missing a component. Split RGB with comma.");
+        int r,g,b;
+        try {
+            r = Integer.parseInt(rgb[0]);
+            g = Integer.parseInt(rgb[1]);
+            b = Integer.parseInt(rgb[2]);
+            return Color.fromRGB(r, g, b);
+        } catch(NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid color format ("+arg+")");
+        }
+    }
+
+    private Stream<String> materials() {
+        return Arrays.stream(Material.values())
+                .map(Enum::name)
+                .filter(m -> !m.startsWith("LEGACY_"))
+                .map(String::toLowerCase);
+    }
 
 }

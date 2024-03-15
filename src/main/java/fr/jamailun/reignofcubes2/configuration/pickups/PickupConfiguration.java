@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 /**
  * Manages the configuration of the pickups.
@@ -97,4 +98,12 @@ public class PickupConfiguration {
         return List.copyOf(entries);
     }
 
+    @Override
+    public String toString() {
+        StringJoiner sj = new StringJoiner(", ");
+        for(PickupConfigEntry entry : entries) {
+            sj.add(entry.id() + "/" + entry.score());
+        }
+        return "["+sj+"]";
+    }
 }

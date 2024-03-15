@@ -3,10 +3,14 @@ package fr.jamailun.reignofcubes2.configuration;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.configuration.ConfigurationSection;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/**
+ * Set of rules for the game.
+ */
 @Getter
 @Setter
 public class GameRules {
@@ -32,6 +36,11 @@ public class GameRules {
     private double scoreKillSteal = -1;
     private int scoreDeathPenalty = -1;
 
+    /**
+     * Load a GameRules set from configuration.
+     * @param config the ConfigurationSection to deserialize from.
+     * @return a non-null GameRules.
+     */
     public static @Nonnull GameRules load(@Nullable ConfigurationSection config) {
         if(config == null)
             return defaultRules();
@@ -70,7 +79,11 @@ public class GameRules {
         return rules;
     }
 
-    public void write(ConfigurationSection config) {
+    /**
+     * Serialize this GameRules to configuration.
+     * @param config the configuration to write to.
+     */
+    public void write(@NotNull ConfigurationSection config) {
         ConfigurationSection pc = config.createSection("players-count");
         pc.set("min", playerCountMin);
         pc.set("max", playerCountMax);
@@ -93,6 +106,10 @@ public class GameRules {
         scoring.set("death-penalty", scoreDeathPenalty);
     }
 
+    /**
+     * Test if this rules-set is valid.
+     * @return false if the configuration cannot be played.
+     */
     public boolean isValid() {
         return (playerCountMin > 0 && playerCountMax > playerCountMin)
                 && (crownDuration > 0 && crownDurationSteal > 0)
@@ -104,7 +121,11 @@ public class GameRules {
                 );
     }
 
-    public static GameRules defaultRules() {
+    /**
+     * Create a new GameRules set, with default playable values.
+     * @return an invalid GamesRules. Spawn, lobby, ... must be set.
+     */
+    public static @Nonnull GameRules defaultRules() {
         GameRules rules = new GameRules();
         // players
         rules.playerCountMin = 4;
@@ -127,6 +148,12 @@ public class GameRules {
         return rules;
     }
 
+    /**
+     * Create a string for this object.
+     * @param prefix prefix of each line (indent)
+     * @param last suffix (indent-1).
+     * @return a bukkit-colored String.
+     */
     public String nicePrint(String prefix, String last) {
         return "§7{"
                 + prefix + "§7players = " + niceInt(playerCountMin) + " -> " + niceInt(playerCountMax)
@@ -149,6 +176,7 @@ public class GameRules {
             return "§f0";
         return "§a" + i;
     }
+
     private String niceDouble(double d) {
         if(d < 0)
             return "§c" + "<unset>";
