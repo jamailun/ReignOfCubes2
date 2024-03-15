@@ -1,6 +1,7 @@
 package fr.jamailun.reignofcubes2.commands;
 
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.gui.AdminKitsGUI;
 import fr.jamailun.reignofcubes2.gui.ShopGUI;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import org.bukkit.command.Command;
@@ -24,13 +25,15 @@ public class ShopCommand extends AbstractCommand {
             return error(sender, "Must be a player tp open shop.");
         }
 
-        if(!game().isPlaying()) {
-            return error(sender, "Can only open the shop while playing.");
-        }
-
         RocPlayer player = game().toPlayer((Player) sender);
         if(player == null)
             return error(sender, "Tu n'es pas dans le jeu. Déso pas déso.");
+
+        if(!game().isPlaying()) {
+            info(sender, "La partie n'ayant pas encore commencé, voici les kits actuellement configurés.");
+            new AdminKitsGUI(player);
+            return true;
+        }
 
         new ShopGUI(player);
 

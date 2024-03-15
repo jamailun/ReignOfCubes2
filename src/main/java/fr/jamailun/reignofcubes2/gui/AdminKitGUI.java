@@ -18,8 +18,8 @@ public class AdminKitGUI extends MenuGUI {
         set(0, new ItemBuilder(Material.OAK_SIGN).setName("§bArmure:").toItemStack());
         for(KitItem item : kit.listItems(true)) {
             ItemBuilder ib = new ItemBuilder(item.getItem());
-            if(item.getSlot() == 40) ib.addLoreLine("§4Slot: §eOFF_HAND");
-            set(slot, ib.toItemStack(), () -> clickedOnItem(item));
+            //if(item.getSlot() == 40) ib.addLoreLine("§4Slot: §eOFF_HAND");
+            set(slot, ib.toItemStack());
             slot ++;
         }
 
@@ -27,8 +27,8 @@ public class AdminKitGUI extends MenuGUI {
         set(9, new ItemBuilder(Material.OAK_SIGN).setName("§bObjets:").toItemStack());
         slot = 10;
         for(KitItem item : kit.listItems(false)) {
-            ItemStack is = new ItemBuilder(item.getItem()).addLoreLine("§dSlot: §e"+item.slotString()).toItemStack();
-            set(slot, is, () -> clickedOnItem(item));
+            ItemStack is = new ItemBuilder(item.getItem()).toItemStack();//.addLoreLine("§dSlot: §e"+item.slotString()).toItemStack();
+            set(slot, is);
             slot ++;
         }
 
@@ -46,7 +46,4 @@ public class AdminKitGUI extends MenuGUI {
         open();
     }
 
-    private void clickedOnItem(KitItem item) {
-        //TODO faire quelque chose ?
-    }
 }

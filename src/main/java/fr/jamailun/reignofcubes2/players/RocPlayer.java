@@ -87,6 +87,7 @@ public class RocPlayer {
         lastMoneySpent = 0;
         isKing = false;
         lastDamager = null;
+        player.closeInventory();
         player.getInventory().clear();
         player.setGameMode(GameMode.ADVENTURE);
         player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue());
