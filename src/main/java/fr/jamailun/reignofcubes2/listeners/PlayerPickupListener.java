@@ -1,6 +1,7 @@
 package fr.jamailun.reignofcubes2.listeners;
 
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.configuration.pickups.PickupConfigEntry;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import fr.jamailun.reignofcubes2.players.ScoreAddReason;
 import org.bukkit.Color;
@@ -30,29 +31,33 @@ public class PlayerPickupListener extends RocListener {
         }
 
         Item item = event.getItem();
-        if(game().didPickedUpItem(item)) {
-            // Score
-            player.addScore(game().getRules().getScorePickup(), ScoreAddReason.PICKUP);
-            ReignOfCubes2.updateRanks(player);
-            // Effect
-            spawnFirework(item.getLocation());
-            // Remove item
+        game().didPickedUpItem(item).ifPresent(entry -> {
             event.setCancelled(true);
-            item.remove();
-        }
+            pickupItem(player, item, entry);
+        });
     }
 
-    private void spawnFirework(Location location) {
+    private void pickupItem(RocPlayer player, Item item, PickupConfigEntry entry) {
+        // Score
+        player.addScore(entry.score(), ScoreAddReason.PICKUP);
+        ReignOfCubes2.updateRanks(player);
+        // Effect
+        spawnFirework(item.getLocation(), entry);
+        // Remove item
+        item.remove();
+    }
+
+    private void spawnFirework(Location location, PickupConfigEntry entry) {
         Firework fw = location.getWorld().spawn(location, Firework.class);
         FireworkMeta fwm = fw.getFireworkMeta();
         fwm.setPower(0);
         fwm.addEffect(
             FireworkEffect.builder()
                 .with(FireworkEffect.Type.BALL_LARGE)
-                .withColor(Color.GREEN, Color.OLIVE, Color.YELLOW)
+                .withColor(entry.color())
                 .flicker(true)
                 .trail(true)
-                .withFade(Color.LIME)
+                .withFade(entry.color().mixColors(Color.WHITE))
                 .build()
         );
         fw.setFireworkMeta(fwm);

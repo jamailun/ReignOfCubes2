@@ -2,6 +2,7 @@ package fr.jamailun.reignofcubes2.configuration;
 
 import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.configuration.pickups.PickupConfiguration;
 import fr.jamailun.reignofcubes2.objects.Throne;
 import fr.jamailun.reignofcubes2.utils.ParticlesPlayer;
 import lombok.Getter;
@@ -17,12 +18,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * A possible configuration for a game.
+ */
 public class WorldConfiguration {
 
     private final File file;
@@ -33,8 +38,15 @@ public class WorldConfiguration {
     @Setter private Location lobby;
     @Getter private GameRules rules;
     @Setter private ItemStack shopItem;
+    @Getter private final PickupConfiguration pickupConfiguration;
 
-    public static WorldConfiguration load(File file) throws BadWorldConfigurationException {
+    /**
+     * Load a WorldConfiguration from a file.
+     * @param file the file to load.
+     * @return a deserialized WorldConfiguration.
+     * @throws BadWorldConfigurationException if something is invalid.
+     */
+    public static @NotNull WorldConfiguration load(@NotNull File file) throws BadWorldConfigurationException {
         if(!file.exists())
             throw new BadWorldConfigurationException("File does not exist: " + file);
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
@@ -69,8 +81,13 @@ public class WorldConfiguration {
         // Shop item
         configuration.shopItem = config.getItemStack("shop-item");
 
-        ReignOfCubes2.info("Loaded configuration " + configuration);
+        // Pickups
+        ConfigurationSection pickups = config.getConfigurationSection("pickups");
+        if(pickups != null) {
+            configuration.pickupConfiguration.deserialize(pickups);
+        }
 
+        ReignOfCubes2.info("Loaded configuration " + configuration);
         return configuration;
     }
 
@@ -80,6 +97,7 @@ public class WorldConfiguration {
         this.author = author;
         this.worldName = worldName;
         this.rules = GameRules.defaultRules();
+        pickupConfiguration = new PickupConfiguration();
     }
 
     public void save() throws IOException {
@@ -117,6 +135,10 @@ public class WorldConfiguration {
         // Shop item
         config.set("shop-item", shopItem);
 
+        // Pickups
+        ConfigurationSection pickups = config.createSection("pickups");
+        pickupConfiguration.save(pickups);
+
         //
         config.save(file);
     }
@@ -126,7 +148,8 @@ public class WorldConfiguration {
                 && lobby != null
                 && (!spawns.isEmpty())
                 && shopItem != null
-                && rules.isValid();
+                && rules.isValid()
+                && ! pickupConfiguration.isEmpty();
     }
 
     public Throne generateThrone(GameManager game) {

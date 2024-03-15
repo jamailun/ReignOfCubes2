@@ -55,7 +55,6 @@ public class RocCommand extends AbstractCommand {
             "spawn.safe-distance", "generator-frequency", "kill-y",
             "scoring.goal", "scoring.king.bonus", "scoring.king.per-second",
             "scoring.kill.flat", "scoring.kill.steal", "scoring.death-penalty",
-            "scoring.pickup",
             "shop-item"
     );
 
@@ -188,7 +187,7 @@ public class RocCommand extends AbstractCommand {
                     Vector vector = ((Player)sender).getLocation().toVector();
                     switch (property) {
                         case "lobby" -> {
-                            config.setLobby(vector);
+                            config.setLobby(((Player)sender).getLocation());
                             info(sender, "Position of lobby has been updated to " + niceVector(vector) + " for §6" + configName);
                         }
                         case "throne.pos_a" -> {
@@ -263,7 +262,6 @@ public class RocCommand extends AbstractCommand {
                     case "scoring.kill.flat" -> setInt(sender, value, rules::setScoreKillFlat, success);
                     case "scoring.kill.steal" -> setDouble(sender, value, rules::setScoreKillSteal, success);
                     case "scoring.death-penalty" -> setInt(sender, value, rules::setScoreDeathPenalty, success);
-                    case "scoring.pickup" -> setInt(sender, value, rules::setScorePickup, success);
                     default -> unexpectedArgument(sender, property, args_2_edit);
                 };
                 if(isSuccess) {

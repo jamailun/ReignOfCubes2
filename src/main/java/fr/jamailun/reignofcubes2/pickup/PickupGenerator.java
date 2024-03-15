@@ -1,29 +1,35 @@
 package fr.jamailun.reignofcubes2.pickup;
 
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.configuration.pickups.PickupConfigEntry;
 import fr.jamailun.reignofcubes2.messages.Messages;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Optional;
+import java.util.function.Supplier;
+
 public class PickupGenerator {
 
     @Getter private final Location location;
     @Setter private double seconds;
+    private final Supplier<PickupConfigEntry> supplier;
 
     private BukkitTask task;
 
+    private PickupConfigEntry lastEntry;
     private Item onGroundItem;
 
-    public PickupGenerator(Location location, double seconds) {
+    public PickupGenerator(Location location, double seconds, Supplier<PickupConfigEntry> supplier) {
         this.location = location;
         this.seconds = seconds;
+        this.supplier = supplier;
     }
 
     private void startWaiting() {
@@ -32,11 +38,12 @@ public class PickupGenerator {
     }
 
     private void spawnItem() {
-        ItemStack item = new ItemStack(Material.EMERALD);
+        lastEntry = supplier.get();
+        ItemStack item = new ItemStack(lastEntry.material());
         ItemMeta meta = item.getItemMeta();
         assert meta != null;
 
-        meta.displayName(Messages.parseComponent("<green>points"));
+        meta.displayName(Messages.parseComponent("<green>"+lastEntry.score()+"points"));
         item.setItemMeta(meta);
 
         onGroundItem = location.getWorld().dropItem(location, item);
@@ -55,18 +62,19 @@ public class PickupGenerator {
         if(onGroundItem != null) {
             onGroundItem.remove();
             onGroundItem = null;
+            lastEntry = null;
         }
     }
 
-    public boolean itemPickedUp(@NotNull Item item) {
+    public Optional<PickupConfigEntry> itemPickedUp(@NotNull Item item) {
         if(onGroundItem == null)
-            return false;
+            return Optional.empty();
         if(item.getUniqueId().equals(onGroundItem.getUniqueId())) {
             onGroundItem.remove();
             startWaiting();
-            return true;
+            return Optional.of(lastEntry);
         }
-        return false;
+        return Optional.empty();
     }
 
 }

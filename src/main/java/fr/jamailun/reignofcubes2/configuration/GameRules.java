@@ -28,7 +28,6 @@ public class GameRules {
     private int scoreGoal = -1;
     private int scoreKingPerSecond = -1;
     private int scoreKingBonus = -1;
-    private int scorePickup = -1;
     private int scoreKillFlat = -1;
     private double scoreKillSteal = -1;
     private int scoreDeathPenalty = -1;
@@ -66,7 +65,6 @@ public class GameRules {
             rules.scoreKillFlat = scoring.getInt("kill-flat", DEFAULT);
             rules.scoreKillSteal = scoring.getDouble("kill-steal", DEFAULT);
             rules.scoreDeathPenalty = scoring.getInt("death-penalty", DEFAULT);
-            rules.scorePickup = scoring.getInt("pickup", DEFAULT);
         }
 
         return rules;
@@ -93,7 +91,6 @@ public class GameRules {
         scoring.set("kill-flat", scoreKillFlat);
         scoring.set("kill-steal", scoreKillSteal);
         scoring.set("death-penalty", scoreDeathPenalty);
-        scoring.set("pickup", scorePickup);
     }
 
     public boolean isValid() {
@@ -103,8 +100,7 @@ public class GameRules {
                 && (generatorFrequency > 1)
                 && (
                     scoreGoal > 0 && scoreKingPerSecond >= 0 && scoreKingBonus >= 0 &&
-                    scoreKillFlat >= 0 && scoreKillSteal >= 0 && scoreDeathPenalty >= 0 &&
-                    scorePickup >= 0
+                    scoreKillFlat >= 0 && scoreKillSteal >= 0 && scoreDeathPenalty >= 0
                 );
     }
 
@@ -128,7 +124,6 @@ public class GameRules {
         rules.scoreKillSteal = 0.5d;
         rules.scoreKillFlat = 50;
         rules.scoreDeathPenalty = 20;
-        rules.scorePickup = 50;
         return rules;
     }
 
@@ -144,7 +139,6 @@ public class GameRules {
                 + prefix + "§7scoring.king = +" + niceInt(scoreKingBonus) + "§7, per-second: " + niceInt(scoreKingPerSecond)
                 + prefix + "§7scoring.kill = +" + niceInt(scoreKillFlat) + "§7, and steal: " + niceDouble(scoreKillSteal)
                 + prefix + "§7scoring.death-penalty = " + niceInt(scoreDeathPenalty)
-                + prefix + "§7scoring.pickup = " + niceInt(scorePickup)
                 + last + "§7}";
     }
 

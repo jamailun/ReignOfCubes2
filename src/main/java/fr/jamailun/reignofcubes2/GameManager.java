@@ -4,6 +4,7 @@ import fr.jamailun.reignofcubes2.configuration.ConfigurationsList;
 import fr.jamailun.reignofcubes2.configuration.GameRules;
 import fr.jamailun.reignofcubes2.configuration.SoundsLibrary;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
+import fr.jamailun.reignofcubes2.configuration.pickups.PickupConfigEntry;
 import fr.jamailun.reignofcubes2.messages.Messages;
 import fr.jamailun.reignofcubes2.objects.Ceremony;
 import fr.jamailun.reignofcubes2.objects.GameCountdown;
@@ -34,8 +35,6 @@ import java.util.stream.StreamSupport;
 public class GameManager {
 
     private final PlayersManager players = new PlayersManager(this);
-    private final PickupsManager pickups = new PickupsManager();
-
 
     @Getter private GameState state;
     @Getter private final ConfigurationsList configurationsList = new ConfigurationsList();
@@ -46,6 +45,7 @@ public class GameManager {
 
     // Score
     @Getter private final Ranking<RocPlayer> ranking = new Ranking<>(RocPlayer::getScore);
+    private final PickupsManager pickups = new PickupsManager(() -> worldConfiguration.getPickupConfiguration().pickRandom());
     private BukkitTask gameTimer;
 
     // Countdown
@@ -101,9 +101,7 @@ public class GameManager {
             }
 
             // A player connected while the game was on. Spectator !
-            ReignOfCubes2.info("joined : spectator.");
             ReignOfCubes2.runTaskLater(() -> {
-                ReignOfCubes2.info("set gamemode !");
                 p.setGameMode(GameMode.SPECTATOR);
                 p.teleport(players.iterator().next().getPlayer());
             }, 0.5);
@@ -511,7 +509,7 @@ public class GameManager {
         }
     }
 
-    public boolean didPickedUpItem(Item item) {
+    public Optional<PickupConfigEntry> didPickedUpItem(Item item) {
         return pickups.tryPickupItem(item);
     }
 }
