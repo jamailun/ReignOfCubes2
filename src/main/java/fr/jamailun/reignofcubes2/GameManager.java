@@ -188,7 +188,7 @@ public class GameManager {
         if(worldConfiguration == null || ! worldConfiguration.isValid()) return;
         int minPlayers = getRules().getPlayerCountMin();
         if(players.size() >= minPlayers) {
-            ReignOfCubes2.info("Enough players ! Will start the game now.");
+            ReignOfCubes2.info("Enough players (" + players.size() + " >= " + minPlayers + ") ! Will start the game now.");
             startCountdown();
         }
     }

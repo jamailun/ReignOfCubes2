@@ -27,7 +27,7 @@ public class PlayerDamageListener extends RocListener {
     // Because firework damages are dealt poorly in the API, must look up for firweorks manually...
     private final static double SAFE_FW_RADIUS = 5;
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.LOW)
     public void disablePickupFireworks(FireworkExplodeEvent e) {
         Firework firework = e.getEntity();
         if(firework.getPersistentDataContainer().has(ReignOfCubes2.marker())) {
@@ -36,10 +36,10 @@ public class PlayerDamageListener extends RocListener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
-    public void playerDamageLobby(EntityDamageEvent e) {
-        if(!game().isPlaying()) {
-            e.setCancelled(true);
+    @EventHandler(priority = EventPriority.LOW)
+    public void playerDamageLobby(EntityDamageEvent event) {
+        if( ! game().isPlaying()) {
+            event.setCancelled(shouldCancelNonPlaying(event));
         }
     }
 
@@ -61,7 +61,7 @@ public class PlayerDamageListener extends RocListener {
     @EventHandler
     public void entityDamageEvent(EntityDamageByEntityEvent event) {
         if( ! game().isPlaying()) {
-            event.setCancelled(true);
+            event.setCancelled(shouldCancelNonPlaying(event));
             return;
         }
 
@@ -105,5 +105,13 @@ public class PlayerDamageListener extends RocListener {
                 }
             }
         }
+    }
+
+    private boolean shouldCancelNonPlaying(EntityDamageEvent e) {
+        if(e.getEntity() instanceof Player) {
+            boolean isVoid = e.getCause() == EntityDamageEvent.DamageCause.KILL || e.getCause() == EntityDamageEvent.DamageCause.VOID;
+            return ! isVoid;
+        }
+        return false;
     }
 }
