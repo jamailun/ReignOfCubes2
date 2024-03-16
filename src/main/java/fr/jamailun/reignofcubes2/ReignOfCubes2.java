@@ -84,6 +84,7 @@ public final class ReignOfCubes2 extends JavaPlugin {
     @Override
     public void onDisable() {
         ReignOfCubes2.info("Disabling plugin.");
+        gameManager.purge();
     }
 
     public static BukkitTask runTaskTimer(Runnable runnable, double periodSeconds) {

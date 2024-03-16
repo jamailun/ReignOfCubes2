@@ -43,7 +43,7 @@ public class PickupGenerator {
         ItemMeta meta = item.getItemMeta();
         assert meta != null;
 
-        meta.displayName(Messages.parseComponent("<green>"+lastEntry.score()+"points"));
+        meta.displayName(Messages.parseComponent("<green>"+lastEntry.score()+" points"));
         item.setItemMeta(meta);
 
         onGroundItem = location.getWorld().dropItem(location, item);
@@ -71,8 +71,9 @@ public class PickupGenerator {
             return Optional.empty();
         if(item.getUniqueId().equals(onGroundItem.getUniqueId())) {
             onGroundItem.remove();
+            PickupConfigEntry entry = lastEntry;
             startWaiting();
-            return Optional.of(lastEntry);
+            return Optional.of(entry);
         }
         return Optional.empty();
     }

@@ -19,6 +19,7 @@ import fr.jamailun.reignofcubes2.utils.WorldSetter;
 import lombok.Getter;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -363,6 +364,14 @@ public class GameManager {
             }
         }, 1);
 
+        // Clear entities after loading (
+        ReignOfCubes2.runTaskLater(() -> {
+            ReignOfCubes2.info("Clear all entities of world.");
+            world.getEntities().stream()
+                    .filter(e -> !(e instanceof Player))
+                    .forEach(Entity::remove);
+        }, 1.5);
+
         // Sounds and messages
         playSound(SoundsLibrary.GAME_STARTED_1);
         playSound(SoundsLibrary.GAME_STARTED_2);
@@ -404,6 +413,14 @@ public class GameManager {
         // Reset throne
         loadConfiguration(configurationsList.getDefault());
         ReignOfCubes2.runTaskLater(this::testShouldStartGame, 2);
+    }
+
+    /**
+     * To call before shutdown : clear elements.
+     */
+    public void purge() {
+        // Reset all
+        pickups.purgeAndStop();
     }
 
     public void broadcast(String entry, Object... args) {
