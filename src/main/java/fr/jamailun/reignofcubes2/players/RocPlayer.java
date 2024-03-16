@@ -91,7 +91,7 @@ public class RocPlayer {
         player.getInventory().clear();
         player.setGameMode(GameMode.ADVENTURE);
         player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue());
-        player.setSaturation(100);
+        player.setSaturation(20);
     }
 
     public void respawned() {

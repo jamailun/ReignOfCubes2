@@ -10,6 +10,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -47,6 +48,7 @@ public class PickupGenerator {
         item.setItemMeta(meta);
 
         onGroundItem = location.getWorld().dropItem(location, item);
+        onGroundItem.setVelocity(new Vector(0, 0, 0));
     }
 
     public void start() {
