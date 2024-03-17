@@ -5,6 +5,7 @@ import com.sk89q.worldedit.regions.Region;
 import fr.jamailun.reignofcubes2.GameState;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.configuration.GameRules;
+import fr.jamailun.reignofcubes2.configuration.TagsConfiguration;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
 import fr.jamailun.reignofcubes2.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.configuration.pickups.PickupConfigEntry;
@@ -41,7 +42,9 @@ public class RocCommand extends AbstractCommand {
     private final static List<String> args_1_start = List.of("game", "countdown");
     private final static List<String> args_1_reload = List.of("messages", "kits");
     private final static List<String> args_1_kits = List.of("gui", "from-inventory.new", "from-inventory.update", "give", "delete", "edit");
-    private final static List<String> args_1_config = List.of("enable", "set-default", "list", "create", "delete", "edit", "edit.spawns", "edit.generators", "edit.pickups", "show");
+    private final static List<String> args_1_config = List.of("enable", "set-default", "list", "create",
+            "delete", "edit", "edit.spawns", "edit.generators", "edit.pickups", "edit.tags",
+            "show");
     private final static List<String> args_1_cheat = List.of("set.king", "set.score");
     private final static List<String> args_list = List.of("add", "remove", "list");
     private final static List<String> args_2_kits_edit = List.of("cost", "icon.type", "name", "tag");
@@ -56,6 +59,12 @@ public class RocCommand extends AbstractCommand {
             "scoring.goal", "scoring.king.bonus", "scoring.king.per-second",
             "scoring.kill.flat", "scoring.kill.steal", "scoring.death-penalty",
             "shop-item"
+    );
+    private final static List<String> args_2_edit_tags = List.of(
+            "regicide.attack.king.flat", "regicide.attack.king.mult",
+            "regicide.attack.others.flat", "regicide.attack.others.mult",
+            "regicide.defend.king.flat", "regicide.defend.king.mult",
+            "regicide.defend.others.flat", "regicide.defend.others.mult"
     );
 
     public RocCommand(ReignOfCubes2 plugin) {
@@ -165,6 +174,37 @@ public class RocCommand extends AbstractCommand {
                     return error(sender, "Unknown configuration: " + configName);
                 WorldConfiguration config = configs().get(configName);
                 return info(sender, "§rConfiguration: " + config.nicePrint());
+            }
+
+
+            if(arg.equalsIgnoreCase("edit.tags")) {
+                if(args.length < 2) return error(sender, "Specify the config-name and the property to edit.");
+                String configName = args[0];
+                String property = args[1].toLowerCase();
+                if(!configs().contains(configName))
+                    return error(sender, "Unknown configuration: " + configName);
+                WorldConfiguration config = configs().get(configName);
+                if(args.length < 3)
+                    return error(sender, "To change this tag-property, specify a value");
+                String value = args[2];
+
+                TagsConfiguration tags = config.getTagsConfiguration();
+                String success = "TagsConfiguration §6"+configName+"§a has been updated successfully.";
+                boolean isSuccess = switch(property) {
+                    case "regicide.attack.king.flat" -> setDouble(sender, value, tags::setRegicideAttackFlatKing, success);
+                    case "regicide.attack.king.mult" -> setDouble(sender, value, tags::setRegicideAttackMultiplicativeKing, success);
+                    case "regicide.attack.others.flat" -> setDouble(sender, value, tags::setRegicideAttackFlatOthers, success);
+                    case "regicide.attack.others.mult" -> setDouble(sender, value, tags::setRegicideAttackMultiplicativeOthers, success);
+                    case "regicide.defend.king.flat" -> setDouble(sender, value, tags::setRegicideDefendFlatKing, success);
+                    case "regicide.defend.king.mult" -> setDouble(sender, value, tags::setRegicideDefendMultiplicativeKing, success);
+                    case "regicide.defend.others.flat" -> setDouble(sender, value, tags::setRegicideDefendFlatOthers, success);
+                    case "regicide.defend.others.mult" -> setDouble(sender, value, tags::setRegicideDefendMultiplicativeOthers, success);
+                    default -> unexpectedArgument(sender, property, args_2_edit);
+                };
+                if(isSuccess) {
+                    return saveConfiguration(sender, config);
+                }
+                return true;
             }
 
             // Edit a configuration
@@ -707,6 +747,7 @@ public class RocCommand extends AbstractCommand {
                         || args[1].equalsIgnoreCase("edit.spawns")
                         || args[1].equalsIgnoreCase("edit.generators")
                         || args[1].equalsIgnoreCase("edit.pickups")
+                        || args[1].equalsIgnoreCase("edit.tags")
                         || args[1].equalsIgnoreCase("set-default")
                         || args[1].equalsIgnoreCase("show")
                         || args[1].equalsIgnoreCase("enable")
@@ -736,6 +777,9 @@ public class RocCommand extends AbstractCommand {
             if(args[0].equalsIgnoreCase("config")) {
                 if(args[1].equalsIgnoreCase("edit")) {
                     return args_2_edit.stream().filter(a -> a.startsWith(arg3)).toList();
+                }
+                else if(args[1].equalsIgnoreCase("edit.tags")) {
+                    return args_2_edit_tags.stream().filter(a -> a.startsWith(arg3)).toList();
                 }
                 else if(args[1].equalsIgnoreCase("edit.spawns")
                 || args[1].equalsIgnoreCase("edit.generators")

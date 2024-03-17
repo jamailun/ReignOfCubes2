@@ -111,7 +111,7 @@ public class TagsConfiguration {
     private String niceDouble(double d, double zero) {
         if(d == zero)
             return "§e" + d;
-        return (d < 0 ? "§c" : "§a") + d;
+        return (d < zero ? "§c" : "§a") + d;
     }
 
 }

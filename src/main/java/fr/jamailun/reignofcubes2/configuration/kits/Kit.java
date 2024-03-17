@@ -185,7 +185,7 @@ public class Kit {
         }
     }
 
-    public void setTagId(@NotNull String tagId) {
+    public void setTagId(@Nullable String tagId) {
         this.tagId = tagId;
         this.tag = TagsRegistry.find(tagId);
     }
