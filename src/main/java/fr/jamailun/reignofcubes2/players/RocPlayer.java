@@ -5,6 +5,7 @@ import fr.jamailun.reignofcubes2.configuration.SoundsLibrary;
 import fr.jamailun.reignofcubes2.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.events.ScoreGainedEvent;
 import fr.jamailun.reignofcubes2.messages.Messages;
+import fr.jamailun.reignofcubes2.tags.Tag;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -13,8 +14,10 @@ import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -31,6 +34,8 @@ public class RocPlayer {
     @Getter @Setter private int lastMoneySpent = 0;
     private RocPlayer lastDamager;
     private long lastDamageTook = 0;
+
+    private Tag tag;
 
     public RocPlayer(Player player) {
         this.player = player;
@@ -154,4 +159,26 @@ public class RocPlayer {
     public void playSound(SoundsLibrary.SoundEntry entry) {
         playSound(entry.sound(), 5f, entry.pitch());
     }
+
+    public void setTag(@NotNull Tag tag) {
+        clearTag();
+        this.tag = tag;
+        tag.added(this);
+    }
+
+    public void clearTag() {
+        if(hasTag()) {
+            tag.removed(this);
+            tag = null;
+        }
+    }
+
+    public boolean hasTag() {
+        return tag != null;
+    }
+
+    public Optional<Tag> getTag() {
+        return Optional.ofNullable(tag);
+    }
+
 }

@@ -1,9 +1,6 @@
 package fr.jamailun.reignofcubes2;
 
-import fr.jamailun.reignofcubes2.configuration.ConfigurationsList;
-import fr.jamailun.reignofcubes2.configuration.GameRules;
-import fr.jamailun.reignofcubes2.configuration.SoundsLibrary;
-import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
+import fr.jamailun.reignofcubes2.configuration.*;
 import fr.jamailun.reignofcubes2.configuration.pickups.PickupConfigEntry;
 import fr.jamailun.reignofcubes2.messages.Messages;
 import fr.jamailun.reignofcubes2.music.MusicManager;
@@ -317,6 +314,9 @@ public class GameManager {
 
     public GameRules getRules() {
         return worldConfiguration.getRules();
+    }
+    public TagsConfiguration getTagsConfiguration() {
+        return worldConfiguration.getTagsConfiguration();
     }
 
     public void startCountdown() {

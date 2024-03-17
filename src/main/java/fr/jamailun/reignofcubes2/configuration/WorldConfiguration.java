@@ -37,6 +37,7 @@ public class WorldConfiguration {
     @Setter private Vector throneA, throneB;
     @Setter private Location lobby;
     @Getter private GameRules rules;
+    @Getter private TagsConfiguration tagsConfiguration;
     @Setter private ItemStack shopItem;
     @Getter private final PickupConfiguration pickupConfiguration;
 
@@ -85,6 +86,12 @@ public class WorldConfiguration {
         ConfigurationSection pickups = config.getConfigurationSection("pickups");
         if(pickups != null) {
             configuration.pickupConfiguration.deserialize(pickups);
+        }
+
+        // Tags
+        ConfigurationSection tags = config.getConfigurationSection("tags");
+        if(tags != null) {
+            configuration.tagsConfiguration = TagsConfiguration.load(tags);
         }
 
         ReignOfCubes2.info("Loaded configuration " + configuration);
@@ -139,6 +146,10 @@ public class WorldConfiguration {
         ConfigurationSection pickups = config.createSection("pickups");
         pickupConfiguration.save(pickups);
 
+        // Tags
+        ConfigurationSection tags = config.createSection("tags");
+        tagsConfiguration.write(tags);
+
         //
         config.save(file);
     }
@@ -149,7 +160,8 @@ public class WorldConfiguration {
                 && (!spawns.isEmpty())
                 && shopItem != null
                 && rules.isValid()
-                && ! pickupConfiguration.isEmpty();
+                && ! pickupConfiguration.isEmpty()
+                && tagsConfiguration.isValid();
     }
 
     public Throne generateThrone(GameManager game) {
@@ -233,17 +245,17 @@ public class WorldConfiguration {
         String end = "\n  ";
         String endl = "§r,"+end;
         return "§r{" + end
-                + "name = §6" + name + endl
-                + "author = §6" + author + endl
+                + "name = §6" + name + "§r, author = §6" + author + endl
                 + "world = " + (Bukkit.getWorld(worldName) != null ? "§a" : "§c") + worldName + endl
-                + "§l" + "valid = " + (isValid() ? "§atrue" : "§cfalse") + endl
-                + "throne = " + niceVector(throneA) + " -> " +  niceVector(throneB) + endl
-                + "lobby = " + (lobby==null?"§4null":niceVector(lobby.toVector())+"/"+lobby.getWorld().getName()) + endl
-                + "spawns = §7" + spawns + endl
+                + "§lvalid = " + (isValid() ? "§atrue" : "§cfalse") + endl
+                + "throne = " + niceVector(throneA) + " -> " +  niceVector(throneB)
+                    + "§r, lobby = " + (lobby==null?"§4null":niceVector(lobby.toVector())+"/"+lobby.getWorld().getName()) + endl
+                + "spawns = " + (spawns.isEmpty()?"§c":"§a") + spawns.size()
+                    + "§r, generators = " + (generators.isEmpty()?"§c":"§a") + generators + endl
                 + "pickups = " + (pickupConfiguration.isEmpty()?"§c":"§a") + pickupConfiguration + endl
-                + "generators = §7" + generators + endl
                 + "shop-item = " + (shopItem == null ? "§cnone" : "§a"+shopItem.getType()) + endl
                 + "rules = §7" + rules.nicePrint("\n    ", "\n  ")
+                + "§r, tags = " + tagsConfiguration.nicePrint("\n    ", "\n  ")
                 + "§r\n}";
     }
 
