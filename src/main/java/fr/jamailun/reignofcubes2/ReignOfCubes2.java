@@ -9,6 +9,7 @@ import fr.jamailun.reignofcubes2.listeners.*;
 import fr.jamailun.reignofcubes2.music.MusicManager;
 import fr.jamailun.reignofcubes2.placeholder.RocPlaceholderExpansion;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
+import fr.jamailun.reignofcubes2.tags.NinjaTag;
 import fr.jamailun.reignofcubes2.tags.RegicideTag;
 import fr.jamailun.reignofcubes2.tags.TagsRegistry;
 import io.papermc.paper.plugin.configuration.PluginMeta;
@@ -18,6 +19,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -90,6 +92,7 @@ public final class ReignOfCubes2 extends JavaPlugin {
 
         // Load tags
         TagsRegistry.register(new RegicideTag());
+        TagsRegistry.register(new NinjaTag());
     }
 
     @Override
@@ -158,6 +161,10 @@ public final class ReignOfCubes2 extends JavaPlugin {
             INSTANCE.marker = new NamespacedKey(INSTANCE, "marker");
         }
         return INSTANCE.marker;
+    }
+
+    public static Plugin plugin() {
+        return INSTANCE;
     }
 
 }

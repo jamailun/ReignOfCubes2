@@ -167,6 +167,7 @@ public class GameManager {
 
         // After one second, test if no/one player are remaining.
         ReignOfCubes2.runTaskLater(this::testGameOverMissingPlayers, 1);
+        player.setTag(null);
     }
 
     private void testGameOverMissingPlayers() {

@@ -3,6 +3,8 @@ package fr.jamailun.reignofcubes2.listeners;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.objects.Throne;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
+import fr.jamailun.reignofcubes2.tags.NinjaTag;
+import fr.jamailun.reignofcubes2.tags.Tag;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -11,6 +13,9 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
+
+import java.util.Optional;
 
 public class PlayerMovementListener extends RocListener {
 
@@ -63,6 +68,23 @@ public class PlayerMovementListener extends RocListener {
         else {
             if(inside && throne.isCooldownOk(player.getUUID()))
                 throne.enters(player);
+        }
+    }
+
+    @EventHandler
+    public void playerSneak(PlayerToggleSneakEvent event) {
+        if(!game().isPlaying())
+            return;
+        RocPlayer player = game().toPlayer(event.getPlayer());
+        if(player != null) {
+            Optional<Tag> tag = player.getTag();
+            if(tag.isPresent() && tag.get() instanceof NinjaTag ninja) {
+                if(event.getPlayer().isSneaking()) {
+                    ninja.show(player);
+                } else {
+                    ninja.hide(player);
+                }
+            }
         }
     }
 
