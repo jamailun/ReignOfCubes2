@@ -6,14 +6,14 @@ prefix: RoC-2
 authors: [jamailun]
 description: ROC is back
 load: POSTWORLD
-depend: [ WorldEdit, PlaceholderAPI ]
+depend: [ WorldEdit, PlaceholderAPI, NoteBlockAPI ]
 
 commands:
   roc:
     description: All RoC command to configure the plugin.
     permission: roc.admin
   shop:
-    description: Open the shop. Require being playing.
+    description: Open the shop.
 
 permissions:
   roc.*:

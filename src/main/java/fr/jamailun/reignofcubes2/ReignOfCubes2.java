@@ -5,6 +5,7 @@ import fr.jamailun.reignofcubes2.configuration.KitsConfiguration;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
 import fr.jamailun.reignofcubes2.configuration.kits.KitItem;
 import fr.jamailun.reignofcubes2.listeners.*;
+import fr.jamailun.reignofcubes2.music.MusicManager;
 import fr.jamailun.reignofcubes2.placeholder.RocPlaceholderExpansion;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import io.papermc.paper.plugin.configuration.PluginMeta;
@@ -24,6 +25,7 @@ public final class ReignOfCubes2 extends JavaPlugin {
     private static ReignOfCubes2 INSTANCE;
 
     @Getter private GameManager gameManager;
+    @Getter private MusicManager musicManager;
     private KitsConfiguration kitsConfiguration;
     private NamespacedKey marker;
 
@@ -42,6 +44,9 @@ public final class ReignOfCubes2 extends JavaPlugin {
             return;
         }
 
+        // Load musics
+        musicManager = new MusicManager(getFile("musics"));
+
         // Load kits
         kitsConfiguration = new KitsConfiguration(getFile("kits"));
 
@@ -53,7 +58,7 @@ public final class ReignOfCubes2 extends JavaPlugin {
 
     private void enableRoc() {
         // Game manager
-        gameManager = new GameManager();
+        gameManager = new GameManager(musicManager);
 
         // Listeners
         new PlayerConnectionListener(this);

@@ -6,6 +6,8 @@ import fr.jamailun.reignofcubes2.configuration.SoundsLibrary;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
 import fr.jamailun.reignofcubes2.configuration.pickups.PickupConfigEntry;
 import fr.jamailun.reignofcubes2.messages.Messages;
+import fr.jamailun.reignofcubes2.music.MusicManager;
+import fr.jamailun.reignofcubes2.music.MusicType;
 import fr.jamailun.reignofcubes2.objects.Ceremony;
 import fr.jamailun.reignofcubes2.objects.GameCountdown;
 import fr.jamailun.reignofcubes2.objects.Throne;
@@ -36,6 +38,7 @@ import java.util.stream.StreamSupport;
 public class GameManager {
 
     private final PlayersManager players = new PlayersManager(this);
+    @Getter private final MusicManager musics;
 
     @Getter private GameState state;
     @Getter private final ConfigurationsList configurationsList = new ConfigurationsList();
@@ -55,7 +58,8 @@ public class GameManager {
     // is over with a victory ?
     private boolean isVictory;
 
-    GameManager() {
+    GameManager(MusicManager musics) {
+        this.musics = musics;
         loadConfiguration(configurationsList.getDefault());
     }
 
@@ -123,6 +127,8 @@ public class GameManager {
             makePlayerJoinsLobby(p);
         }
 
+        // Add to musics
+        musics.addPlayer(p, MusicType.LOBBY);
 
         // Test if the game should start.
         testShouldStartGame();
@@ -142,6 +148,7 @@ public class GameManager {
     }
 
     public void playerLeftServer(Player p) {
+        musics.removePlayer(p);
         players.maybeLeave(p);
         if(!players.exists(p)) {
             return;
@@ -256,6 +263,7 @@ public class GameManager {
         // remove king from old king.
         if(king != null) {
             assert king != player : "The king wanted to become the king again...";
+            musics.addPlayer(king.getPlayer(), MusicType.PLAY_NORMAL);
             king.setKing(false);
         }
 
@@ -263,6 +271,7 @@ public class GameManager {
         player.setKing(true);
         king = player;
         broadcast("event.king.new", king.getName());
+        musics.addPlayer(king.getPlayer(), MusicType.PLAY_KING);
 
         // Add score
         king.addScore(getRules().getScoreKingBonus(), ScoreAddReason.KING_FLAT_BONUS);
@@ -374,7 +383,9 @@ public class GameManager {
 
         // Sounds and messages
         playSound(SoundsLibrary.GAME_STARTED_1);
-        playSound(SoundsLibrary.GAME_STARTED_2);
+        for(RocPlayer pl : players) {
+            musics.addPlayer(pl.getPlayer(), MusicType.PLAY_NORMAL);
+        }
 
         broadcast("game.start");
         ReignOfCubes2.info("Game started.");
@@ -408,6 +419,9 @@ public class GameManager {
 
         // Message and go back to spawn
         ReignOfCubes2.info("Game stopped.");
+        for(RocPlayer pl : players) {
+            musics.addPlayer(pl.getPlayer(), MusicType.LOBBY);
+        }
         players.backToLobby();
 
         // Reset throne
@@ -497,6 +511,7 @@ public class GameManager {
         ReignOfCubes2.info("Player re-joined : " + p.getName() + ".");
         p.teleport(getWorldConfiguration().getSafeSpawn(true));
         player.respawned();
+        musics.addPlayer(p, MusicType.PLAY_NORMAL);
     }
 
     /**
