@@ -73,8 +73,6 @@ public class PlayerMovementListener extends RocListener {
 
     @EventHandler
     public void playerSneak(PlayerToggleSneakEvent event) {
-        if(!game().isPlaying())
-            return;
         RocPlayer player = game().toPlayer(event.getPlayer());
         if(player != null) {
             Optional<Tag> tag = player.getTag();

@@ -44,6 +44,7 @@ public class NinjaTag extends Tag {
         if(hiddenPlayers.contains(rocPlayer.getUUID()))
             return;
         hiddenPlayers.add(rocPlayer.getUUID());
+        rocPlayer.sendMessage("tags.ninja.hidden");
 
         Player player = rocPlayer.getPlayer();
         player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, PotionEffect.INFINITE_DURATION, 9, true, true, true));
@@ -57,8 +58,9 @@ public class NinjaTag extends Tag {
 
     public void show(RocPlayer rocPlayer) {
         if(!hiddenPlayers.contains(rocPlayer.getUUID()))
-            return;;
+            return;
         hiddenPlayers.remove(rocPlayer.getUUID());
+        rocPlayer.sendMessage("tags.ninja.visible");
 
         Player player = rocPlayer.getPlayer();
         player.removePotionEffect(PotionEffectType.INVISIBILITY);

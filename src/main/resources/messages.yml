@@ -62,6 +62,10 @@ messages:
       start: "<yellow>[<light_purple>👑<yellow>] <white><b>Le joueur <yellow>{0}<white> débute le couronnement."
       start-steal: "<yellow>[<dark_red>👑<yellow>] <white><b>Le joueur <red>{0}<white> commence à voler le trône."
       fail: "<yellow>[<light_purple>👑<yellow>] <white><b>Le joueur <gray>{0}<white> a échoué son couronnement."
+    tags:
+      ninja:
+        hidden: "<white>[<green>!<white>] <gray>Tu es désormais invisible."
+        visible: "<white>[<red>!<white>] <gray>Attention, tu es désormais <white>visible<gray>."
     tab:
       player:
         you: "&2toi"
