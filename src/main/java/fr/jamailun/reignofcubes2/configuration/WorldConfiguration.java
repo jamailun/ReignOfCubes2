@@ -37,7 +37,7 @@ public class WorldConfiguration {
     @Setter private Vector throneA, throneB;
     @Setter private Location lobby;
     @Getter private GameRules rules;
-    @Getter private TagsConfiguration tagsConfiguration;
+    @Getter private TagsConfiguration tagsConfiguration = new TagsConfiguration();
     @Setter private ItemStack shopItem;
     @Getter private final PickupConfiguration pickupConfiguration;
 

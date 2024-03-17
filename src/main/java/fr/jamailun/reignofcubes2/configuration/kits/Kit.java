@@ -2,6 +2,8 @@ package fr.jamailun.reignofcubes2.configuration.kits;
 
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
+import fr.jamailun.reignofcubes2.tags.Tag;
+import fr.jamailun.reignofcubes2.tags.TagsRegistry;
 import fr.jamailun.reignofcubes2.utils.ItemBuilder;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,6 +12,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +25,10 @@ public class Kit {
     @Getter @Setter private String displayName;
     @Getter @Setter private Material iconType;
     @Getter @Setter private int cost;
+
+    @Getter private Tag tag;
+    @Getter private String tagId; //used when 'tag' is null.
+
     private final Set<KitItem> items = new HashSet<>();
 
     private final File file;
@@ -67,6 +75,10 @@ public class Kit {
             iconType = Material.BARRIER;
         }
 
+        // tag
+        tagId = config.getString("tag");
+        tag = TagsRegistry.find(tagId);
+
         // Items
         items.clear();
         List<?> itemsList = config.getList("items");
@@ -110,18 +122,17 @@ public class Kit {
         }
     }
 
-    public boolean save() {
+    public void save() {
         try {
             config.set("name", displayName);
             config.set("cost", cost);
             config.set("icon-type", iconType.name());
+            config.set("tag", tagId);
             config.set("items", items.stream().sorted(Comparator.comparing(KitItem::getSlot)).toList());
 
             config.save(file);
-            return true;
         } catch (IOException e) {
             ReignOfCubes2.error("Could not save kit '" + id + "' : " + e.getMessage());
-            return false;
         }
     }
 
@@ -156,6 +167,8 @@ public class Kit {
         }
 
         p.updateInventory();
+
+        player.setTag(tag);
     }
 
     public List<KitItem> listItems(boolean equipment) {
@@ -170,5 +183,10 @@ public class Kit {
         if( ! file.renameTo(newFile)) {
             ReignOfCubes2.error("Could not rename kit file " + file + " to " + newFile);
         }
+    }
+
+    public void setTagId(@NotNull String tagId) {
+        this.tagId = tagId;
+        this.tag = TagsRegistry.find(tagId);
     }
 }

@@ -2,6 +2,7 @@ package fr.jamailun.reignofcubes2;
 
 import fr.jamailun.reignofcubes2.commands.*;
 import fr.jamailun.reignofcubes2.configuration.KitsConfiguration;
+import fr.jamailun.reignofcubes2.configuration.TagsConfiguration;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
 import fr.jamailun.reignofcubes2.configuration.kits.KitItem;
 import fr.jamailun.reignofcubes2.listeners.*;
@@ -88,7 +89,7 @@ public final class ReignOfCubes2 extends JavaPlugin {
         }
 
         // Load tags
-        TagsRegistry.register(new RegicideTag(gameManager));
+        TagsRegistry.register(new RegicideTag());
     }
 
     @Override
@@ -135,6 +136,9 @@ public final class ReignOfCubes2 extends JavaPlugin {
 
     public static KitsConfiguration getKits() {
         return INSTANCE.kitsConfiguration;
+    }
+    public static TagsConfiguration getTags() {
+        return INSTANCE.gameManager.getTagsConfiguration();
     }
 
     public static WorldConfiguration getCurrentConfig() {

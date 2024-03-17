@@ -421,6 +421,7 @@ public class GameManager {
         ReignOfCubes2.info("Game stopped.");
         for(RocPlayer pl : players) {
             musics.addPlayer(pl.getPlayer(), MusicType.LOBBY);
+            pl.reset();
         }
         players.backToLobby();
 

@@ -11,6 +11,7 @@ import fr.jamailun.reignofcubes2.configuration.pickups.PickupConfigEntry;
 import fr.jamailun.reignofcubes2.gui.AdminKitsGUI;
 import fr.jamailun.reignofcubes2.messages.Messages;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
+import fr.jamailun.reignofcubes2.tags.TagsRegistry;
 import fr.jamailun.reignofcubes2.utils.WorldEditHandler;
 import org.bukkit.*;
 import org.bukkit.command.Command;
@@ -43,7 +44,7 @@ public class RocCommand extends AbstractCommand {
     private final static List<String> args_1_config = List.of("enable", "set-default", "list", "create", "delete", "edit", "edit.spawns", "edit.generators", "edit.pickups", "show");
     private final static List<String> args_1_cheat = List.of("set.king", "set.score");
     private final static List<String> args_list = List.of("add", "remove", "list");
-    private final static List<String> args_2_kits_edit = List.of("cost", "icon.type", "name");
+    private final static List<String> args_2_kits_edit = List.of("cost", "icon.type", "name", "tag");
     private final static List<String> args_3_get_set = List.of("get", "set");
 
     private final static List<String> args_2_edit = List.of(
@@ -616,6 +617,10 @@ public class RocCommand extends AbstractCommand {
 
             // == actions as a console
             if(arg.equalsIgnoreCase("edit")) {
+                if("tag.remove".equalsIgnoreCase(args[1])) {
+                    kit.setTagId(null);
+                    return info(sender, "Removed tag from kit");
+                }
                 if(args.length < 3) return error(sender, "Specify value to change, and the new value.");
                 switch(args[1].toLowerCase()) {
                     case "cost":
@@ -631,6 +636,14 @@ public class RocCommand extends AbstractCommand {
                     case "name":
                         String newValue = absorbRemaining(2, args);
                         kit.setDisplayName(newValue);
+                        break;
+                    case "tag":
+                        String tag = args[2];
+                        kit.setTagId(tag);
+                        if(TagsRegistry.find(tag) == null) {
+                            kit.save();
+                            return info(sender, "Kit saved, but tag §c" + tag + " §f is unknown.");
+                        }
                         break;
                     default:
                         return unexpectedArgument(sender, args[2], args_2_kits_edit);

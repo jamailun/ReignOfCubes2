@@ -30,7 +30,8 @@ public final class TagsRegistry {
      * @param id the ID of the tag to find.
      * @return null if no tags exist with this ID.
      */
-    public static @Nullable Tag find(@NotNull String id) {
+    public static @Nullable Tag find(@Nullable String id) {
+        if(id == null) return null;
         return tags.get(id);
     }
 

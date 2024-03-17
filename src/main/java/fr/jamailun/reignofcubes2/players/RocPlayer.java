@@ -15,6 +15,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -97,11 +98,14 @@ public class RocPlayer {
         player.setGameMode(GameMode.ADVENTURE);
         player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue());
         player.setSaturation(20);
+        player.clearActivePotionEffects();
+        clearTag();
     }
 
     public void respawned() {
         lastMoneySpent = 0;
         lastDamager = null;
+        player.clearActivePotionEffects();
 
         // Equip default kit
         Kit defaultKit = ReignOfCubes2.getKits().getDefaultKit();
@@ -160,10 +164,11 @@ public class RocPlayer {
         playSound(entry.sound(), 5f, entry.pitch());
     }
 
-    public void setTag(@NotNull Tag tag) {
+    public void setTag(@Nullable Tag tag) {
         clearTag();
         this.tag = tag;
-        tag.added(this);
+        if(tag != null)
+            tag.added(this);
     }
 
     public void clearTag() {

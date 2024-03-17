@@ -36,10 +36,12 @@ public class AdminKitsGUI extends MenuGUI {
     private void displayKits(List<Kit> kits) {
         int slot = 0;
         for(Kit kit : kits) {
-            ItemStack is = new ItemBuilder(kit.toIcon())
-                    .addLoreLine("Cost: " + (kit.getCost()<0?"§4invalid":"§a"+kit.getCost()))
-                    .toItemStack();
-            set(slot, is, () -> clickOnKit(kit));
+            ItemBuilder is = new ItemBuilder(kit.toIcon());
+            if(kit.getTagId() != null) {
+                is.addLoreLine("Tag : " + (kit.getTag()==null?"§c":"§e") + kit.getTagId());
+            }
+            is.addLoreLine("Cost: " + (kit.getCost()<0?"§4invalid":"§a"+kit.getCost()));
+            set(slot, is.toItemStack(), () -> clickOnKit(kit));
             slot++;
         }
     }

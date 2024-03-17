@@ -1,6 +1,6 @@
 package fr.jamailun.reignofcubes2.tags;
 
-import fr.jamailun.reignofcubes2.GameManager;
+import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.configuration.TagsConfiguration;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -13,22 +13,23 @@ import org.jetbrains.annotations.Nullable;
  */
 public class RegicideTag extends Tag {
 
-    private final GameManager game;
-
-    public RegicideTag(GameManager game) {
+    public RegicideTag() {
         super("regicide");
-        this.game = game;
     }
 
     @Override
-    public void added(@NotNull RocPlayer holder) { }
+    public void added(@NotNull RocPlayer holder) {
+        ReignOfCubes2.info("[debug] " + holder.getName() + " is now REGICIDE");
+    }
 
     @Override
-    public void removed(@NotNull RocPlayer holder) { }
+    public void removed(@NotNull RocPlayer holder) {
+        ReignOfCubes2.info("[debug] " + holder.getName() + " is not regicide anymore.");
+    }
 
     @Override
     public void holderAttacks(@NotNull RocPlayer holder, @NotNull RocPlayer other, @NotNull EntityDamageByEntityEvent event) {
-        TagsConfiguration config = game.getTagsConfiguration();
+        TagsConfiguration config = ReignOfCubes2.getTags();
         boolean targetKing = other.isKing();
 
         double flatMod = targetKing ? config.getRegicideAttackFlatKing() : config.getRegicideAttackFlatOthers();
@@ -44,7 +45,7 @@ public class RegicideTag extends Tag {
     public void holderDefends(@NotNull RocPlayer holder, @Nullable RocPlayer other, @NotNull EntityDamageEvent event) {
         if(other == null) // only care when attacker is non-null
             return;
-        TagsConfiguration config = game.getTagsConfiguration();
+        TagsConfiguration config = ReignOfCubes2.getTags();
         boolean targetKing = other.isKing();
 
         double flatMod = targetKing ? config.getRegicideDefendFlatKing() : config.getRegicideDefendFlatOthers();
