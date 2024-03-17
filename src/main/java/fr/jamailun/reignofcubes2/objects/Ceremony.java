@@ -3,6 +3,7 @@ package fr.jamailun.reignofcubes2.objects;
 import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.configuration.SoundsLibrary;
+import fr.jamailun.reignofcubes2.music.MusicType;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -29,6 +30,7 @@ public class Ceremony {
         // Start
         task = ReignOfCubes2.runTaskTimer(this::tick, TICK_RATE);
         ReignOfCubes2.info("[CEREMONY] Started.");
+        game.getMusics().addPlayer(player.getUUID(), MusicType.CEREMONY);
 
         if(game.hasKing()) {
             game.broadcast("ceremony.start-steal", player.getName());
@@ -49,10 +51,10 @@ public class Ceremony {
             return;
         }
         // Play a 'ding' (every N ticks)
-        if((++dingCounter) % dingFrequency == 0) {
+        /*if((++dingCounter) % dingFrequency == 0) {
             double pitch = (elapsed * (1.05d)/duration) + 0.05d;
             player.playSound(SoundsLibrary.CEREMONY_DING, 0.9f, (float) pitch);
-        }
+        }*/
     }
 
     public void stop() {
@@ -62,6 +64,7 @@ public class Ceremony {
             if( ! success) {
                 game.broadcast("ceremony.fail", player.getName());
                 game.playSound(SoundsLibrary.CEREMONY_FAILS);
+                game.getMusics().addPlayer(player.getUUID(), MusicType.PLAY_NORMAL);
             }
         }
     }
@@ -80,7 +83,7 @@ public class Ceremony {
     }
 
     public String getColor() {
-        return "YELLOW"; // TODO
+        return "YELLOW"; // TODO ?
     }
 
 }

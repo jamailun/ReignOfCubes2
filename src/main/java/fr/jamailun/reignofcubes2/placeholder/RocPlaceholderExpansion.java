@@ -30,8 +30,8 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
         if("music".equals(param)) {
             Optional<Song> currentSong = game.getMusics().getHeardSong(player);
             return currentSong
-                    .map(song -> "§e" + song.getTitle())
-                    .orElse("§7Aucune");
+                    .map(song -> song.getTitle() == null || song.getTitle().isEmpty() ? "§f§oInconnue" : "§e" + song.getTitle())
+                    .orElse("§7§oAucune");
         }
 
         RocPlayer rocPlayer = game.toPlayer(player);
