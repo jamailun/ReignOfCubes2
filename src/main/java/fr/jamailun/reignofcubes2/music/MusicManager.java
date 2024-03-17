@@ -87,8 +87,13 @@ public class MusicManager {
     public void removePlayer(UUID uuid) {
         MusicType type = listeners.remove(uuid);
         if(type != null && radios.containsKey(type)) {
-            radios.get(type).removePlayer(uuid);
-            ReignOfCubes2.info("Player LEFT radio " + type);
+            RadioSongPlayer radio = radios.get(type);
+            radio.removePlayer(uuid);
+            ReignOfCubes2.info("Player left radio " + type);
+            if(radio.getPlayerUUIDs().isEmpty()) {
+                radio.setPlaying(false);
+                ReignOfCubes2.info("Radio stopped.");
+            }
         }
     }
 
