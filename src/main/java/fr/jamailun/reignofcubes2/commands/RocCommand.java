@@ -40,7 +40,7 @@ public class RocCommand extends AbstractCommand {
 
     private final static List<String> args_0 = List.of("config", "start", "stop", "help", "reload", "show", "cheat", "kits", "tp.lobby");
     private final static List<String> args_1_start = List.of("game", "countdown");
-    private final static List<String> args_1_reload = List.of("messages", "kits");
+    private final static List<String> args_1_reload = List.of("messages", "kits", "musics");
     private final static List<String> args_1_kits = List.of("gui", "from-inventory.new", "from-inventory.update", "give", "delete", "edit");
     private final static List<String> args_1_config = List.of("enable", "set-default", "list", "create",
             "delete", "edit", "edit.spawns", "edit.generators", "edit.pickups", "edit.tags",
@@ -558,6 +558,11 @@ public class RocCommand extends AbstractCommand {
             if(arg.equalsIgnoreCase("messages")) {
                 Messages.reload();
                 return success(sender, "Messages configuration reloaded.");
+            }
+
+            if(arg.equalsIgnoreCase("musics")) {
+                game().getMusics().reload();
+                return success(sender, "Musics reloaded.");
             }
 
             if(arg.equalsIgnoreCase("kits")) {

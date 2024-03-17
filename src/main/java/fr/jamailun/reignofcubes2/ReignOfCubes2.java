@@ -52,6 +52,10 @@ public final class ReignOfCubes2 extends JavaPlugin {
         // Load musics
         musicManager = new MusicManager(getFile("musics"));
 
+        // Load tags
+        TagsRegistry.register(new RegicideTag());
+        TagsRegistry.register(new NinjaTag());
+
         // Load kits
         kitsConfiguration = new KitsConfiguration(getFile("kits"));
 
@@ -89,10 +93,6 @@ public final class ReignOfCubes2 extends JavaPlugin {
         for(Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             gameManager.playerJoinsServer(onlinePlayer);
         }
-
-        // Load tags
-        TagsRegistry.register(new RegicideTag());
-        TagsRegistry.register(new NinjaTag());
     }
 
     @Override
