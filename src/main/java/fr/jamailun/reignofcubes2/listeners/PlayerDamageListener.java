@@ -8,10 +8,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.FireworkExplodeEvent;
 
 import java.util.*;
 
@@ -20,21 +18,8 @@ public class PlayerDamageListener extends RocListener {
         super(plugin);
     }
 
-    // Stores UUID of firework that shall not deal damages
-    private final Set<UUID> safeFireworks = new HashSet<>();
     // Stores SHOOTERS protected from someone who deals them thorns damage
     private final Map<UUID, UUID> safeThorns = new HashMap<>();
-    // Because firework damages are dealt poorly in the API, must look up for firweorks manually...
-    private final static double SAFE_FW_RADIUS = 5;
-
-    @EventHandler(priority = EventPriority.LOW)
-    public void disablePickupFireworks(FireworkExplodeEvent e) {
-        Firework firework = e.getEntity();
-        if(firework.getPersistentDataContainer().has(ReignOfCubes2.marker())) {
-            safeFireworks.add(firework.getUniqueId());
-            ReignOfCubes2.runTaskLater(() -> safeFireworks.remove(firework.getUniqueId()), 0.5);
-        }
-    }
 
     @EventHandler(priority = EventPriority.LOW)
     public void playerDamageLobby(EntityDamageEvent event) {
@@ -43,26 +28,19 @@ public class PlayerDamageListener extends RocListener {
         }
     }
 
-    // For some reason, Fireworks damage trigger 'EntityDamageByBlockEvent' with a null damager ???
-    @EventHandler
-    public void cancelFireworkDamages(EntityDamageByBlockEvent e) {
-        if(e.getDamager() == null) {
-            // Should be a firework... We MUST scan entities around
-            // then find a firework in the 'safe' list.
-            e.getEntity().getNearbyEntities(SAFE_FW_RADIUS, SAFE_FW_RADIUS, SAFE_FW_RADIUS)
-                    .stream()
-                    .map(Entity::getUniqueId)
-                    .filter(safeFireworks::contains)
-                    .findFirst()
-                    .ifPresent(uuid -> e.setCancelled(true));
-        }
-    }
-
     @EventHandler
     public void entityDamageEvent(EntityDamageByEntityEvent event) {
         if( ! game().isPlaying()) {
             event.setCancelled(shouldCancelNonPlaying(event));
             return;
+        }
+
+        // Cancel fireworks !
+        if(event.getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION && event.getDamager() instanceof Firework firework) {
+            if(firework.getPersistentDataContainer().has(ReignOfCubes2.marker())) {
+                event.setCancelled(true);
+                return;
+            }
         }
 
         Entity victimEntity = event.getEntity();
