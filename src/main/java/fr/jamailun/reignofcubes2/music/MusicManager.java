@@ -5,7 +5,9 @@ import com.xxmicloxx.NoteBlockAPI.songplayer.Fade;
 import com.xxmicloxx.NoteBlockAPI.songplayer.RadioSongPlayer;
 import com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.*;
@@ -23,6 +25,11 @@ public class MusicManager {
         this.folder = folder;
         assertFolder(folder);
         reload();
+
+        // Every 30 seconds, disable vanilla sounds
+        ReignOfCubes2.runTaskTimer(() -> {
+            Bukkit.getOnlinePlayers().forEach(p -> p.stopSound(org.bukkit.SoundCategory.MUSIC));
+        }, 30);
     }
 
     /**
@@ -114,6 +121,13 @@ public class MusicManager {
                 throw new RuntimeException("Could not assert folder existence : '" + folder + "'.");
             }
         }
+    }
+
+    public Optional<Song> getHeardSong(@NotNull Player player) {
+        MusicType type = listeners.get(player.getUniqueId());
+        if(type == null) return Optional.empty();
+        RadioSongPlayer radio = radios.get(type);
+        return Optional.of(radio.getSong());
     }
 
 }

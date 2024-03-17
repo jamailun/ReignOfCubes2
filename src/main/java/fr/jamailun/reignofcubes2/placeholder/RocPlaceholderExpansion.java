@@ -1,5 +1,6 @@
 package fr.jamailun.reignofcubes2.placeholder;
 
+import com.xxmicloxx.NoteBlockAPI.model.Song;
 import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
@@ -26,6 +27,13 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
 
     @Override
     public @Nullable String onPlaceholderRequest(Player player, @NotNull String param) {
+        if("music".equals(param)) {
+            Optional<Song> currentSong = game.getMusics().getHeardSong(player);
+            return currentSong
+                    .map(song -> "§e" + song.getTitle())
+                    .orElse("§7Aucune");
+        }
+
         RocPlayer rocPlayer = game.toPlayer(player);
         String lan = (rocPlayer == null ? "fr" : rocPlayer.getLanguage());
         String common = getRequestAny(param, lan);

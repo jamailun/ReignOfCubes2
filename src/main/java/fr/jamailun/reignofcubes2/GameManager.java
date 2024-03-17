@@ -365,9 +365,9 @@ public class GameManager {
         gameTimer = ReignOfCubes2.runTaskTimer(() -> {
             if(hasKing()) {
                 king.addScore(getRules().getScoreKingPerSecond(), ScoreAddReason.KING_EVERY_SECOND);
-                king.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20, 0, false, false, true));
+                king.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 40, 0, false, false, true));
                 if(throne != null && throne.isAlreadyInside(king)) {
-                    king.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20, 0, false, false, true));
+                    king.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 40, 0, false, false, true));
                 }
                 ranking.update(king);
             }
