@@ -22,6 +22,7 @@ public class Ceremony {
 
     private static final int dingFrequency = 2;
     private int dingCounter = 0;
+    private boolean playsDings = false;
 
     public Ceremony(GameManager game, RocPlayer player) {
         this.game = game;
@@ -31,6 +32,7 @@ public class Ceremony {
         task = ReignOfCubes2.runTaskTimer(this::tick, TICK_RATE);
         ReignOfCubes2.info("[CEREMONY] Started.");
         game.getMusics().addPlayer(player.getUUID(), MusicType.CEREMONY);
+        playsDings = ! game.getMusics().hasRadioFor(MusicType.CEREMONY);
 
         if(game.hasKing()) {
             game.broadcast("ceremony.start-steal", player.getName());
@@ -51,10 +53,10 @@ public class Ceremony {
             return;
         }
         // Play a 'ding' (every N ticks)
-        /*if((++dingCounter) % dingFrequency == 0) {
+        if(playsDings && (++dingCounter) % dingFrequency == 0) {
             double pitch = (elapsed * (1.05d)/duration) + 0.05d;
             player.playSound(SoundsLibrary.CEREMONY_DING, 0.9f, (float) pitch);
-        }*/
+        }
     }
 
     public void stop() {

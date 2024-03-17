@@ -120,6 +120,10 @@ public class MusicManager {
         }
     }
 
+    public boolean hasRadioFor(MusicType type) {
+        return radios.containsKey(type);
+    }
+
     private static void assertFolder(File folder) {
         if(!folder.exists()) {
             if(!folder.mkdirs()) {
