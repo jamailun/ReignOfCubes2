@@ -9,7 +9,10 @@ public enum ScoreAddReason {
     KILL_FLAT("score.reason.kill-bonus"),
     KILL_STEAL("score.reason.kill-steal"),
     PICKUP("score.reason.pickup"),
-    ADMINISTRATOR("score.reason.administrator");
+    ADMINISTRATOR("score.reason.administrator"),
+
+
+    TAG_STEALER("score.reason.tags.stolen");
 
     private final String entry;
     ScoreAddReason(String entry) {

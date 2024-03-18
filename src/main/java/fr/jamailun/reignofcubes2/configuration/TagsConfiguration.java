@@ -25,6 +25,9 @@ public class TagsConfiguration {
     private double regicideDefendFlatOthers;
     private double regicideDefendMultiplicativeOthers;
 
+    // Stealer
+    private int stealerPointsPerHit;
+
     public static @Nonnull TagsConfiguration load(@Nullable ConfigurationSection config) {
         if(config == null)
             return defaultConfiguration();
@@ -42,7 +45,11 @@ public class TagsConfiguration {
             rules.regicideDefendFlatOthers = regicide.getDouble("defend-others-flat", 0);
             rules.regicideDefendMultiplicativeOthers = regicide.getDouble("defend-others-mult", 1);
         }
-
+        // Stealer
+        ConfigurationSection stealer = config.getConfigurationSection("stealer");
+        if(stealer != null) {
+            rules.stealerPointsPerHit = stealer.getInt("points-per-hit", 0);
+        }
 
         return rules;
     }
@@ -61,6 +68,8 @@ public class TagsConfiguration {
         regicide.set("defend-king-mult", regicideDefendMultiplicativeKing);
         regicide.set("defend-others-flat", regicideDefendFlatOthers);
         regicide.set("defend-others-mult", regicideDefendMultiplicativeOthers);
+        ConfigurationSection stealer = config.createSection("stealer");
+        stealer.set("points-per-hit", stealerPointsPerHit);
     }
 
     /**
@@ -84,6 +93,9 @@ public class TagsConfiguration {
         config.regicideDefendFlatOthers = 0;
         config.regicideDefendMultiplicativeOthers = 0.9;
 
+        // Stealer
+        config.stealerPointsPerHit = 1;
+
         return config;
     }
 
@@ -104,10 +116,16 @@ public class TagsConfiguration {
                 + prefix + "  §7defend.king.mult = " + niceDouble(regicideDefendMultiplicativeKing, 1)
                 + prefix + "  §7defend.others.flat = " + niceDouble(regicideDefendFlatOthers, 0)
                 + prefix + "  §7defend.others.mult = " + niceDouble(regicideDefendMultiplicativeOthers, 1)
-                + prefix + "}"
+                + prefix + "},"
+                + prefix + "§7stealer.points-per-hit = " + niceInt(stealerPointsPerHit, 0)
                 + last + "§7}";
     }
 
+    private String niceInt(int num, int zero) {
+        if(num == zero)
+            return "§e" + num;
+        return (num < zero ? "§c" : "§a") + num;
+    }
     private String niceDouble(double d, double zero) {
         if(d == zero)
             return "§e" + d;

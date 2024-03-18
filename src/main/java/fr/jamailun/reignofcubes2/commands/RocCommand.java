@@ -64,7 +64,8 @@ public class RocCommand extends AbstractCommand {
             "regicide.attack.king.flat", "regicide.attack.king.mult",
             "regicide.attack.others.flat", "regicide.attack.others.mult",
             "regicide.defend.king.flat", "regicide.defend.king.mult",
-            "regicide.defend.others.flat", "regicide.defend.others.mult"
+            "regicide.defend.others.flat", "regicide.defend.others.mult",
+            "stealer.points-per-hit"
     );
 
     public RocCommand(ReignOfCubes2 plugin) {
@@ -199,6 +200,7 @@ public class RocCommand extends AbstractCommand {
                     case "regicide.defend.king.mult" -> setDouble(sender, value, tags::setRegicideDefendMultiplicativeKing, success);
                     case "regicide.defend.others.flat" -> setDouble(sender, value, tags::setRegicideDefendFlatOthers, success);
                     case "regicide.defend.others.mult" -> setDouble(sender, value, tags::setRegicideDefendMultiplicativeOthers, success);
+                    case "stealer.points-per-hit" -> setInt(sender, value, tags::setStealerPointsPerHit, success);
                     default -> unexpectedArgument(sender, property, args_2_edit);
                 };
                 if(isSuccess) {
