@@ -54,8 +54,10 @@ public class PlayerDamageListener extends RocListener {
             // Attacker is a Player
             if(damagerEntity instanceof Player pd) {
                 RocPlayer damager = game().toPlayer(pd);
-                if(damager == null)
+                if(damager == null) {
+                    victim.getTag().ifPresent(tag -> tag.holderDefends(victim, null, event));
                     return;
+                }
 
                 // Protect from thorns damage IF from projectile-revenge
                 if(event.getCause() == EntityDamageEvent.DamageCause.THORNS) {
@@ -65,7 +67,7 @@ public class PlayerDamageListener extends RocListener {
                     }
                 }
 
-                victim.setLastDamager(damager);
+                playerAttacked(damager, victim, event);
             }
             // Attacker is a Projectile
             else if(damagerEntity instanceof Projectile pp) {
@@ -79,10 +81,17 @@ public class PlayerDamageListener extends RocListener {
                     safeThorns.put(shooter.getUUID(), victim.getUUID());
                     ReignOfCubes2.runTaskLater(() -> safeThorns.remove(shooter.getUUID()), 0.3);
 
-                    victim.setLastDamager(shooter);
+                    // Report attack
+                    playerAttacked(shooter, victim, event);
                 }
             }
         }
+    }
+
+    private void playerAttacked(RocPlayer damager, RocPlayer victim, EntityDamageByEntityEvent event) {
+        damager.getTag().ifPresent(t -> t.holderAttacks(damager, victim, event));
+        victim.getTag().ifPresent(t -> t.holderDefends(damager, victim, event));
+        victim.setLastDamager(damager);
     }
 
     private boolean shouldCancelNonPlaying(EntityDamageEvent e) {
