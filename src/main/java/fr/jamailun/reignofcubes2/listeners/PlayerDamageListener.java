@@ -90,7 +90,7 @@ public class PlayerDamageListener extends RocListener {
 
     private void playerAttacked(RocPlayer damager, RocPlayer victim, EntityDamageByEntityEvent event) {
         damager.getTag().ifPresent(t -> t.holderAttacks(damager, victim, event));
-        victim.getTag().ifPresent(t -> t.holderDefends(damager, victim, event));
+        victim.getTag().ifPresent(t -> t.holderDefends(victim, damager, event));
         victim.setLastDamager(damager);
     }
 

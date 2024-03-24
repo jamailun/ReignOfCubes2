@@ -46,10 +46,10 @@ public class RegicideTag extends Tag {
         if(other == null) // only care when attacker is non-null
             return;
         TagsConfiguration config = ReignOfCubes2.getTags();
-        boolean targetKing = other.isKing();
+        boolean attackerKing = other.isKing();
 
-        double flatMod = targetKing ? config.getRegicideDefendFlatKing() : config.getRegicideDefendFlatOthers();
-        double multMod = targetKing ? config.getRegicideDefendMultiplicativeKing() : config.getRegicideDefendMultiplicativeOthers();
+        double flatMod = attackerKing ? config.getRegicideDefendFlatKing() : config.getRegicideDefendFlatOthers();
+        double multMod = attackerKing ? config.getRegicideDefendMultiplicativeKing() : config.getRegicideDefendMultiplicativeOthers();
 
         // Add bonus defense
         double damages = event.getDamage();

@@ -69,6 +69,7 @@ messages:
       ninja:
         hidden: "<white>[<green>!<white>] <gray>Tu es désormais invisible."
         visible: "<white>[<red>!<white>] <gray>Attention, tu es désormais <white>visible<gray>."
+        cooldown: "<white>[<dark_red>!<white>] <gray>Compétence en cooldown !"
     tab:
       player:
         you: "&2toi"

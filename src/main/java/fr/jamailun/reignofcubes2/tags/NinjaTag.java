@@ -11,9 +11,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * A tag for a ninja.
@@ -26,7 +24,11 @@ public class NinjaTag extends Tag {
         super("ninja");
     }
 
+    //TODO configurable
+    private static final double COOLDOWN = 5000;
+
     private final Set<UUID> hiddenPlayers = new HashSet<>();
+    private final Map<UUID, Long> cooldowns = new HashMap<>();
 
     @Override
     public void added(@NotNull RocPlayer holder) {
@@ -41,9 +43,18 @@ public class NinjaTag extends Tag {
     }
 
     public void hide(RocPlayer rocPlayer) {
-        if(hiddenPlayers.contains(rocPlayer.getUUID()))
+        UUID uuid = rocPlayer.getUUID();
+        if(hiddenPlayers.contains(uuid))
             return;
-        hiddenPlayers.add(rocPlayer.getUUID());
+        if(cooldowns.containsKey(uuid)) {
+            long last = cooldowns.get(uuid);
+            long delta = System.currentTimeMillis() - last;
+            if(delta <= COOLDOWN) {
+                rocPlayer.sendMessage("tags.ninja.cooldown");
+                return;
+            }
+        }
+        hiddenPlayers.add(uuid);
         rocPlayer.sendMessage("tags.ninja.hidden");
 
         Player player = rocPlayer.getPlayer();
@@ -53,13 +64,14 @@ public class NinjaTag extends Tag {
                 p.hidePlayer(ReignOfCubes2.plugin(), player);
             }
         });
-        player.getWorld().spawnParticle(Particle.DRIP_LAVA, player.getLocation(), 10);
+        player.getWorld().spawnParticle(Particle.SMOKE_LARGE, player.getLocation().clone().add(0, 0.6, 0), 2);
     }
 
     public void show(RocPlayer rocPlayer) {
         if(!hiddenPlayers.contains(rocPlayer.getUUID()))
             return;
         hiddenPlayers.remove(rocPlayer.getUUID());
+        cooldowns.put(rocPlayer.getUUID(), System.currentTimeMillis());
         rocPlayer.sendMessage("tags.ninja.visible");
 
         Player player = rocPlayer.getPlayer();
@@ -70,12 +82,13 @@ public class NinjaTag extends Tag {
             }
         });
 
-        player.getWorld().spawnParticle(Particle.DRIP_LAVA, player.getLocation(), 10);
+        player.getWorld().spawnParticle(Particle.SMOKE_LARGE, player.getLocation().clone().add(0, 0.6, 0), 2);
     }
 
     @Override
     public void holderAttacks(@NotNull RocPlayer holder, @NotNull RocPlayer other, @NotNull EntityDamageByEntityEvent event) {
        show(holder);
+       event.setDamage(event.getDamage() / 2);
     }
 
     @Override
