@@ -14,6 +14,7 @@ import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -23,18 +24,18 @@ import java.util.UUID;
 /**
  * Wrap players for the RoC game.
  */
-
 public class RocPlayer {
 
     @Getter private Player player;
 
     @Getter private int score = 0;
+    @Getter private int gold = 0;
     @Getter @Setter private boolean isKing = false;
+
     @Getter @Setter private String language = "fr";
     @Getter @Setter private int lastMoneySpent = 0;
-    private RocPlayer lastDamager;
-    private long lastDamageTook = 0;
 
+    private LastDamage lastDamages;
     private Tag tag;
 
     public RocPlayer(Player player) {
@@ -67,6 +68,22 @@ public class RocPlayer {
             sendMessage("score.base.loose", String.valueOf(delta), reason.toString(language));
     }
 
+    public void addGold(int gold) {
+        if(gold <= 0) return;
+        this.gold += gold;
+        getPlayer().sendMessage("&a+"+gold+" golds.");
+    }
+    public void removeGold(int gold) {
+        if(gold <= 0) return;
+        this.gold -= gold;
+        if(this.gold < 0)
+            this.gold = 0;
+        getPlayer().sendMessage("&c-"+gold+" golds.");
+    }
+    public boolean hasGold(int gold) {
+        return this.gold >= gold;
+    }
+
     public void sendMessage(String entry, Object... args) {
         Messages.send(player, language, entry, args);
     }
@@ -91,7 +108,7 @@ public class RocPlayer {
         score = 0;
         lastMoneySpent = 0;
         isKing = false;
-        lastDamager = null;
+        lastDamages = null;
         player.closeInventory();
         player.getInventory().clear();
         player.setGameMode(GameMode.ADVENTURE);
@@ -103,7 +120,7 @@ public class RocPlayer {
 
     public void respawned() {
         lastMoneySpent = 0;
-        lastDamager = null;
+        lastDamages = null;
         player.clearActivePotionEffects();
 
         // Equip default kit
@@ -127,15 +144,13 @@ public class RocPlayer {
         }, 0.5);
     }
 
-    public void setLastDamager(RocPlayer damager) {
-        lastDamager = damager;
-        lastDamageTook = System.currentTimeMillis();
+    public void setLastDamager(@Nullable RocPlayer damager) {
+        lastDamages = new LastDamage(damager);
     }
 
-    public RocPlayer getLastDamager() {
-        long now = System.currentTimeMillis();
-        if(now - lastDamageTook <= 6000) { // last 6 seconds ?
-            return lastDamager;
+    public @Nullable RocPlayer getLastDamager() {
+        if(lastDamages != null && lastDamages.millisSince() <= 6000) {
+            return lastDamages.getDamager();
         }
         return null;
     }
@@ -150,16 +165,16 @@ public class RocPlayer {
         return false;
     }
 
-    public void playSound(Sound sound, float volume, float pitch) {
+    public void playSound(@NotNull Sound sound, float volume, float pitch) {
         if(!isValid()) return;
         player.playSound(player.getLocation(), sound, volume, pitch);
     }
 
-    public void changePlayerInstance(Player player) {
+    public void changePlayerInstance(@NotNull Player player) {
         this.player = player;
     }
 
-    public void playSound(SoundsLibrary.SoundEntry entry) {
+    public void playSound(@NotNull SoundsLibrary.SoundEntry entry) {
         playSound(entry.sound(), 5f, entry.pitch());
     }
 
