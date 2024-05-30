@@ -3,7 +3,8 @@ package fr.jamailun.reignofcubes2.configuration;
 import fr.jamailun.reignofcubes2.api.sounds.SoundEffect;
 import org.bukkit.Sound;
 
-public class SoundsLibrary {
+public final class SoundsLibrary {
+    private SoundsLibrary() {}
 
     public final static SoundEntry DEAD = new SoundEntry(Sound.ENTITY_ALLAY_HURT, 0.5f);
     public final static SoundEntry DEAD_AS_KING = new SoundEntry(Sound.ENTITY_ELDER_GUARDIAN_CURSE, 0.9f);

@@ -1,9 +1,10 @@
 package fr.jamailun.reignofcubes2.commands;
 
 import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.gui.AdminKitsGUI;
 import fr.jamailun.reignofcubes2.gui.ShopGUI;
-import fr.jamailun.reignofcubes2.players.RocPlayerImpl;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -21,11 +22,11 @@ public class ShopCommand extends AbstractCommand {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
-        if(!(sender instanceof Player)) {
+        if(!(sender instanceof Player pl)) {
             return error(sender, "Must be a player tp open shop.");
         }
 
-        RocPlayerImpl player = game().toPlayer((Player) sender);
+        RocPlayer player = ReignOfCubes2.findPlayer(pl);
         if(player == null)
             return error(sender, "Tu n'es pas dans le jeu. Déso pas déso.");
 

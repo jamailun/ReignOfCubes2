@@ -127,7 +127,7 @@ public class ThroneImpl implements Throne {
             synchronized (pcKey) {
                 playersCooldowns.remove(uuid);
             }
-        }, game.getRules().getThroneCooldown());
+        }, game.getConfiguration().getRules().getThroneCooldown());
         return true;
     }
 

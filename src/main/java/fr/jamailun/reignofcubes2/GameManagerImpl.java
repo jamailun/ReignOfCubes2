@@ -44,14 +44,14 @@ public class GameManagerImpl implements GameManager {
 
     @Getter private GameState state;
     @Getter private final ConfigurationsList configurationsList = new ConfigurationsList();
-    @Getter private WorldConfiguration worldConfiguration;
+    private GameConfiguration worldConfiguration;
     private World world;
     @Getter private RocPlayer king;
     @Getter private Throne throne;
 
     // Score
     @Getter private final Ranking<RocPlayer> ranking = new Ranking<>(RocPlayer::getScore);
-    private final PickupsManager pickups = new PickupsManager(() -> worldConfiguration.getPickupConfiguration().pickRandom());
+    private final PickupsManager pickups = new PickupsManager(() -> getConfiguration().getPickupsSection().pickRandom());
     private BukkitTask gameTimer;
 
     // Countdown
@@ -65,7 +65,7 @@ public class GameManagerImpl implements GameManager {
         loadConfiguration(configurationsList.getDefault());
     }
 
-    public boolean loadConfiguration(@Nullable WorldConfiguration configuration) {
+    public boolean loadConfiguration(@Nullable GameConfiguration configuration) {
         if(isStatePlaying()) {
             MainROC2.error("Cannot change configuration while playing !");
             return false;
@@ -297,7 +297,7 @@ public class GameManagerImpl implements GameManager {
         return state == GameState.COUNT_DOWN;
     }
 
-    public @Nullable RocPlayerImpl toPlayer(@Nullable Player p) {
+    public @Nullable RocPlayerImpl getPlayerImplementation(@Nullable Player p) {
         if(p == null) return null;
         if(isStatePlaying()) {
             if(players.exists(p))
@@ -307,6 +307,7 @@ public class GameManagerImpl implements GameManager {
         return players.join(p);
     }
 
+    @Override
     public boolean hasKing() {
         return king != null;
     }
@@ -324,8 +325,9 @@ public class GameManagerImpl implements GameManager {
     public GameRulesSection getRules() {
         return worldConfiguration.getRules();
     }
+
     public TagsConfigurationSection getTagsConfiguration() {
-        return worldConfiguration.getTagsConfiguration();
+        return worldConfiguration.getTagsSection();
     }
 
     public void startCountdown() {
@@ -499,16 +501,14 @@ public class GameManagerImpl implements GameManager {
                 .findFirst();
     }
 
+    @Override
     public int getOnlinePlayersCount() {
         return (int) players().filter(p -> p.getPlayer().isOnline()).count();
     }
 
+    @Override
     public void playSound(SoundEffect effect) {
-        playSound(effect.sound(), effect.volume(), effect.pitch());
-    }
-
-    public void playSound(Sound sound, float volume, float pitch) {
-        players().forEach(p -> p.playSound(sound, volume, pitch));
+        players().forEach(p -> p.playSound(effect.sound(), effect.volume(), effect.pitch()));
     }
 
     public void playerRejoins(Player p) {
@@ -518,7 +518,7 @@ public class GameManagerImpl implements GameManager {
 
         // clear stuff anyway, and teleport
         MainROC2.info("Player re-joined : " + p.getName() + ".");
-        p.teleport(getWorldConfiguration().getSafeSpawn(true));
+        p.teleport(getConfiguration().getSafeSpawn(true));
         player.respawned();
         musicManager.addPlayer(p, MusicType.PLAY_NORMAL);
     }
@@ -557,5 +557,10 @@ public class GameManagerImpl implements GameManager {
 
     public Optional<PickupConfigEntry> didPickedUpItem(Item item) {
         return pickups.tryPickupItem(item);
+    }
+
+    @Override
+    public GameConfiguration getConfiguration() {
+        return worldConfiguration;
     }
 }

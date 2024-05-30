@@ -1,5 +1,6 @@
 package fr.jamailun.reignofcubes2.api;
 
+import fr.jamailun.reignofcubes2.api.configuration.RocConfiguration;
 import fr.jamailun.reignofcubes2.api.gameplay.Ceremony;
 import fr.jamailun.reignofcubes2.api.gameplay.GameCountdown;
 import fr.jamailun.reignofcubes2.api.music.MusicManager;
@@ -33,5 +34,7 @@ public interface GameManager {
     @NotNull MusicManager getMusicManager();
 
     Ranking<RocPlayer> getRanking();
+
+    RocConfiguration getConfiguration();
 
 }

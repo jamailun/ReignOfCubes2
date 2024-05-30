@@ -3,7 +3,7 @@ package fr.jamailun.reignofcubes2.commands;
 import fr.jamailun.reignofcubes2.GameManagerImpl;
 import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.configuration.ConfigurationsList;
-import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
+import fr.jamailun.reignofcubes2.configuration.GameConfiguration;
 import fr.jamailun.reignofcubes2.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.players.RocPlayerImpl;
 import org.bukkit.Bukkit;
@@ -114,7 +114,7 @@ abstract class AbstractCommand implements CommandExecutor, TabCompleter {
 
 
     protected Stream<String> configurationsNames() {
-        return configs().list().stream().map(WorldConfiguration::getName);
+        return configs().list().stream().map(GameConfiguration::getName);
     }
 
     protected Stream<String> playersNames() {

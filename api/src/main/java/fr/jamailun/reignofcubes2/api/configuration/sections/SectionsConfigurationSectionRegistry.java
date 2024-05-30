@@ -9,8 +9,8 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.*;
 
-public final class SectionsRegistry {
-    private SectionsRegistry() {}
+public final class SectionsConfigurationSectionRegistry {
+    private SectionsConfigurationSectionRegistry() {}
 
     private final static Map<Class<? extends RocConfigurationSection>, Method> DESERIALIZE_METHODS = new HashMap<>();
 

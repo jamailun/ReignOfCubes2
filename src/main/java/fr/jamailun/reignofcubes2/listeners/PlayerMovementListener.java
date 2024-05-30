@@ -1,8 +1,9 @@
 package fr.jamailun.reignofcubes2.listeners;
 
 import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.gameplay.Throne;
-import fr.jamailun.reignofcubes2.players.RocPlayerImpl;
+import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -43,7 +44,7 @@ public class PlayerMovementListener extends RocListener {
         }
 
         // get RoC wrapper.
-        RocPlayerImpl player = game().toPlayer(event.getPlayer());
+        RocPlayer player = ReignOfCubes2.findPlayer(event.getPlayer());
         if(player == null) {
             if(game().isStatePlaying())
                 event.getPlayer().setGameMode(GameMode.SPECTATOR);

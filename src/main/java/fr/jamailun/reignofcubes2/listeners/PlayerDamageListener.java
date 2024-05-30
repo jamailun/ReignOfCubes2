@@ -1,8 +1,9 @@
 package fr.jamailun.reignofcubes2.listeners;
 
 import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.events.RocPlayerAttacksPlayerEvent;
-import fr.jamailun.reignofcubes2.players.RocPlayerImpl;
+import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Firework;
@@ -50,12 +51,12 @@ public class PlayerDamageListener extends RocListener {
 
         // Victim is a player
         if(victimEntity instanceof Player pv) {
-            RocPlayerImpl victim = game().toPlayer(pv);
+            RocPlayer victim = ReignOfCubes2.findPlayer(pv);
             if(victim == null)
                 return;
             // Attacker is a Player
             if(damagerEntity instanceof Player pd) {
-                RocPlayerImpl damager = game().toPlayer(pd);
+                RocPlayer damager = ReignOfCubes2.findPlayer(pv);
                 if(damager == null) {
                     return;
                 }
@@ -74,7 +75,7 @@ public class PlayerDamageListener extends RocListener {
             else if(damagerEntity instanceof Projectile pp) {
                 // get the shooter : it's a player
                 if(pp.getShooter() instanceof Player pd) {
-                    RocPlayerImpl shooter = game().toPlayer(pd);
+                    RocPlayer shooter = ReignOfCubes2.findPlayer(pv);
                     if(shooter == null)
                         return;
 
@@ -89,7 +90,7 @@ public class PlayerDamageListener extends RocListener {
         }
     }
 
-    private void playerAttacked(RocPlayerImpl damager, RocPlayerImpl victim, EntityDamageByEntityEvent event) {
+    private void playerAttacked(RocPlayer damager, RocPlayer victim, EntityDamageByEntityEvent event) {
         victim.setLastDamager(damager);
         Bukkit.getPluginManager().callEvent(new RocPlayerAttacksPlayerEvent(damager, victim, event));
     }

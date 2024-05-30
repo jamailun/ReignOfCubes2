@@ -103,7 +103,7 @@ public class Kit {
         return true;
     }
 
-    public void loadFromInventory(RocPlayerImpl player) {
+    public void loadFromInventory(RocPlayer player) {
         PlayerInventory inventory = player.getPlayer().getInventory();
         items.clear();
 

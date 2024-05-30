@@ -1,7 +1,8 @@
 package fr.jamailun.reignofcubes2.listeners;
 
 import fr.jamailun.reignofcubes2.MainROC2;
-import fr.jamailun.reignofcubes2.players.RocPlayerImpl;
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -16,7 +17,7 @@ public class PlayerDeathListener extends RocListener {
     @EventHandler
     public void playerKilledEvent(PlayerDeathEvent event) {
         Player v = event.getPlayer();
-        RocPlayerImpl victim = game().toPlayer(v);
+        RocPlayer victim = ReignOfCubes2.findPlayer(v);
         if(victim == null || shouldIgnore(v.getWorld())) {
             return;
         }

@@ -4,7 +4,7 @@ import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.commands.*;
 import fr.jamailun.reignofcubes2.configuration.KitsConfiguration;
 import fr.jamailun.reignofcubes2.configuration.sections.TagsConfigurationSection;
-import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
+import fr.jamailun.reignofcubes2.configuration.GameConfiguration;
 import fr.jamailun.reignofcubes2.configuration.kits.KitItem;
 import fr.jamailun.reignofcubes2.listeners.*;
 import fr.jamailun.reignofcubes2.music.MusicManagerImpl;
@@ -146,8 +146,8 @@ public final class MainROC2 extends JavaPlugin {
         return INSTANCE.gameManager.getTagsConfiguration();
     }
 
-    public static WorldConfiguration getCurrentConfig() {
-        return INSTANCE.gameManager.getWorldConfiguration();
+    public static GameConfiguration getCurrentConfig() {
+        return INSTANCE.gameManager.getConfiguration();
     }
 
     public static boolean isPlaying() {

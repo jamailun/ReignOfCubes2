@@ -99,8 +99,8 @@ public class PlayersManager implements Iterable<RocPlayerImpl> {
     }
 
     public void backToLobby() {
-        assert game.getWorldConfiguration().isValid();
-        Location lobby = game.getWorldConfiguration().getLobby();
+        assert game.getConfiguration().isValid();
+        Location lobby = game.getConfiguration().getLobby();
 
         // tp ALL players instead
         for(Player player : Bukkit.getOnlinePlayers()) {

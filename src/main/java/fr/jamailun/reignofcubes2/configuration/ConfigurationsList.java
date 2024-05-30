@@ -1,6 +1,7 @@
 package fr.jamailun.reignofcubes2.configuration;
 
 import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.configuration.BadConfigurationException;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -12,8 +13,8 @@ import java.util.*;
 public class ConfigurationsList {
 
     private final File directory;
-    private WorldConfiguration defaultConfiguration;
-    private final Map<String, WorldConfiguration> configurations = new HashMap<>();
+    private GameConfiguration defaultConfiguration;
+    private final Map<String, GameConfiguration> configurations = new HashMap<>();
 
     public ConfigurationsList() {
         // Load configurations
@@ -30,9 +31,9 @@ public class ConfigurationsList {
         for(File file : files) {
             if( !isYaml(file)) continue;
             try {
-                WorldConfiguration configuration = WorldConfiguration.load(file);
+                GameConfiguration configuration = new GameConfiguration(file);
                 configurations.put(configuration.getName(), configuration);
-            } catch (WorldConfiguration.BadWorldConfigurationException e) {
+            } catch (BadConfigurationException e) {
                 MainROC2.error("Could not load file " + file + " : " + e.getMessage());
             }
         }
@@ -44,7 +45,7 @@ public class ConfigurationsList {
             MainROC2.warning("No default configuration set.");
             return;
         }
-        WorldConfiguration configuration = get(defaultName);
+        GameConfiguration configuration = get(defaultName);
         if(configuration == null) {
             MainROC2.error("Unknown default configuration: '" + defaultName + "'.");
             return;
@@ -56,18 +57,18 @@ public class ConfigurationsList {
         defaultConfiguration = configuration;
     }
 
-    public Map<String, WorldConfiguration> getConfigurations() {
+    public Map<String, GameConfiguration> getConfigurations() {
         return Collections.unmodifiableMap(configurations);
     }
 
-    public List<WorldConfiguration> list() {
+    public List<GameConfiguration> list() {
         return configurations.values()
                 .stream()
-                .sorted(Comparator.comparing(WorldConfiguration::getName))
+                .sorted(Comparator.comparing(GameConfiguration::getName))
                 .toList();
     }
 
-    public void setDefault(@Nullable WorldConfiguration configuration) {
+    public void setDefault(@Nullable GameConfiguration configuration) {
         // validity
         if(configuration != null) {
             if(!configuration.isValid()) {
@@ -81,11 +82,11 @@ public class ConfigurationsList {
         MainROC2.saveDefaultConfiguration();
     }
 
-    public @Nullable WorldConfiguration getDefault() {
+    public @Nullable GameConfiguration getDefault() {
         return defaultConfiguration;
     }
 
-    public boolean isDefault(WorldConfiguration configuration) {
+    public boolean isDefault(GameConfiguration configuration) {
         return defaultConfiguration != null && defaultConfiguration.getName().equalsIgnoreCase(configuration.getName());
     }
 
@@ -97,7 +98,7 @@ public class ConfigurationsList {
         return configurations.size();
     }
 
-    public WorldConfiguration get(String name) {
+    public GameConfiguration get(String name) {
         return configurations.get(name);
     }
 
@@ -105,7 +106,7 @@ public class ConfigurationsList {
         return configurations.containsKey(name);
     }
 
-    public @Nullable WorldConfiguration createNewConfiguration(String name, String author, World world) {
+    public @Nullable GameConfiguration createNewConfiguration(String name, String author, World world) {
         assert ! contains(name) : "This configuration already exists";
         File file = new File(directory, name + ".yml");
         if(! file.exists()) {
@@ -116,7 +117,7 @@ public class ConfigurationsList {
             }
         }
 
-        WorldConfiguration configuration = new WorldConfiguration(file, name, author, world.getName());
+        GameConfiguration configuration = new GameConfiguration(file, name, author, world.getName());
         try {
             configuration.save();
         } catch(IOException e) {

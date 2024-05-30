@@ -4,9 +4,11 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
 import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.api.GameState;
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.configuration.sections.GameRulesSection;
 import fr.jamailun.reignofcubes2.configuration.sections.TagsConfigurationSection;
-import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
+import fr.jamailun.reignofcubes2.configuration.GameConfiguration;
 import fr.jamailun.reignofcubes2.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.configuration.pickups.PickupConfigEntry;
 import fr.jamailun.reignofcubes2.gui.AdminKitsGUI;
@@ -98,7 +100,7 @@ public class RocCommand extends AbstractCommand {
                 String name = args[0];
                 if(!configs().contains(name))
                     return error(sender, "Unknown configuration: " + name);
-                WorldConfiguration config = configs().get(name);
+                GameConfiguration config = configs().get(name);
                 if(!config.isValid())
                     return error(sender, "Configuration " + name + " is not valid.");
                 info(sender, "Enabling configuration " + config + "...");
@@ -116,7 +118,7 @@ public class RocCommand extends AbstractCommand {
                 String name = args[0];
                 if(!configs().contains(name))
                     return error(sender, "Unknown configuration: " + name);
-                WorldConfiguration config = configs().get(name);
+                GameConfiguration config = configs().get(name);
                 if(!config.isValid())
                     return error(sender, "Configuration " + name + " is not valid.");
                 configs().setDefault(config);
@@ -134,7 +136,7 @@ public class RocCommand extends AbstractCommand {
                         info(sender, "§6- " + n.getName() + "§7 by " + n.getAuthor() + " on " + n.getWorldName()
                                 + " : " + (n.isValid() ? "§a[VALID]" : "§c[INVALID]")
                 ));
-                WorldConfiguration defaultConfig = configs().getDefault();
+                GameConfiguration defaultConfig = configs().getDefault();
                 if(defaultConfig != null) {
                     info(sender, "§7Default configuration : §6" + defaultConfig.getName());
                 } else {
@@ -173,7 +175,7 @@ public class RocCommand extends AbstractCommand {
                 String configName = args[0];
                 if(!configs().contains(configName))
                     return error(sender, "Unknown configuration: " + configName);
-                WorldConfiguration config = configs().get(configName);
+                GameConfiguration config = configs().get(configName);
                 return info(sender, "§rConfiguration: " + config.nicePrint());
             }
 
@@ -184,12 +186,12 @@ public class RocCommand extends AbstractCommand {
                 String property = args[1].toLowerCase();
                 if(!configs().contains(configName))
                     return error(sender, "Unknown configuration: " + configName);
-                WorldConfiguration config = configs().get(configName);
+                GameConfiguration config = configs().get(configName);
                 if(args.length < 3)
                     return error(sender, "To change this tag-property, specify a value");
                 String value = args[2];
 
-                TagsConfigurationSection tags = config.getTagsConfiguration();
+                TagsConfigurationSection tags = config.getTagsSection();
                 String success = "TagsConfiguration §6"+configName+"§a has been updated successfully.";
                 boolean isSuccess = switch(property) {
                     case "regicide.attack.king.flat" -> setDouble(sender, value, tags::setRegicideAttackFlatKing, success);
@@ -216,7 +218,7 @@ public class RocCommand extends AbstractCommand {
                 String property = args[1].toLowerCase();
                 if(!configs().contains(configName))
                     return error(sender, "Unknown configuration: " + configName);
-                WorldConfiguration config = configs().get(configName);
+                GameConfiguration config = configs().get(configName);
 
                 if(     property.equals("throne.pos_a")
                         || property.equals("throne.pos_b")
@@ -229,7 +231,7 @@ public class RocCommand extends AbstractCommand {
                     Vector vector = ((Player)sender).getLocation().toVector();
                     switch (property) {
                         case "lobby" -> {
-                            config.setLobby(((Player)sender).getLocation());
+                            config.getWorldSection().setLobby(((Player)sender).getLocation().toVector());
                             info(sender, "Position of lobby has been updated to " + niceVector(vector) + " for §6" + configName);
                         }
                         case "throne.pos_a" -> {
@@ -238,7 +240,7 @@ public class RocCommand extends AbstractCommand {
                                     Math.floor(vector.getY()),
                                     Math.floor(vector.getZ())
                             );
-                            config.setThroneA(vector.add(MODIFIER_A));
+                            config.getWorldSection().setThroneA(vector.add(MODIFIER_A));
                             info(sender, "Position of throne has been updated to " + niceVector(vector) + " for §6" + configName);
                         }
                         case "throne.pos_b" -> {
@@ -247,7 +249,7 @@ public class RocCommand extends AbstractCommand {
                                     Math.ceil(vector.getY()),
                                     Math.floor(vector.getZ())
                             );
-                            config.setThroneB(vector.add(MODIFIER_B));
+                            config.getWorldSection().setThroneB(vector.add(MODIFIER_B));
                             info(sender, "Position of throne has been updated to " + niceVector(vector) + " for §6" + configName);
                         }
                         default -> {
@@ -255,8 +257,8 @@ public class RocCommand extends AbstractCommand {
                             if (region == null) return error(sender, "Select a zone with WE to use this.");
                             Vector3 min = region.getMinimumPoint().toVector3();
                             Vector3 max = region.getMaximumPoint().toVector3();
-                            config.setThroneA(new Vector(min.getX(), min.getY(), min.getZ()).add(MODIFIER_A));
-                            config.setThroneB(new Vector(max.getX(), max.getY(), max.getZ()).add(MODIFIER_B));
+                            config.getWorldSection().setThroneA(new Vector(min.getX(), min.getY(), min.getZ()).add(MODIFIER_A));
+                            config.getWorldSection().setThroneB(new Vector(max.getX(), max.getY(), max.getZ()).add(MODIFIER_B));
                             info(sender, "Position of throne has been updated for §6" + configName
                                     + "§a to §e" + min + "§a ; §e" + max);
                         }
@@ -278,7 +280,7 @@ public class RocCommand extends AbstractCommand {
                     } else if(value.equals("set")) {
                         ItemStack item = p.getInventory().getItemInMainHand();
                         if(item.getType().isAir()) return error(sender, "Hold an item in hand.");
-                        config.setShopItem(item);
+                        config.getWorldSection().setShopItem(item);
                         if(saveConfiguration(sender, config)) {
                             success(sender, "ShopItem changed successfully.");
                         }
@@ -319,7 +321,7 @@ public class RocCommand extends AbstractCommand {
                 arg = args[1].toLowerCase();
                 if(!configs().contains(configName))
                     return error(sender, "Unknown configuration: " + configName);
-                WorldConfiguration config = configs().get(configName);
+                GameConfiguration config = configs().get(configName);
 
                 if(arg.equals("list")) {
                     if(config.spawnsList().isEmpty()) {
@@ -366,7 +368,7 @@ public class RocCommand extends AbstractCommand {
                 arg = args[1].toLowerCase();
                 if(!configs().contains(configName))
                     return error(sender, "Unknown configuration: " + configName);
-                WorldConfiguration config = configs().get(configName);
+                GameConfiguration config = configs().get(configName);
 
                 if(arg.equals("list")) {
                     if(config.listGenerators().isEmpty()) {
@@ -413,13 +415,13 @@ public class RocCommand extends AbstractCommand {
                 arg = args[1].toLowerCase();
                 if(!configs().contains(configName))
                     return error(sender, "Unknown configuration: " + configName);
-                WorldConfiguration config = configs().get(configName);
+                GameConfiguration config = configs().get(configName);
 
                 if("list".equalsIgnoreCase(arg)) {
-                    if(config.getPickupConfiguration().isEmpty()) {
+                    if(config.getPickupsSection().isEmpty()) {
                         return info(sender, "§7No pickup-entry set for §6"+configName+"§7.");
                     }
-                    List<PickupConfigEntry> pickups = config.getPickupConfiguration().listEntries();
+                    List<PickupConfigEntry> pickups = config.getPickupsSection().listEntries();
                     info(sender, "§7Pick-up entries ("+pickups.size()+") :");
                     pickups.forEach(p -> info(sender, "§7- §e" + p));
                     return true;
@@ -431,7 +433,7 @@ public class RocCommand extends AbstractCommand {
                     if(args.length < 3)
                         return error(sender, "Specify the ID of the generator to remove.");
                     String id = args[2];
-                    PickupConfigEntry entry = config.getPickupConfiguration().listEntries()
+                    PickupConfigEntry entry = config.getPickupsSection().listEntries()
                             .stream()
                             .filter(e -> e.id().equals(id))
                             .findFirst()
@@ -468,7 +470,7 @@ public class RocCommand extends AbstractCommand {
                     } catch(Exception e) { return error(sender, "Invalid color (r,g,b) '" + args[5] + "' : " + e.getMessage()); }
 
                     PickupConfigEntry entry = new PickupConfigEntry(id, material, score, chance, color);
-                    config.getPickupConfiguration().add(entry);
+                    config.getPickupsSection().add(entry);
                     success(sender, "Added a pickup-entry to the configuration.");
                     return saveConfiguration(sender, config);
                 }
@@ -477,7 +479,7 @@ public class RocCommand extends AbstractCommand {
                     if(args.length < 3)
                         return error(sender, "Specify the ID of the generator to remove.");
                     String id = args[2];
-                    config.getPickupConfiguration().remove(id);
+                    config.getPickupsSection().remove(id);
                     info(sender, "Removed a pickup-entry from the configuration.");
                     return saveConfiguration(sender, config);
                 }
@@ -492,10 +494,10 @@ public class RocCommand extends AbstractCommand {
             if(game().isStatePlaying()) {
                 return error(sender, "Cannot interrupt game while playing. Stop-it first.");
             }
-            WorldConfiguration config = game().getWorldConfiguration();
+            GameConfiguration config = game().getConfiguration();
             if(config == null || ! config.isValid())
                 return error(sender, "Invalid configuration. Either on-set or invalid.");
-            Location lobby = game().getWorldConfiguration().getLobby();
+            Location lobby = game().getConfiguration().getLobby();
             game().players()
                     .filter(RocPlayerImpl::isValid)
                     .map(RocPlayerImpl::getPlayer)
@@ -582,7 +584,7 @@ public class RocCommand extends AbstractCommand {
             String name = args[0];
             if(!configs().contains(name))
                 return error(sender, "Unknown configuration: " + name);
-            WorldConfiguration config = configs().get(name);
+            GameConfiguration config = configs().get(name);
             boolean result = config.debug.toggle((Player)sender);
             return info(sender, "Debug showing has been toggled (" + result + ").");
         }
@@ -624,8 +626,8 @@ public class RocCommand extends AbstractCommand {
         }
 
         if(arg.equalsIgnoreCase("kits")) {
-            if(!(sender instanceof Player)) return error(sender, "Cannot use 'kits' subcommand as a console.");
-            RocPlayerImpl player = game().toPlayer((Player) sender);
+            if(!(sender instanceof Player pl)) return error(sender, "Cannot use 'kits' subcommand as a console.");
+            RocPlayer player = ReignOfCubes2.findPlayer(pl);
             if(player == null) return error(sender, "Tu n'es pas dans le jeu. déso");
 
             if(args.length < 1) return missingArgument(sender, args_1_kits);
@@ -838,7 +840,7 @@ public class RocCommand extends AbstractCommand {
         return "(" + vector.getX() + "," + vector.getY() + "," + vector.getZ() + ")";
     }
 
-    private boolean saveConfiguration(CommandSender sender, WorldConfiguration config) {
+    private boolean saveConfiguration(CommandSender sender, GameConfiguration config) {
         try{
             config.save();
             MainROC2.info("Configuration " + config.getName() + " saved successfully.");

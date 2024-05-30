@@ -1,13 +1,12 @@
 package fr.jamailun.reignofcubes2.placeholder;
 
-import fr.jamailun.reignofcubes2.GameManagerImpl;
 import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.api.GameManager;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.api.configuration.RocConfiguration;
 import fr.jamailun.reignofcubes2.api.gameplay.Ceremony;
 import fr.jamailun.reignofcubes2.api.gameplay.GameCountdown;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
-import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
 import fr.jamailun.reignofcubes2.messages.Messages;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
@@ -22,7 +21,7 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
 
     private final GameManager game;
 
-    public RocPlaceholderExpansion(GameManagerImpl game) {
+    public RocPlaceholderExpansion(GameManager game) {
         this.game = game;
     }
 
@@ -174,8 +173,8 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
         return MainROC2.getMeta().getVersion();
     }
 
-    private WorldConfiguration config() {
-        return game.getWorldConfiguration();
+    private RocConfiguration config() {
+        return game.getConfiguration();
     }
 
     private String bool(boolean bool) {

@@ -16,17 +16,15 @@ public class PlayerRespawnListener extends RocListener {
         if(shouldIgnore(event.getPlayer().getWorld())) {
             return;
         }
-        if(game().toPlayer(event.getPlayer()) == null)
+        RocPlayerImpl player = game().getPlayerImplementation(event.getPlayer());
+        if(player == null)
             return; // Ignore completely
 
         // Change the respawn location.
-        event.setRespawnLocation(game().getWorldConfiguration().getSafeSpawn(true));
+        event.setRespawnLocation(game().getConfiguration().getSafeSpawn(true));
 
         // Signal respawn to the player class.
-        RocPlayerImpl player = game().toPlayer(event.getPlayer());
-        if(player != null) {
-            player.respawned();
-        }
+        player.respawned();
     }
 
 }

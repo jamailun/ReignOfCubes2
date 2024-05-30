@@ -1,7 +1,7 @@
 package fr.jamailun.reignofcubes2.configuration.pickups;
 
 import fr.jamailun.reignofcubes2.MainROC2;
-import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
+import fr.jamailun.reignofcubes2.api.configuration.BadConfigurationException;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
@@ -29,9 +29,9 @@ public record PickupConfigEntry(String id, Material material, int score, double 
      * @param id the ID of the entry.
      * @param section the ConfigurationSection to deserialize from.
      * @return a non-null and valid PickupConfigEntry.
-     * @throws WorldConfiguration.BadWorldConfigurationException if the configuration is not valid.
+     * @throws BadConfigurationException if the configuration is not valid.
      */
-    public static @NotNull PickupConfigEntry deserialize(@NotNull String id, @NotNull ConfigurationSection section) throws WorldConfiguration.BadWorldConfigurationException {
+    public static @NotNull PickupConfigEntry deserialize(@NotNull String id, @NotNull ConfigurationSection section) throws BadConfigurationException {
         assertExists(id, section, "material");
         assertExists(id, section, "score");
         assertExists(id, section, "chance");
@@ -43,11 +43,11 @@ public record PickupConfigEntry(String id, Material material, int score, double 
         try {
             material = Material.valueOf(matStr);
         } catch(NoSuchElementException e) {
-            throw new WorldConfiguration.BadWorldConfigurationException("Invalid material for PickupConfigEntry "+id+": '"+matStr+"'.");
+            throw new BadConfigurationException("Invalid material for PickupConfigEntry "+id+": '"+matStr+"'.");
         }
         int score = section.getInt("score");
         if(score <= 0)
-            throw new WorldConfiguration.BadWorldConfigurationException("Invalid non-positive score in PickupConfigEntry "+id+": "+score+".");
+            throw new BadConfigurationException("Invalid non-positive score in PickupConfigEntry "+id+": "+score+".");
         double chance = section.getDouble("chance");
         Color color = Color.fromRGB(section.getInt("color"));
         return new PickupConfigEntry(id, material, score, chance, color);
@@ -66,9 +66,9 @@ public record PickupConfigEntry(String id, Material material, int score, double 
         section.set("color", color.asRGB());
     }
 
-    private static void assertExists(String id, ConfigurationSection section, String key) throws WorldConfiguration.BadWorldConfigurationException {
+    private static void assertExists(String id, ConfigurationSection section, String key) throws BadConfigurationException {
         if(!section.contains(key))
-            throw new WorldConfiguration.BadWorldConfigurationException("Missing key '"+key+"' in pickupEntry '" + id +"'.");
+            throw new BadConfigurationException("Missing key '"+key+"' in pickupEntry '" + id +"'.");
     }
 
     /**
