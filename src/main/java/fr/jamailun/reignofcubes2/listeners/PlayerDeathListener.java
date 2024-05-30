@@ -1,24 +1,22 @@
 package fr.jamailun.reignofcubes2.listeners;
 
-import fr.jamailun.reignofcubes2.ReignOfCubes2;
-import fr.jamailun.reignofcubes2.players.RocPlayer;
-import org.bukkit.entity.Entity;
+import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.players.RocPlayerImpl;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
 public class PlayerDeathListener extends RocListener {
-    public PlayerDeathListener(ReignOfCubes2 plugin) {
+    public PlayerDeathListener(MainROC2 plugin) {
         super(plugin);
     }
 
     @EventHandler
     public void playerKilledEvent(PlayerDeathEvent event) {
         Player v = event.getPlayer();
-        RocPlayer victim = game().toPlayer(v);
+        RocPlayerImpl victim = game().toPlayer(v);
         if(victim == null || shouldIgnore(v.getWorld())) {
             return;
         }
@@ -28,7 +26,7 @@ public class PlayerDeathListener extends RocListener {
 
     @EventHandler
     public void savePunchingBallInLobby(EntityDeathEvent event) {
-        if(game().isPlaying())
+        if(game().isStatePlaying())
             return;
         if(!(event.getEntity() instanceof Player)) {
             EntityDamageEvent last = event.getEntity().getLastDamageCause();

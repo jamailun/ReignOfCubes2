@@ -1,15 +1,15 @@
 package fr.jamailun.reignofcubes2.listeners;
 
-import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.gui.ShopGUI;
-import fr.jamailun.reignofcubes2.players.RocPlayer;
+import fr.jamailun.reignofcubes2.players.RocPlayerImpl;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class PlayerInteractionListener extends RocListener {
-    public PlayerInteractionListener(ReignOfCubes2 plugin) {
+    public PlayerInteractionListener(MainROC2 plugin) {
         super(plugin);
     }
 
@@ -23,7 +23,7 @@ public class PlayerInteractionListener extends RocListener {
         // Ignore non-playing state or non right-click.
         Player p = e.getPlayer();
         if(! (
-                game().isPlaying() &&
+                game().isStatePlaying() &&
                 (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) &&
                 p.getInventory().getHeldItemSlot() == 8
         )) {
@@ -31,7 +31,7 @@ public class PlayerInteractionListener extends RocListener {
         }
 
         // Open shop
-        RocPlayer player = game().toPlayer(p);
+        RocPlayerImpl player = game().toPlayer(p);
         if(player != null) {
             new ShopGUI(player);
         }

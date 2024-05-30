@@ -1,6 +1,6 @@
 package fr.jamailun.reignofcubes2.messages;
 
-import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.MainROC2;
 import lombok.NonNull;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -56,7 +56,7 @@ public class Messages {
 
     private void init() {
         // Get real messages.yml
-        File file = ReignOfCubes2.getFile("messages.yml");
+        File file = MainROC2.getFile("messages.yml");
         if(assertFileExists(file)) {
             createFileFromJar(file);
         }
@@ -104,7 +104,7 @@ public class Messages {
         if(language == null)
             language = defaultLanguage;
         if(!messages.containsKey(language)) {
-            ReignOfCubes2.warning("Language not supported: " + language);
+            MainROC2.warning("Language not supported: " + language);
             language = defaultLanguage;
         }
         return messages.get(language).get(entry);

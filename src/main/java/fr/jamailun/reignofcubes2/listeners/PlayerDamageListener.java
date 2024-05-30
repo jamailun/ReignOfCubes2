@@ -1,7 +1,9 @@
 package fr.jamailun.reignofcubes2.listeners;
 
-import fr.jamailun.reignofcubes2.ReignOfCubes2;
-import fr.jamailun.reignofcubes2.players.RocPlayer;
+import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.events.RocPlayerAttacksPlayerEvent;
+import fr.jamailun.reignofcubes2.players.RocPlayerImpl;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -14,7 +16,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import java.util.*;
 
 public class PlayerDamageListener extends RocListener {
-    public PlayerDamageListener(ReignOfCubes2 plugin) {
+    public PlayerDamageListener(MainROC2 plugin) {
         super(plugin);
     }
 
@@ -23,21 +25,21 @@ public class PlayerDamageListener extends RocListener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void playerDamageLobby(EntityDamageEvent event) {
-        if( ! game().isPlaying()) {
+        if( ! game().isStatePlaying()) {
             event.setCancelled(shouldCancelNonPlaying(event));
         }
     }
 
     @EventHandler
     public void entityDamageEvent(EntityDamageByEntityEvent event) {
-        if( ! game().isPlaying()) {
+        if( ! game().isStatePlaying()) {
             event.setCancelled(shouldCancelNonPlaying(event));
             return;
         }
 
         // Cancel fireworks !
         if(event.getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION && event.getDamager() instanceof Firework firework) {
-            if(firework.getPersistentDataContainer().has(ReignOfCubes2.marker())) {
+            if(firework.getPersistentDataContainer().has(MainROC2.marker())) {
                 event.setCancelled(true);
                 return;
             }
@@ -48,14 +50,13 @@ public class PlayerDamageListener extends RocListener {
 
         // Victim is a player
         if(victimEntity instanceof Player pv) {
-            RocPlayer victim = game().toPlayer(pv);
+            RocPlayerImpl victim = game().toPlayer(pv);
             if(victim == null)
                 return;
             // Attacker is a Player
             if(damagerEntity instanceof Player pd) {
-                RocPlayer damager = game().toPlayer(pd);
+                RocPlayerImpl damager = game().toPlayer(pd);
                 if(damager == null) {
-                    victim.getTag().ifPresent(tag -> tag.holderDefends(victim, null, event));
                     return;
                 }
 
@@ -73,13 +74,13 @@ public class PlayerDamageListener extends RocListener {
             else if(damagerEntity instanceof Projectile pp) {
                 // get the shooter : it's a player
                 if(pp.getShooter() instanceof Player pd) {
-                    RocPlayer shooter = game().toPlayer(pd);
+                    RocPlayerImpl shooter = game().toPlayer(pd);
                     if(shooter == null)
                         return;
 
                     // We protect the shooter from potential
                     safeThorns.put(shooter.getUUID(), victim.getUUID());
-                    ReignOfCubes2.runTaskLater(() -> safeThorns.remove(shooter.getUUID()), 0.3);
+                    MainROC2.runTaskLater(() -> safeThorns.remove(shooter.getUUID()), 0.3);
 
                     // Report attack
                     playerAttacked(shooter, victim, event);
@@ -88,10 +89,9 @@ public class PlayerDamageListener extends RocListener {
         }
     }
 
-    private void playerAttacked(RocPlayer damager, RocPlayer victim, EntityDamageByEntityEvent event) {
-        damager.getTag().ifPresent(t -> t.holderAttacks(damager, victim, event));
-        victim.getTag().ifPresent(t -> t.holderDefends(victim, damager, event));
+    private void playerAttacked(RocPlayerImpl damager, RocPlayerImpl victim, EntityDamageByEntityEvent event) {
         victim.setLastDamager(damager);
+        Bukkit.getPluginManager().callEvent(new RocPlayerAttacksPlayerEvent(damager, victim, event));
     }
 
     private boolean shouldCancelNonPlaying(EntityDamageEvent e) {

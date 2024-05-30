@@ -1,6 +1,6 @@
 package fr.jamailun.reignofcubes2.listeners;
 
-import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.MainROC2;
 import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -11,7 +11,7 @@ import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
 public class DisabledActionsListener extends RocListener {
-    public DisabledActionsListener(ReignOfCubes2 plugin) {
+    public DisabledActionsListener(MainROC2 plugin) {
         super(plugin);
     }
 

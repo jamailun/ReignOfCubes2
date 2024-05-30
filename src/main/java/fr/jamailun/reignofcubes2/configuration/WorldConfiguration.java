@@ -1,9 +1,11 @@
 package fr.jamailun.reignofcubes2.configuration;
 
-import fr.jamailun.reignofcubes2.GameManager;
-import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.GameManagerImpl;
+import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.configuration.pickups.PickupConfiguration;
-import fr.jamailun.reignofcubes2.objects.Throne;
+import fr.jamailun.reignofcubes2.configuration.sections.GameRulesSection;
+import fr.jamailun.reignofcubes2.configuration.sections.TagsConfigurationSection;
+import fr.jamailun.reignofcubes2.gameplay.ThroneImpl;
 import fr.jamailun.reignofcubes2.utils.ParticlesPlayer;
 import lombok.Getter;
 import lombok.NonNull;
@@ -36,8 +38,8 @@ public class WorldConfiguration {
     private List<Vector> generators = new ArrayList<>();
     @Setter private Vector throneA, throneB;
     @Setter private Location lobby;
-    @Getter private GameRules rules;
-    @Getter private TagsConfiguration tagsConfiguration = new TagsConfiguration();
+    @Getter private GameRulesSection rules;
+    @Getter private TagsConfigurationSection tagsConfiguration = new TagsConfigurationSection();
     @Setter private ItemStack shopItem;
     @Getter private final PickupConfiguration pickupConfiguration;
 
@@ -77,7 +79,7 @@ public class WorldConfiguration {
 
         // Load rules
         ConfigurationSection rulesSection = config.getConfigurationSection("rules");
-        configuration.rules = GameRules.load(rulesSection);
+        configuration.rules = GameRulesSection.load(rulesSection);
 
         // Shop item
         configuration.shopItem = config.getItemStack("shop-item");
@@ -91,10 +93,10 @@ public class WorldConfiguration {
         // Tags
         ConfigurationSection tags = config.getConfigurationSection("tags");
         if(tags != null) {
-            configuration.tagsConfiguration = TagsConfiguration.load(tags);
+            configuration.tagsConfiguration = TagsConfigurationSection.load(tags);
         }
 
-        ReignOfCubes2.info("Loaded configuration " + configuration);
+        MainROC2.info("Loaded configuration " + configuration);
         return configuration;
     }
 
@@ -103,7 +105,7 @@ public class WorldConfiguration {
         this.name = name;
         this.author = author;
         this.worldName = worldName;
-        this.rules = GameRules.defaultRules();
+        this.rules = GameRulesSection.defaultRules();
         pickupConfiguration = new PickupConfiguration();
     }
 
@@ -164,11 +166,11 @@ public class WorldConfiguration {
                 && tagsConfiguration.isValid();
     }
 
-    public Throne generateThrone(GameManager game) {
+    public ThroneImpl generateThrone(GameManagerImpl game) {
         assert isValid() : "Can only generate a throne if the configuration is valid.";
         World world = Bukkit.getWorld(worldName);
         assert world != null;
-        return new Throne(game, throneA, throneB);
+        return new ThroneImpl(game, throneA, throneB);
     }
 
     public Location getLobby() {
@@ -296,7 +298,7 @@ public class WorldConfiguration {
                 showing.remove(uuid).cancel();
                 return false;
             }
-            BukkitTask task = ReignOfCubes2.runTaskTimer(() -> {
+            BukkitTask task = MainROC2.runTaskTimer(() -> {
                 // throne
                 if(throneA != null) {
                     Location a = throneA.toLocation(player.getWorld());

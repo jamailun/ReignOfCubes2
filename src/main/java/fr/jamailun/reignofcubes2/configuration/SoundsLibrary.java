@@ -1,5 +1,6 @@
 package fr.jamailun.reignofcubes2.configuration;
 
+import fr.jamailun.reignofcubes2.api.sounds.SoundEffect;
 import org.bukkit.Sound;
 
 public class SoundsLibrary {
@@ -38,6 +39,11 @@ public class SoundsLibrary {
     public final static SoundEntry CEREMONY_FAILS = new SoundEntry(Sound.ENTITY_GHAST_SCREAM, 0.75f);
 
     // ----
-    public record SoundEntry(Sound sound, float pitch)
-    {}
+    public record SoundEntry(Sound sound, float pitch) implements SoundEffect {
+
+        @Override
+        public float volume() {
+            return 1;
+        }
+    }
 }

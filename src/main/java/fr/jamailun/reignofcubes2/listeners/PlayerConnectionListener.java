@@ -1,12 +1,12 @@
 package fr.jamailun.reignofcubes2.listeners;
 
-import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.MainROC2;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class PlayerConnectionListener extends RocListener {
-    public PlayerConnectionListener(ReignOfCubes2 plugin) {
+    public PlayerConnectionListener(MainROC2 plugin) {
         super(plugin);
     }
 

@@ -1,10 +1,10 @@
 package fr.jamailun.reignofcubes2.gui;
 
-import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.players.RocPlayer;
+import fr.jamailun.reignofcubes2.api.players.ScoreRemoveReason;
 import fr.jamailun.reignofcubes2.configuration.SoundsLibrary;
 import fr.jamailun.reignofcubes2.configuration.kits.Kit;
-import fr.jamailun.reignofcubes2.players.RocPlayer;
-import fr.jamailun.reignofcubes2.players.ScoreRemoveReason;
 import fr.jamailun.reignofcubes2.utils.ItemBuilder;
 import fr.jamailun.reignofcubes2.utils.MenuGUI;
 
@@ -52,7 +52,7 @@ public class ShopGUI extends MenuGUI {
         kit.equip(getPlayer());
         getPlayer().sendMessage("score.messages.kit-bought");
         getPlayer().getPlayer().closeInventory();
-        ReignOfCubes2.updateRanks(getPlayer());
+        MainROC2.updateRanks(getPlayer());
     }
 
     private String printCost(RocPlayer player, Kit kit) {
@@ -61,7 +61,7 @@ public class ShopGUI extends MenuGUI {
     }
 
     private List<Kit> listKits() {
-        return ReignOfCubes2.getKits().getKits()
+        return MainROC2.getKits().getKits()
                 .stream()
                 .filter(k -> k.getCost() > 0)
                 .sorted(Comparator.comparing(Kit::getCost))

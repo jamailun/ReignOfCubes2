@@ -1,6 +1,6 @@
 package fr.jamailun.reignofcubes2.pickup;
 
-import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.configuration.pickups.PickupConfigEntry;
 import fr.jamailun.reignofcubes2.messages.Messages;
 import lombok.Getter;
@@ -35,7 +35,7 @@ public class PickupGenerator {
 
     private void startWaiting() {
         cancel(); // Ne mange pas de pain
-        task = ReignOfCubes2.runTaskLater(this::spawnItem, seconds);
+        task = MainROC2.runTaskLater(this::spawnItem, seconds);
     }
 
     private void spawnItem() {

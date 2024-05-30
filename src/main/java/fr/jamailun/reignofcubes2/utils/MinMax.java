@@ -1,6 +1,6 @@
 package fr.jamailun.reignofcubes2.utils;
 
-import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.MainROC2;
 import lombok.Getter;
 
 @Getter
@@ -16,7 +16,7 @@ public class MinMax {
 
     public boolean contains(double value, String debug) {
         boolean contains = contains(value);
-        ReignOfCubes2.info("[contains-["+debug+"]] " + min + " <= " + value + " <= " + max + "  ?  " + contains);
+        MainROC2.info("[contains-["+debug+"]] " + min + " <= " + value + " <= " + max + "  ?  " + contains);
         return contains;
     }
 }

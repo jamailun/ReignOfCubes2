@@ -1,47 +1,46 @@
 package fr.jamailun.reignofcubes2.tags;
 
-import fr.jamailun.reignofcubes2.ReignOfCubes2;
-import fr.jamailun.reignofcubes2.configuration.TagsConfiguration;
-import fr.jamailun.reignofcubes2.players.RocPlayer;
-import fr.jamailun.reignofcubes2.players.ScoreAddReason;
-import fr.jamailun.reignofcubes2.players.ScoreRemoveReason;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
+import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.events.RocPlayerAttacksPlayerEvent;
+import fr.jamailun.reignofcubes2.api.players.RocPlayer;
+import fr.jamailun.reignofcubes2.api.players.ScoreAddReason;
+import fr.jamailun.reignofcubes2.api.players.ScoreRemoveReason;
+import fr.jamailun.reignofcubes2.configuration.sections.TagsConfigurationSection;
+import org.bukkit.event.EventHandler;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * A tag for a points-stealer.
  */
-public class StealerTag extends RocTag {
+public class StealerTag extends AbstractRocTag {
 
     public StealerTag() {
         super("stealer");
     }
 
     @Override
-    public void added(@NotNull RocPlayer holder) {
-        ReignOfCubes2.info("[debug] " + holder.getName() + " is now stealer");
+    public void playerAdded(@NotNull RocPlayer holder) {
+        MainROC2.info("[debug] " + holder.getName() + " is now stealer");
     }
 
     @Override
-    public void removed(@NotNull RocPlayer holder) {
-        ReignOfCubes2.info("[debug] " + holder.getName() + " is NOT stealer anymore.");
+    public void playerRemoved(@NotNull RocPlayer holder) {
+        MainROC2.info("[debug] " + holder.getName() + " is NOT stealer anymore.");
     }
 
-    @Override
-    public void holderAttacks(@NotNull RocPlayer holder, @NotNull RocPlayer other, @NotNull EntityDamageByEntityEvent event) {
-        TagsConfiguration config = ReignOfCubes2.getTags();
+    @EventHandler
+    public void attackEvent(RocPlayerAttacksPlayerEvent event) {
+        if(!event.getAttacker().isTag(this))
+            return;
+
+        TagsConfigurationSection config = MainROC2.getTags();
         int stole = config.getStealerPointsPerHit();
 
-        if(other.hasScore(stole)) {
-            other.removeScore(stole, ScoreRemoveReason.TAG_STEALER);
-            holder.addScore(stole, ScoreAddReason.TAG_STEALER);
+        if(event.getVictim().hasScore(stole)) {
+            event.getVictim().removeScore(stole, ScoreRemoveReason.TAG_STEALER);
+            event.getAttacker().addScore(stole, ScoreAddReason.TAG_STEALER);
         }
+
     }
 
-    @Override
-    public void holderDefends(@NotNull RocPlayer holder, @Nullable RocPlayer other, @NotNull EntityDamageEvent event) {
-        // nothing
-    }
 }

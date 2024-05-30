@@ -1,6 +1,9 @@
 package fr.jamailun.reignofcubes2.tags;
 
-import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.tags.RocTag;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,9 +23,10 @@ public final class TagsRegistry {
      * Register a new tag.
      * @param tag the tag to add. Will override tags with same ID.
      */
-    public static void register(@NotNull RocTag tag) {
+    public static void register(Plugin plugin, @NotNull RocTag tag) {
         tags.put(tag.getId(), tag);
-        ReignOfCubes2.info("New tag registered : '" + tag.getId() + "'.");
+        MainROC2.info("New tag registered : '" + tag.getId() + "'.");
+        Bukkit.getPluginManager().registerEvents(tag, plugin);
     }
 
     /**

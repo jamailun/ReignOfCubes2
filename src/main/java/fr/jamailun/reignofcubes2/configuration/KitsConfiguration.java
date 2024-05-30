@@ -1,6 +1,6 @@
 package fr.jamailun.reignofcubes2.configuration;
 
-import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.configuration.kits.Kit;
 import org.bukkit.Material;
 
@@ -26,7 +26,7 @@ public class KitsConfiguration {
                 throw new RuntimeException("Cannot create KitsConfiguration folder "+folder+"'.");
         }
 
-        ReignOfCubes2.info("Kits | Folder = " + folder);
+        MainROC2.info("Kits | Folder = " + folder);
         reload();
     }
 
@@ -34,19 +34,19 @@ public class KitsConfiguration {
         kits.clear();
         File[] files = folder.listFiles();
         if(files == null) {
-            ReignOfCubes2.warning("No kit file in " + folder);
+            MainROC2.warning("No kit file in " + folder);
             return;
         }
         for(File file : files) {
             if( ! (file.getName().endsWith(".yml") || file.getName().endsWith(".yaml"))) {
-                ReignOfCubes2.warning("Invalid kit extension : " + file);
+                MainROC2.warning("Invalid kit extension : " + file);
                 continue;
             }
             Kit kit = new Kit(file);
             kits.put(kit.getId(), kit);
         }
 
-        ReignOfCubes2.info("KitsConfiguration loaded " + kits.size() + " kits.");
+        MainROC2.info("KitsConfiguration loaded " + kits.size() + " kits.");
     }
 
     public Kit create(String id, String displayName) {

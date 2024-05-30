@@ -9,12 +9,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A section in the ROC configuration.
+ */
 public abstract class RocConfigurationSection {
 
+    /**
+     * Test if this rules-set is valid.
+     * @return false if the configuration cannot be played.
+     */
     public abstract boolean isValid();
 
-    public abstract String getSectionName();
-
+    /**
+     * Serialize this GameRules to configuration.
+     * @param config the configuration to write to.
+     */
     public abstract void write(@NotNull ConfigurationSection config);
 
     protected String niceInt(int num, int zero) {
@@ -29,6 +38,12 @@ public abstract class RocConfigurationSection {
         return (d < zero ? "§c" : "§a") + d;
     }
 
+    /**
+     * Create a string for this object.
+     * @param prefix prefix of each line (indent)
+     * @param last suffix (indent-1).
+     * @return a bukkit-colored String.
+     */
     public abstract String nicePrint(String prefix, String last);
 
     @SuppressWarnings("unchecked")
@@ -48,5 +63,10 @@ public abstract class RocConfigurationSection {
         }
         config.set(path, maps);
     }
+
+    protected String niceVector(Vector vector) {
+        return vector == null ? "§c<unset>§r" : "§a(" + vector.getX() + "," + vector.getY() + "," + vector.getZ() + ")§r";
+    }
+
 
 }

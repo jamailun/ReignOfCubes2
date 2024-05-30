@@ -1,11 +1,11 @@
 package fr.jamailun.reignofcubes2.commands;
 
-import fr.jamailun.reignofcubes2.GameManager;
-import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.GameManagerImpl;
+import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.configuration.ConfigurationsList;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
 import fr.jamailun.reignofcubes2.configuration.kits.Kit;
-import fr.jamailun.reignofcubes2.players.RocPlayer;
+import fr.jamailun.reignofcubes2.players.RocPlayerImpl;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
 import org.jetbrains.annotations.NotNull;
@@ -17,16 +17,16 @@ import java.util.stream.Stream;
 
 abstract class AbstractCommand implements CommandExecutor, TabCompleter {
 
-    protected final ReignOfCubes2 plugin;
+    protected final MainROC2 plugin;
 
-    protected AbstractCommand(ReignOfCubes2 plugin, String command) {
+    protected AbstractCommand(MainROC2 plugin, String command) {
         this.plugin = plugin;
         PluginCommand cmd = Bukkit.getPluginCommand(command);
         assert cmd != null;
         cmd.setExecutor(this);
         cmd.setTabCompleter(this);
 
-        ReignOfCubes2.info("Command '"+command+"' enabled.");
+        MainROC2.info("Command '"+command+"' enabled.");
     }
 
     @Override
@@ -66,7 +66,7 @@ abstract class AbstractCommand implements CommandExecutor, TabCompleter {
         return target;
     }
 
-    protected GameManager game() {
+    protected GameManagerImpl game() {
         return plugin.getGameManager();
     }
 
@@ -96,8 +96,8 @@ abstract class AbstractCommand implements CommandExecutor, TabCompleter {
     }
 
 
-    protected RocPlayer getPlayer(CommandSender sender, String playerName) {
-        Optional<RocPlayer> player = game().findPlayer(playerName);
+    protected RocPlayerImpl getPlayer(CommandSender sender, String playerName) {
+        Optional<RocPlayerImpl> player = game().findPlayer(playerName);
         if(player.isEmpty()) {
             error(sender, "Invalid player-name: '" + playerName + "'.");
             return null;
@@ -118,11 +118,11 @@ abstract class AbstractCommand implements CommandExecutor, TabCompleter {
     }
 
     protected Stream<String> playersNames() {
-        return game().players().map(RocPlayer::getName);
+        return game().players().map(RocPlayerImpl::getName);
     }
 
     protected Stream<String> kitsIds() {
-        return ReignOfCubes2.getKits().getKits().stream().map(Kit::getId);
+        return MainROC2.getKits().getKits().stream().map(Kit::getId);
     }
 
     protected abstract boolean sendHelp(CommandSender sender);

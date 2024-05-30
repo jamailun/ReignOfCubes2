@@ -1,6 +1,6 @@
 package fr.jamailun.reignofcubes2.configuration.pickups;
 
-import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -89,7 +89,7 @@ public record PickupConfigEntry(String id, Material material, int score, double 
                         .build()
         );
         fw.setFireworkMeta(fwm);
-        fw.getPersistentDataContainer().set(ReignOfCubes2.marker(), PersistentDataType.BOOLEAN, true);
+        fw.getPersistentDataContainer().set(MainROC2.marker(), PersistentDataType.BOOLEAN, true);
         fw.detonate();
     }
 

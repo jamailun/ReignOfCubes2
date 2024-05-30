@@ -1,8 +1,9 @@
 package fr.jamailun.reignofcubes2.configuration.kits;
 
-import fr.jamailun.reignofcubes2.ReignOfCubes2;
-import fr.jamailun.reignofcubes2.players.RocPlayer;
-import fr.jamailun.reignofcubes2.tags.RocTag;
+import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.players.RocPlayer;
+import fr.jamailun.reignofcubes2.api.tags.RocTag;
+import fr.jamailun.reignofcubes2.players.RocPlayerImpl;
 import fr.jamailun.reignofcubes2.tags.TagsRegistry;
 import fr.jamailun.reignofcubes2.utils.ItemBuilder;
 import lombok.Getter;
@@ -39,7 +40,7 @@ public class Kit {
             throw new RuntimeException("Kit file must exist ! " + file);
         }
         id = file.getName().replace(".yml", "");
-        ReignOfCubes2.info("Kit reading file " + file + ", ID is '" + id + "'.");
+        MainROC2.info("Kit reading file " + file + ", ID is '" + id + "'.");
         config = YamlConfiguration.loadConfiguration(file);
         reload();
     }
@@ -70,7 +71,7 @@ public class Kit {
         try {
             iconType = Material.valueOf(iconTypeStr);
         } catch(IllegalArgumentException e) {
-            ReignOfCubes2.error("Invalid icon TYPE '" + iconTypeStr + "'.");
+            MainROC2.error("Invalid icon TYPE '" + iconTypeStr + "'.");
             iconType = Material.BARRIER;
         }
 
@@ -82,27 +83,27 @@ public class Kit {
         items.clear();
         List<?> itemsList = config.getList("items");
         if(itemsList == null) {
-            ReignOfCubes2.error("No 'items' list in kit-file.");
+            MainROC2.error("No 'items' list in kit-file.");
             return;
         }
         for(Object entry : itemsList) {
             if(entry instanceof KitItem item) {
                 items.add(item);
             } else {
-                ReignOfCubes2.error("Unknown item type : " + entry + " | " + entry.getClass());
+                MainROC2.error("Unknown item type : " + entry + " | " + entry.getClass());
             }
         }
     }
 
     private boolean assertContains(String key) {
         if(!config.contains(key)) {
-            ReignOfCubes2.error("Kit " + file + " does NOT contains key '" + key +"'.");
+            MainROC2.error("Kit " + file + " does NOT contains key '" + key +"'.");
             return false;
         }
         return true;
     }
 
-    public void loadFromInventory(RocPlayer player) {
+    public void loadFromInventory(RocPlayerImpl player) {
         PlayerInventory inventory = player.getPlayer().getInventory();
         items.clear();
 
@@ -115,7 +116,7 @@ public class Kit {
                 items.add(ki);
 
                 if(ki.getItem().getType() == Material.AIR) {
-                    ReignOfCubes2.error("[!] Item of slot " + ki.getSlot() + " has been corrupted in kit " + id);
+                    MainROC2.error("[!] Item of slot " + ki.getSlot() + " has been corrupted in kit " + id);
                 }
             }
         }
@@ -131,7 +132,7 @@ public class Kit {
 
             config.save(file);
         } catch (IOException e) {
-            ReignOfCubes2.error("Could not save kit '" + id + "' : " + e.getMessage());
+            MainROC2.error("Could not save kit '" + id + "' : " + e.getMessage());
         }
     }
 
@@ -158,8 +159,8 @@ public class Kit {
         }
 
         // if in game ? add shop item !
-        if(ReignOfCubes2.isPlaying()) {
-            ItemStack is = ReignOfCubes2.getCurrentConfig().getShopItem();
+        if(MainROC2.isPlaying()) {
+            ItemStack is = MainROC2.getCurrentConfig().getShopItem();
             if (is != null) {
                 p.getInventory().setItem(8, is);
             }
@@ -180,7 +181,7 @@ public class Kit {
     public void archiveFile(File folder) {
         File newFile = new File(folder, id + "." + UUID.randomUUID().toString().substring(20) + ".removed");
         if( ! file.renameTo(newFile)) {
-            ReignOfCubes2.error("Could not rename kit file " + file + " to " + newFile);
+            MainROC2.error("Could not rename kit file " + file + " to " + newFile);
         }
     }
 

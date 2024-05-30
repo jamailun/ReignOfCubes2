@@ -1,13 +1,14 @@
 package fr.jamailun.reignofcubes2.placeholder;
 
-import com.xxmicloxx.NoteBlockAPI.model.Song;
-import fr.jamailun.reignofcubes2.GameManager;
-import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.GameManagerImpl;
+import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.GameManager;
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.api.gameplay.Ceremony;
+import fr.jamailun.reignofcubes2.api.gameplay.GameCountdown;
+import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
 import fr.jamailun.reignofcubes2.messages.Messages;
-import fr.jamailun.reignofcubes2.objects.Ceremony;
-import fr.jamailun.reignofcubes2.objects.GameCountdown;
-import fr.jamailun.reignofcubes2.players.RocPlayer;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -21,20 +22,17 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
 
     private final GameManager game;
 
-    public RocPlaceholderExpansion(GameManager game) {
+    public RocPlaceholderExpansion(GameManagerImpl game) {
         this.game = game;
     }
 
     @Override
     public @Nullable String onPlaceholderRequest(Player player, @NotNull String param) {
         if("music".equals(param)) {
-            Optional<Song> currentSong = game.getMusics().getHeardSong(player);
-            return currentSong
-                    .map(song -> song.getTitle() == null || song.getTitle().isEmpty() ? "§f§oInconnue" : "§e" + song.getTitle())
-                    .orElse("§7§oAucune");
+            return game.getMusicManager().getHeardSongTitle(player);
         }
 
-        RocPlayer rocPlayer = game.toPlayer(player);
+        RocPlayer rocPlayer = ReignOfCubes2.findPlayer(player);
         String lan = (rocPlayer == null ? "fr" : rocPlayer.getLanguage());
         String common = getRequestAny(param, lan);
 
@@ -68,22 +66,22 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
             case "map" -> config() == null ? NONE : config().getName();
             case "map_author" -> config() == null ? NONE : config().getAuthor();
             case "online" -> String.valueOf(game.getOnlinePlayersCount());
-            case "is_playing" -> bool(game.isPlaying());
-            case "is_countdown" -> bool(game.isCountdown());
+            case "is_playing" -> bool(game.isStatePlaying());
+            case "is_countdown" -> bool(game.isStateCountdown());
 
             // Countdown
             case "countdown" -> {
                 GameCountdown countdown = game.getCountdown();
                 if (countdown == null) yield "§cNo countdown.";
-                yield String.valueOf(countdown.getRemaining());
+                yield String.valueOf(countdown.getRemainingSeconds());
             }
 
             // Ceremony
-            case "is_ceremony" -> bool(game.isPlaying() && game.getCeremony() != null);
+            case "is_ceremony" -> bool(game.isStatePlaying() && game.getCeremony() != null);
             case "ceremony_text" -> {
                 Ceremony ceremony = game.getCeremony();
                 if (ceremony == null) yield "§cNo ceremony.";
-                yield Messages.format(lan, "tab.bars.ceremony", ceremony.getPlayerName());
+                yield Messages.format(lan, "tab.bars.ceremony", ceremony.getPlayer().getName());
             }
             case "ceremony_ratio" -> {
                 Ceremony ceremony = game.getCeremony();
@@ -114,7 +112,7 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
             case "prefix_tab" -> player.isKing() ? player.i18n("tab.prefix.king.tab") : player.i18n("tab.prefix.player.tab");
 
             default -> {
-                ReignOfCubes2.error("[PlaceHolder] Invalid param for ROC: '" + param + "'.");
+                MainROC2.error("[PlaceHolder] Invalid param for ROC: '" + param + "'.");
                 yield null;
             }
         };
@@ -127,7 +125,7 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
     }
 
     private String handleRanking(String param, String lan, @Nullable RocPlayer player) {
-        if(!game.isPlaying()) {
+        if(!game.isStatePlaying()) {
             return "§4not_started";
         }
         String[] tokens = param.split(":", 2);
@@ -155,7 +153,7 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
     }
 
     private int getRank(RocPlayer player) {
-        if(!game.isPlaying() || player.getScore() == 0)
+        if(!game.isStatePlaying() || player.getScore() == 0)
             return -1;
         return game.getRanking().getRankOf(player).orElse(-1) + 1;
     }
@@ -173,7 +171,7 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getVersion() {
-        return ReignOfCubes2.getMeta().getVersion();
+        return MainROC2.getMeta().getVersion();
     }
 
     private WorldConfiguration config() {

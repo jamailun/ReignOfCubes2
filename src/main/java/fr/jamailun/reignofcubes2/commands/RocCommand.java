@@ -2,16 +2,16 @@ package fr.jamailun.reignofcubes2.commands;
 
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
-import fr.jamailun.reignofcubes2.GameState;
-import fr.jamailun.reignofcubes2.ReignOfCubes2;
-import fr.jamailun.reignofcubes2.configuration.GameRules;
-import fr.jamailun.reignofcubes2.configuration.TagsConfiguration;
+import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.GameState;
+import fr.jamailun.reignofcubes2.configuration.sections.GameRulesSection;
+import fr.jamailun.reignofcubes2.configuration.sections.TagsConfigurationSection;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
 import fr.jamailun.reignofcubes2.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.configuration.pickups.PickupConfigEntry;
 import fr.jamailun.reignofcubes2.gui.AdminKitsGUI;
 import fr.jamailun.reignofcubes2.messages.Messages;
-import fr.jamailun.reignofcubes2.players.RocPlayer;
+import fr.jamailun.reignofcubes2.players.RocPlayerImpl;
 import fr.jamailun.reignofcubes2.tags.TagsRegistry;
 import fr.jamailun.reignofcubes2.utils.WorldEditHandler;
 import org.bukkit.*;
@@ -68,7 +68,7 @@ public class RocCommand extends AbstractCommand {
             "stealer.points-per-hit"
     );
 
-    public RocCommand(ReignOfCubes2 plugin) {
+    public RocCommand(MainROC2 plugin) {
         super(plugin, "roc");
     }
 
@@ -92,7 +92,7 @@ public class RocCommand extends AbstractCommand {
             // Set the current configuration
             if(arg.equalsIgnoreCase("enable")) {
                 if(args.length == 0) return error(sender, "Specify the configuration to use.");
-                if(game().isPlaying()) {
+                if(game().isStatePlaying()) {
                     return error(sender, "Cannot change configuration while playing.");
                 }
                 String name = args[0];
@@ -110,7 +110,7 @@ public class RocCommand extends AbstractCommand {
 
             if(arg.equalsIgnoreCase("set-default")) {
                 if(args.length == 0) return error(sender, "Specify the configuration to use.");
-                if(game().isPlaying()) {
+                if(game().isStatePlaying()) {
                     return error(sender, "Cannot change configuration while playing.");
                 }
                 String name = args[0];
@@ -189,7 +189,7 @@ public class RocCommand extends AbstractCommand {
                     return error(sender, "To change this tag-property, specify a value");
                 String value = args[2];
 
-                TagsConfiguration tags = config.getTagsConfiguration();
+                TagsConfigurationSection tags = config.getTagsConfiguration();
                 String success = "TagsConfiguration §6"+configName+"§a has been updated successfully.";
                 boolean isSuccess = switch(property) {
                     case "regicide.attack.king.flat" -> setDouble(sender, value, tags::setRegicideAttackFlatKing, success);
@@ -287,7 +287,7 @@ public class RocCommand extends AbstractCommand {
                     return unexpectedArgument(sender, value, args_3_get_set);
                 }
 
-                GameRules rules = config.getRules();
+                GameRulesSection rules = config.getRules();
                 String success = "Configuration §6"+configName+"§a has been updated successfully.";
                 boolean isSuccess = switch(property) {
                     case "players.min" -> setInt(sender, value, rules::setPlayerCountMin, success);
@@ -489,7 +489,7 @@ public class RocCommand extends AbstractCommand {
         }
 
         if(arg.equalsIgnoreCase("tp.lobby")) {
-            if(game().isPlaying()) {
+            if(game().isStatePlaying()) {
                 return error(sender, "Cannot interrupt game while playing. Stop-it first.");
             }
             WorldConfiguration config = game().getWorldConfiguration();
@@ -497,8 +497,8 @@ public class RocCommand extends AbstractCommand {
                 return error(sender, "Invalid configuration. Either on-set or invalid.");
             Location lobby = game().getWorldConfiguration().getLobby();
             game().players()
-                    .filter(RocPlayer::isValid)
-                    .map(RocPlayer::getPlayer)
+                    .filter(RocPlayerImpl::isValid)
+                    .map(RocPlayerImpl::getPlayer)
                     .forEach(p -> {
                         info(p, "Téléporté au lobby par " + sender.getName());
                         p.teleport(lobby);
@@ -538,13 +538,13 @@ public class RocCommand extends AbstractCommand {
         }
 
         if(arg.equalsIgnoreCase("stop")) {
-            if(game().isPlaying()) {
+            if(game().isStatePlaying()) {
                 info(sender, "Stopping game.");
                 game().broadcast("game.cancelled", sender.getName());
                 game().stop();
                 return true;
             }
-            if(game().isCountdown()) {
+            if(game().isStateCountdown()) {
                 info(sender, "Stopping countdown.");
                 game().broadcast("countdown.cancelled-force", sender.getName());
                 game().stopCountdown();
@@ -563,12 +563,12 @@ public class RocCommand extends AbstractCommand {
             }
 
             if(arg.equalsIgnoreCase("musics")) {
-                game().getMusics().reload();
+                game().getMusicManager().reload();
                 return success(sender, "Musics reloaded.");
             }
 
             if(arg.equalsIgnoreCase("kits")) {
-                ReignOfCubes2.getKits().reload();
+                MainROC2.getKits().reload();
                 return success(sender, "Kits configuration reloaded.");
             }
 
@@ -588,7 +588,7 @@ public class RocCommand extends AbstractCommand {
         }
 
         if(arg.equalsIgnoreCase("cheat")) {
-            if(!game().isPlaying()) return error(sender, "Cannot cheat before the game starts.");
+            if(!game().isStatePlaying()) return error(sender, "Cannot cheat before the game starts.");
             if(args.length < 1) return missingArgument(sender, args_1_cheat);
             arg = args[0];
             args = next(args);
@@ -599,7 +599,7 @@ public class RocCommand extends AbstractCommand {
                     game().cheat.forceKing(null);
                     return info(sender, "King cleared");
                 }
-                RocPlayer target = getPlayer(sender, args[0]);
+                RocPlayerImpl target = getPlayer(sender, args[0]);
                 if(target == null) return true;
                 game().cheat.forceKing(target);
                 return info(sender, "King set.");
@@ -608,7 +608,7 @@ public class RocCommand extends AbstractCommand {
             if(arg.equalsIgnoreCase("set.score")) {
                 if(args.length < 2)
                     return error(sender, "/" + label + " cheat set.score <player> <score>");
-                RocPlayer target = getPlayer(sender, args[0]);
+                RocPlayerImpl target = getPlayer(sender, args[0]);
                 if(target == null) return true;
                 int score;
                 try {
@@ -625,7 +625,7 @@ public class RocCommand extends AbstractCommand {
 
         if(arg.equalsIgnoreCase("kits")) {
             if(!(sender instanceof Player)) return error(sender, "Cannot use 'kits' subcommand as a console.");
-            RocPlayer player = game().toPlayer((Player) sender);
+            RocPlayerImpl player = game().toPlayer((Player) sender);
             if(player == null) return error(sender, "Tu n'es pas dans le jeu. déso");
 
             if(args.length < 1) return missingArgument(sender, args_1_kits);
@@ -645,7 +645,7 @@ public class RocCommand extends AbstractCommand {
                 String id = args[0];
                 String name = absorbRemaining(1, args);
 
-                Kit kit = ReignOfCubes2.getKits().create(id, name);
+                Kit kit = MainROC2.getKits().create(id, name);
                 if(kit == null) {
                     return error(sender, "The id '§4"+id+"§c' already exists.");
                 }
@@ -659,7 +659,7 @@ public class RocCommand extends AbstractCommand {
             // Kit
             if(args.length < 1) return error(sender, "You must specify what kit to use for this command.");
             String kitId = args[0];
-            Kit kit = ReignOfCubes2.getKits().getKit(kitId);
+            Kit kit = MainROC2.getKits().getKit(kitId);
             if(kit == null) return error(sender, "Unknown kit id : '" + kitId + "'.");
 
             // == actions as a console
@@ -700,7 +700,7 @@ public class RocCommand extends AbstractCommand {
             }
 
             if(arg.equalsIgnoreCase("delete")) {
-                ReignOfCubes2.getKits().delete(kit);
+                MainROC2.getKits().delete(kit);
                 return success(sender, "Kit deleted.");
             }
 
@@ -841,10 +841,10 @@ public class RocCommand extends AbstractCommand {
     private boolean saveConfiguration(CommandSender sender, WorldConfiguration config) {
         try{
             config.save();
-            ReignOfCubes2.info("Configuration " + config.getName() + " saved successfully.");
+            MainROC2.info("Configuration " + config.getName() + " saved successfully.");
             return true;
         } catch(IOException e) {
-            ReignOfCubes2.error("Could not save " + config.getName() + ": " + e.getMessage());
+            MainROC2.error("Could not save " + config.getName() + ": " + e.getMessage());
             return error(sender,"Could not save " + config.getName() + ": " + e.getMessage());
         }
     }

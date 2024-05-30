@@ -1,15 +1,16 @@
 package fr.jamailun.reignofcubes2.tags;
 
-import fr.jamailun.reignofcubes2.ReignOfCubes2;
-import fr.jamailun.reignofcubes2.players.RocPlayer;
+import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.api.events.RocPlayerAttacksPlayerEvent;
+import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -18,7 +19,7 @@ import java.util.*;
  * <br/>
  * A ninja can sneak to become COMPLETELY INVISIBLE.
  */
-public class NinjaTag extends RocTag {
+public class NinjaTag extends AbstractRocTag {
 
     public NinjaTag() {
         super("ninja");
@@ -31,14 +32,14 @@ public class NinjaTag extends RocTag {
     private final Map<UUID, Long> cooldowns = new HashMap<>();
 
     @Override
-    public void added(@NotNull RocPlayer holder) {
-        ReignOfCubes2.info("[debug] " + holder.getName() + " is now NINJA");
+    public void playerAdded(@NotNull RocPlayer holder) {
+        MainROC2.info("[debug] " + holder.getName() + " is now NINJA");
         holder.getPlayer().showDemoScreen();
     }
 
     @Override
-    public void removed(@NotNull RocPlayer holder) {
-        ReignOfCubes2.info("[debug] " + holder.getName() + " is not NINJA anymore.");
+    public void playerRemoved(@NotNull RocPlayer holder) {
+        MainROC2.info("[debug] " + holder.getName() + " is not NINJA anymore.");
         show(holder);
     }
 
@@ -61,7 +62,7 @@ public class NinjaTag extends RocTag {
         player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, PotionEffect.INFINITE_DURATION, 9, true, true, true));
         player.getWorld().getPlayers().forEach(p -> {
             if(!(p.equals(player))) {
-                p.hidePlayer(ReignOfCubes2.plugin(), player);
+                p.hidePlayer(MainROC2.plugin(), player);
             }
         });
         player.getWorld().spawnParticle(Particle.SMOKE_LARGE, player.getLocation().clone().add(0, 0.6, 0), 2);
@@ -78,21 +79,37 @@ public class NinjaTag extends RocTag {
         player.removePotionEffect(PotionEffectType.INVISIBILITY);
         player.getWorld().getPlayers().forEach(p -> {
             if(!(p.equals(player))) {
-                p.showPlayer(ReignOfCubes2.plugin(), player);
+                p.showPlayer(MainROC2.plugin(), player);
             }
         });
 
         player.getWorld().spawnParticle(Particle.SMOKE_LARGE, player.getLocation().clone().add(0, 0.6, 0), 2);
     }
 
-    @Override
-    public void holderAttacks(@NotNull RocPlayer holder, @NotNull RocPlayer other, @NotNull EntityDamageByEntityEvent event) {
-       show(holder);
-       event.setDamage(event.getDamage() / 2);
+
+    @EventHandler
+    public void attackEvent(RocPlayerAttacksPlayerEvent event) {
+        if(event.getAttacker().isTag(this)) {
+            show(event.getAttacker());
+            event.getBukkitEvent().setDamage(event.getBukkitEvent().getDamage() / 2);
+        }
+
+        if(event.getVictim().isTag(this)) {
+            show(event.getVictim());
+        }
     }
 
-    @Override
-    public void holderDefends(@NotNull RocPlayer holder, @Nullable RocPlayer other, @NotNull EntityDamageEvent event) {
-        show(holder);
+
+    @EventHandler
+    public void playerSneak(PlayerToggleSneakEvent event) {
+        RocPlayer player = ReignOfCubes2.findPlayer(event.getPlayer());
+        if(player != null && player.isTag(this)) {
+            if(event.getPlayer().isSneaking()) {
+                show(player);
+            } else {
+                hide(player);
+            }
+        }
     }
+
 }

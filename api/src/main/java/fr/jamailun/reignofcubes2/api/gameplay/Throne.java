@@ -3,6 +3,7 @@ package fr.jamailun.reignofcubes2.api.gameplay;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import org.bukkit.Location;
 
+import javax.annotation.Nullable;
 import java.util.UUID;
 
 /**
@@ -28,5 +29,7 @@ public interface Throne {
     void resetCeremony();
 
     boolean isCooldownOk(UUID uuid);
+
+    @Nullable Ceremony getCeremony();
 
 }

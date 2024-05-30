@@ -1,6 +1,6 @@
 package fr.jamailun.reignofcubes2.configuration;
 
-import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.MainROC2;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -17,13 +17,13 @@ public class ConfigurationsList {
 
     public ConfigurationsList() {
         // Load configurations
-        directory = ReignOfCubes2.getFile("configurations");
+        directory = MainROC2.getFile("configurations");
         assert directory.exists() || (directory.mkdirs() && directory.mkdir()) : "Could not generate directories to '"+directory+"'";
-        ReignOfCubes2.info("CONFIG_LIST = " + directory);
+        MainROC2.info("CONFIG_LIST = " + directory);
 
         File[] files = directory.listFiles();
         if(files == null || files.length == 0) {
-            ReignOfCubes2.warning("No configuration exist at all.");
+            MainROC2.warning("No configuration exist at all.");
             return;
         }
 
@@ -33,24 +33,24 @@ public class ConfigurationsList {
                 WorldConfiguration configuration = WorldConfiguration.load(file);
                 configurations.put(configuration.getName(), configuration);
             } catch (WorldConfiguration.BadWorldConfigurationException e) {
-                ReignOfCubes2.error("Could not load file " + file + " : " + e.getMessage());
+                MainROC2.error("Could not load file " + file + " : " + e.getMessage());
             }
         }
 
         // Load default
-        ConfigurationSection config = ReignOfCubes2.getDefaultConfiguration();
+        ConfigurationSection config = MainROC2.getDefaultConfiguration();
         String defaultName = config.getString("default");
         if(defaultName == null) {
-            ReignOfCubes2.warning("No default configuration set.");
+            MainROC2.warning("No default configuration set.");
             return;
         }
         WorldConfiguration configuration = get(defaultName);
         if(configuration == null) {
-            ReignOfCubes2.error("Unknown default configuration: '" + defaultName + "'.");
+            MainROC2.error("Unknown default configuration: '" + defaultName + "'.");
             return;
         }
         if(!configuration.isValid()) {
-            ReignOfCubes2.error("Invalid default configuration: '" + defaultName + "'.");
+            MainROC2.error("Invalid default configuration: '" + defaultName + "'.");
             return;
         }
         defaultConfiguration = configuration;
@@ -71,14 +71,14 @@ public class ConfigurationsList {
         // validity
         if(configuration != null) {
             if(!configuration.isValid()) {
-                ReignOfCubes2.error("Cannot set "+ configuration.getName() + " has default configuration : it is invalid.'");
+                MainROC2.error("Cannot set "+ configuration.getName() + " has default configuration : it is invalid.'");
                 return;
             }
         }
         // save
         defaultConfiguration = configuration;
-        ReignOfCubes2.getDefaultConfiguration().set("default", configuration.getName());
-        ReignOfCubes2.saveDefaultConfiguration();
+        MainROC2.getDefaultConfiguration().set("default", configuration.getName());
+        MainROC2.saveDefaultConfiguration();
     }
 
     public @Nullable WorldConfiguration getDefault() {
@@ -120,7 +120,7 @@ public class ConfigurationsList {
         try {
             configuration.save();
         } catch(IOException e) {
-            ReignOfCubes2.error("Could not save " + configuration + ": " + e);
+            MainROC2.error("Could not save " + configuration + ": " + e);
             return null;
         }
         configurations.put(name, configuration);

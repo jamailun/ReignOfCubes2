@@ -1,10 +1,8 @@
 package fr.jamailun.reignofcubes2.listeners;
 
-import fr.jamailun.reignofcubes2.ReignOfCubes2;
-import fr.jamailun.reignofcubes2.objects.Throne;
-import fr.jamailun.reignofcubes2.players.RocPlayer;
-import fr.jamailun.reignofcubes2.tags.NinjaTag;
-import fr.jamailun.reignofcubes2.tags.RocTag;
+import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.gameplay.Throne;
+import fr.jamailun.reignofcubes2.players.RocPlayerImpl;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,13 +11,10 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerToggleSneakEvent;
-
-import java.util.Optional;
 
 public class PlayerMovementListener extends RocListener {
 
-    public PlayerMovementListener(ReignOfCubes2 plugin) {
+    public PlayerMovementListener(MainROC2 plugin) {
         super(plugin);
     }
 
@@ -40,7 +35,7 @@ public class PlayerMovementListener extends RocListener {
         Block bottom = location.getBlock().getRelative(BlockFace.DOWN);
         if( event.getPlayer().getGameMode() != GameMode.CREATIVE
                 && event.getPlayer().getGameMode() != GameMode.SPECTATOR
-                && game().isPlaying()
+                && game().isStatePlaying()
                 && bottom.getType() == Material.BEDROCK
         ) {
             killVoid(event.getPlayer());
@@ -48,9 +43,9 @@ public class PlayerMovementListener extends RocListener {
         }
 
         // get RoC wrapper.
-        RocPlayer player = game().toPlayer(event.getPlayer());
+        RocPlayerImpl player = game().toPlayer(event.getPlayer());
         if(player == null) {
-            if(game().isPlaying())
+            if(game().isStatePlaying())
                 event.getPlayer().setGameMode(GameMode.SPECTATOR);
             return;
         }
@@ -68,21 +63,6 @@ public class PlayerMovementListener extends RocListener {
         else {
             if(inside && throne.isCooldownOk(player.getUUID()))
                 throne.enters(player);
-        }
-    }
-
-    @EventHandler
-    public void playerSneak(PlayerToggleSneakEvent event) {
-        RocPlayer player = game().toPlayer(event.getPlayer());
-        if(player != null) {
-            Optional<RocTag> tag = player.getTag();
-            if(tag.isPresent() && tag.get() instanceof NinjaTag ninja) {
-                if(event.getPlayer().isSneaking()) {
-                    ninja.show(player);
-                } else {
-                    ninja.hide(player);
-                }
-            }
         }
     }
 

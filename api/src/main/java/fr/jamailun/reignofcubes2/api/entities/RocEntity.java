@@ -13,6 +13,6 @@ public interface RocEntity {
 
     boolean isValid();
 
-    void teleport(Location location);
+    void teleport(@NotNull Location location);
 
 }

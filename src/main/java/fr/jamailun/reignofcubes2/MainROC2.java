@@ -1,14 +1,14 @@
 package fr.jamailun.reignofcubes2;
 
+import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.commands.*;
 import fr.jamailun.reignofcubes2.configuration.KitsConfiguration;
-import fr.jamailun.reignofcubes2.configuration.TagsConfiguration;
+import fr.jamailun.reignofcubes2.configuration.sections.TagsConfigurationSection;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
 import fr.jamailun.reignofcubes2.configuration.kits.KitItem;
 import fr.jamailun.reignofcubes2.listeners.*;
-import fr.jamailun.reignofcubes2.music.MusicManager;
+import fr.jamailun.reignofcubes2.music.MusicManagerImpl;
 import fr.jamailun.reignofcubes2.placeholder.RocPlaceholderExpansion;
-import fr.jamailun.reignofcubes2.players.RocPlayer;
 import fr.jamailun.reignofcubes2.tags.NinjaTag;
 import fr.jamailun.reignofcubes2.tags.RegicideTag;
 import fr.jamailun.reignofcubes2.tags.StealerTag;
@@ -26,12 +26,12 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
 
-public final class ReignOfCubes2 extends JavaPlugin {
+public final class MainROC2 extends JavaPlugin {
 
-    private static ReignOfCubes2 INSTANCE;
+    private static MainROC2 INSTANCE;
 
-    @Getter private GameManager gameManager;
-    @Getter private MusicManager musicManager;
+    @Getter private GameManagerImpl gameManager;
+    @Getter private MusicManagerImpl musicManager;
     private KitsConfiguration kitsConfiguration;
     private NamespacedKey marker;
 
@@ -43,7 +43,7 @@ public final class ReignOfCubes2 extends JavaPlugin {
     @Override
     public void onEnable() {
         INSTANCE = this;
-        ReignOfCubes2.info("Enabling plugin.");
+        MainROC2.info("Enabling plugin.");
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") == null) {
             warning("Could not find PlaceholderAPI. Disabling.");
             Bukkit.getPluginManager().disablePlugin(this);
@@ -51,12 +51,12 @@ public final class ReignOfCubes2 extends JavaPlugin {
         }
 
         // Load musics
-        musicManager = new MusicManager(getFile("musics"));
+        musicManager = new MusicManagerImpl(getFile("musics"));
 
         // Load tags
-        TagsRegistry.register(new RegicideTag());
-        TagsRegistry.register(new NinjaTag());
-        TagsRegistry.register(new StealerTag());
+        TagsRegistry.register(this, new RegicideTag());
+        TagsRegistry.register(this, new NinjaTag());
+        TagsRegistry.register(this, new StealerTag());
 
         // Load kits
         kitsConfiguration = new KitsConfiguration(getFile("kits"));
@@ -69,7 +69,7 @@ public final class ReignOfCubes2 extends JavaPlugin {
 
     private void enableRoc() {
         // Game manager
-        gameManager = new GameManager(musicManager);
+        gameManager = new GameManagerImpl(musicManager);
 
         // Listeners
         new PlayerConnectionListener(this);
@@ -99,7 +99,7 @@ public final class ReignOfCubes2 extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        ReignOfCubes2.info("Disabling plugin.");
+        MainROC2.info("Disabling plugin.");
         gameManager.purge();
     }
 
@@ -142,7 +142,7 @@ public final class ReignOfCubes2 extends JavaPlugin {
     public static KitsConfiguration getKits() {
         return INSTANCE.kitsConfiguration;
     }
-    public static TagsConfiguration getTags() {
+    public static TagsConfigurationSection getTags() {
         return INSTANCE.gameManager.getTagsConfiguration();
     }
 
@@ -151,7 +151,7 @@ public final class ReignOfCubes2 extends JavaPlugin {
     }
 
     public static boolean isPlaying() {
-        return INSTANCE.gameManager.isPlaying();
+        return INSTANCE.gameManager.isStatePlaying();
     }
 
     public static void updateRanks(RocPlayer player) {
