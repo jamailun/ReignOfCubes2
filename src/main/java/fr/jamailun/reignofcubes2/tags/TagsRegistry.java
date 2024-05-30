@@ -9,18 +9,18 @@ import java.util.Map;
 
 /**
  * Registry for tags.
- * @see #register(Tag)
+ * @see #register(RocTag)
  */
 public final class TagsRegistry {
     private TagsRegistry() {}
 
-    private static final Map<String, Tag> tags = new HashMap<>();
+    private static final Map<String, RocTag> tags = new HashMap<>();
 
     /**
      * Register a new tag.
      * @param tag the tag to add. Will override tags with same ID.
      */
-    public static void register(@NotNull Tag tag) {
+    public static void register(@NotNull RocTag tag) {
         tags.put(tag.getId(), tag);
         ReignOfCubes2.info("New tag registered : '" + tag.getId() + "'.");
     }
@@ -30,7 +30,7 @@ public final class TagsRegistry {
      * @param id the ID of the tag to find.
      * @return null if no tags exist with this ID.
      */
-    public static @Nullable Tag find(@Nullable String id) {
+    public static @Nullable RocTag find(@Nullable String id) {
         if(id == null) return null;
         return tags.get(id);
     }

@@ -18,7 +18,7 @@ import java.util.*;
  * <br/>
  * A ninja can sneak to become COMPLETELY INVISIBLE.
  */
-public class NinjaTag extends Tag {
+public class NinjaTag extends RocTag {
 
     public NinjaTag() {
         super("ninja");

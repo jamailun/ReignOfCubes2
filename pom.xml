@@ -54,6 +54,12 @@
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>fr.jamailun</groupId>
+            <artifactId>ReignOfCubes2-Api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- Paper -->
         <dependency>
             <groupId>io.papermc.paper</groupId>

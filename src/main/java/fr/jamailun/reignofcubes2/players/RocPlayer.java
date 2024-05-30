@@ -5,7 +5,7 @@ import fr.jamailun.reignofcubes2.configuration.SoundsLibrary;
 import fr.jamailun.reignofcubes2.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.events.ScoreGainedEvent;
 import fr.jamailun.reignofcubes2.messages.Messages;
-import fr.jamailun.reignofcubes2.tags.Tag;
+import fr.jamailun.reignofcubes2.tags.RocTag;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -35,7 +35,7 @@ public class RocPlayer {
     private RocPlayer lastDamager;
     private long lastDamageTook = 0;
 
-    private Tag tag;
+    private RocTag tag;
 
     public RocPlayer(Player player) {
         this.player = player;
@@ -163,7 +163,7 @@ public class RocPlayer {
         playSound(entry.sound(), 5f, entry.pitch());
     }
 
-    public void setTag(@Nullable Tag tag) {
+    public void setTag(@Nullable RocTag tag) {
         clearTag();
         this.tag = tag;
         if(tag != null)
@@ -181,7 +181,7 @@ public class RocPlayer {
         return tag != null;
     }
 
-    public Optional<Tag> getTag() {
+    public Optional<RocTag> getTag() {
         return Optional.ofNullable(tag);
     }
 

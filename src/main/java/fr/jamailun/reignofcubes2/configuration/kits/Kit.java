@@ -2,7 +2,7 @@ package fr.jamailun.reignofcubes2.configuration.kits;
 
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
-import fr.jamailun.reignofcubes2.tags.Tag;
+import fr.jamailun.reignofcubes2.tags.RocTag;
 import fr.jamailun.reignofcubes2.tags.TagsRegistry;
 import fr.jamailun.reignofcubes2.utils.ItemBuilder;
 import lombok.Getter;
@@ -12,7 +12,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -26,7 +25,7 @@ public class Kit {
     @Getter @Setter private Material iconType;
     @Getter @Setter private int cost;
 
-    @Getter private Tag tag;
+    @Getter private RocTag tag;
     @Getter private String tagId; //used when 'tag' is null.
 
     private final Set<KitItem> items = new HashSet<>();

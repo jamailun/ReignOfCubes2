@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * A tag for a king-slayer.
  */
-public class RegicideTag extends Tag {
+public class RegicideTag extends RocTag {
 
     public RegicideTag() {
         super("regicide");

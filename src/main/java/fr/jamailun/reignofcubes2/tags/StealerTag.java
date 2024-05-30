@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * A tag for a points-stealer.
  */
-public class StealerTag extends Tag {
+public class StealerTag extends RocTag {
 
     public StealerTag() {
         super("stealer");
