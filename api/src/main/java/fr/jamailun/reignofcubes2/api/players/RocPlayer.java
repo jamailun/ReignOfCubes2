@@ -3,13 +3,14 @@ package fr.jamailun.reignofcubes2.api.players;
 import fr.jamailun.reignofcubes2.api.entities.RocDamageable;
 import fr.jamailun.reignofcubes2.api.entities.RocEntity;
 import fr.jamailun.reignofcubes2.api.entities.RocMessager;
+import fr.jamailun.reignofcubes2.api.sounds.SoundEffect;
 import fr.jamailun.reignofcubes2.api.tags.RocTagHolder;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public interface RocPlayer extends RocTagHolder, RocDamageable, RocEntity, RocMessager {
 
-    Player getPlayer();
+    @NotNull Player getPlayer();
 
     boolean isKing();
 
@@ -31,10 +32,10 @@ public interface RocPlayer extends RocTagHolder, RocDamageable, RocEntity, RocMe
 
     boolean hasScore(int value);
 
-    void addScore(int delta, ScoreAddReason reason);
+    void addScore(int delta, @NotNull ScoreAddReason reason);
 
-    void removeScore(int delta, ScoreRemoveReason reason);
+    void removeScore(int delta, @NotNull ScoreRemoveReason reason);
 
-    void teleport(Location location);
+    void playSound(@NotNull SoundEffect effect);
 
 }

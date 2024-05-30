@@ -1,6 +1,6 @@
 package fr.jamailun.reignofcubes2.api.tags;
 
-import fr.jamailun.reignofcubes2.players.RocPlayer;
+import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
