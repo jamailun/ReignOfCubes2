@@ -1,11 +1,11 @@
 package fr.jamailun.reignofcubes2.configuration.kits;
 
-import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.api.tags.RocTag;
 import fr.jamailun.reignofcubes2.api.tags.TagsRegistry;
+import fr.jamailun.reignofcubes2.configuration.sections.WorldSection;
 import fr.jamailun.reignofcubes2.utils.ItemBuilder;
 import lombok.Getter;
 import lombok.Setter;
@@ -175,8 +175,8 @@ public class RocKit implements Kit {
         }
 
         // if in game ? add shop item !
-        if(MainROC2.isPlaying()) {
-            ItemStack is = MainROC2.getCurrentConfig().getShopItem();
+        if(ReignOfCubes2.gameManager().isStatePlaying()) {
+            ItemStack is = ReignOfCubes2.gameManager().getConfiguration().getSection(WorldSection.class).getShopItem();
             if (is != null) {
                 p.getInventory().setItem(8, is);
             }

@@ -21,7 +21,7 @@ public enum ScoreAddReason {
 
     public String toString(String language) {
         if(entry == null) return null;
-        return ReignOfCubes2.getI18n(language, entry);
+        return ReignOfCubes2.i18n(language, entry);
     }
 
     public boolean hasMessage() {

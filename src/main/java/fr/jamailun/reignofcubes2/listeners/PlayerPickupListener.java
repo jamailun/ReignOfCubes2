@@ -35,7 +35,7 @@ public class PlayerPickupListener extends RocListener {
     private void pickupItem(RocPlayer player, Item item, PickupConfigEntry entry) {
         // Score
         player.addScore(entry.score(), ScoreAddReason.PICKUP);
-        MainROC2.updateRanks(player);
+        ReignOfCubes2.gameManager().updateRankings(player);
         // Effect
         entry.spawnFirework(item.getLocation());
         // Remove item

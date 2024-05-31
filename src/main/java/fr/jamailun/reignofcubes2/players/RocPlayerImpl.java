@@ -8,8 +8,8 @@ import fr.jamailun.reignofcubes2.api.players.ScoreAddReason;
 import fr.jamailun.reignofcubes2.api.players.ScoreRemoveReason;
 import fr.jamailun.reignofcubes2.api.sounds.SoundEffect;
 import fr.jamailun.reignofcubes2.api.tags.RocTag;
-import fr.jamailun.reignofcubes2.configuration.kits.RocKit;
 import fr.jamailun.reignofcubes2.api.events.player.ScoreGainedEvent;
+import fr.jamailun.reignofcubes2.configuration.sections.WorldSection;
 import fr.jamailun.reignofcubes2.messages.Messages;
 import lombok.Getter;
 import lombok.Setter;
@@ -151,7 +151,7 @@ public class RocPlayerImpl implements RocPlayer {
         player.clearActivePotionEffects();
 
         // Equip default kit
-        Kit defaultKit = ReignOfCubes2.getKits().getDefaultKit();
+        Kit defaultKit = ReignOfCubes2.kits().getDefaultKit();
         if(defaultKit == null) {
             ReignOfCubes2.logError("No default kit !");
         } else {
@@ -159,7 +159,7 @@ public class RocPlayerImpl implements RocPlayer {
         }
 
         // Add shop item
-        ItemStack is = MainROC2.getCurrentConfig().getShopItem();
+        ItemStack is = ReignOfCubes2.gameManager().getConfiguration().getSection(WorldSection.class).getShopItem();
         if (is != null) {
             getPlayer().getInventory().setItem(8, is);
         }

@@ -1,12 +1,12 @@
 package fr.jamailun.reignofcubes2;
 
+import fr.jamailun.reignofcubes2.api.GameManager;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.RocService;
 import fr.jamailun.reignofcubes2.api.configuration.kits.KitsManager;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.commands.*;
 import fr.jamailun.reignofcubes2.configuration.KitsConfigurationManager;
-import fr.jamailun.reignofcubes2.configuration.sections.TagsConfigurationSection;
 import fr.jamailun.reignofcubes2.configuration.GameConfiguration;
 import fr.jamailun.reignofcubes2.configuration.kits.RocKitItem;
 import fr.jamailun.reignofcubes2.listeners.*;
@@ -147,7 +147,7 @@ public final class MainROC2 extends JavaPlugin implements RocService {
     }
 
     @Override
-    public @NotNull String getI18n(String language, String key, Object... vars) {
+    public @NotNull String i18n(String language, String key, Object... vars) {
         return null;
     }
 
@@ -172,24 +172,13 @@ public final class MainROC2 extends JavaPlugin implements RocService {
     }
 
     @Override
-    public @NotNull KitsManager getKits() {
+    public @NotNull KitsManager kits() {
         return kitsConfiguration;
     }
 
-    public static TagsConfigurationSection getTags() {
-        return INSTANCE.gameManager.getTagsConfiguration();
-    }
-
-    public static GameConfiguration getCurrentConfig() {
-        return INSTANCE.gameManager.getConfiguration();
-    }
-
-    public static boolean isPlaying() {
-        return INSTANCE.gameManager.isStatePlaying();
-    }
-
-    public static void updateRanks(RocPlayer player) {
-        INSTANCE.gameManager.getRanking().update(player);
+    @Override
+    public @NotNull GameManager gameManager() {
+        return gameManager;
     }
 
     public static NamespacedKey marker() {

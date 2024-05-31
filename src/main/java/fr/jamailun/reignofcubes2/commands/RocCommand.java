@@ -572,7 +572,7 @@ public class RocCommand extends AbstractCommand {
             }
 
             if(arg.equalsIgnoreCase("kits")) {
-                ReignOfCubes2.getKits().reload();
+                ReignOfCubes2.kits().reload();
                 return success(sender, "Kits configuration reloaded.");
             }
 
@@ -650,7 +650,7 @@ public class RocCommand extends AbstractCommand {
                 String name = absorbRemaining(1, args);
                 Kit kit;
                 try {
-                    kit = ReignOfCubes2.getKits().create(id, name);
+                    kit = ReignOfCubes2.kits().create(id, name);
                 } catch(KitAlreadyExistsException ignored) {
                     return error(sender, "The id '§4"+id+"§c' already exists.");
                 }
@@ -664,7 +664,7 @@ public class RocCommand extends AbstractCommand {
             // Kit
             if(args.length < 1) return error(sender, "You must specify what kit to use for this command.");
             String kitId = args[0];
-            Optional<Kit> kitOpt = ReignOfCubes2.getKits().getKit(kitId);
+            Optional<Kit> kitOpt = ReignOfCubes2.kits().getKit(kitId);
             if(kitOpt.isEmpty()) return error(sender, "Unknown kit id : '" + kitId + "'.");
             Kit kit = kitOpt.get();
 
@@ -706,7 +706,7 @@ public class RocCommand extends AbstractCommand {
             }
 
             if(arg.equalsIgnoreCase("delete")) {
-                ReignOfCubes2.getKits().delete(kit);
+                ReignOfCubes2.kits().delete(kit);
                 return success(sender, "Kit deleted.");
             }
 

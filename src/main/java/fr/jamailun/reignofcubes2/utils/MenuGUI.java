@@ -116,7 +116,7 @@ public abstract class MenuGUI {
 
 
     protected final KitsManager kits() {
-        return ReignOfCubes2.getKits();
+        return ReignOfCubes2.kits();
     }
 
     protected final void setDefaultFooter() {

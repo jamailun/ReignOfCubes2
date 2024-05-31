@@ -53,7 +53,7 @@ public class ShopGUI extends MenuGUI {
         kit.equip(getPlayer());
         getPlayer().sendMessage("score.messages.kit-bought");
         getPlayer().getPlayer().closeInventory();
-        MainROC2.updateRanks(getPlayer());
+        ReignOfCubes2.gameManager().updateRankings(getPlayer());
     }
 
     private String printCost(RocPlayer player, Kit kit) {
@@ -62,7 +62,7 @@ public class ShopGUI extends MenuGUI {
     }
 
     private List<Kit> listKits() {
-        return ReignOfCubes2.getKits().getKits()
+        return ReignOfCubes2.kits().getKits()
                 .stream()
                 .filter(k -> k.getCost() > 0)
                 .sorted(Comparator.comparing(Kit::getCost))

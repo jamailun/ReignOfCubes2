@@ -123,7 +123,7 @@ abstract class AbstractCommand implements CommandExecutor, TabCompleter {
     }
 
     protected Stream<String> kitsIds() {
-        return ReignOfCubes2.getKits().getKits().stream().map(Kit::getId);
+        return ReignOfCubes2.kits().getKits().stream().map(Kit::getId);
     }
 
     protected abstract boolean sendHelp(CommandSender sender);

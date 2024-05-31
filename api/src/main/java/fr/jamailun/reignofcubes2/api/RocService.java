@@ -8,7 +8,11 @@ import org.jetbrains.annotations.NotNull;
 public interface RocService {
     RocPlayer findPlayer(Player player);
 
-    @NotNull String getI18n(String language, String key, Object... vars);
+    @NotNull String i18n(String language, String key, Object... vars);
+
+    @NotNull KitsManager kits();
+
+    @NotNull GameManager gameManager();
 
     void logDebug(String message);
 
@@ -17,7 +21,5 @@ public interface RocService {
     void logWarning(String message);
 
     void logError(String message);
-
-    @NotNull KitsManager getKits();
 
 }
