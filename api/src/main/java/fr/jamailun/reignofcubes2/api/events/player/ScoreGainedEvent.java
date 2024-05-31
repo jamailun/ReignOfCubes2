@@ -1,4 +1,4 @@
-package fr.jamailun.reignofcubes2.api.events;
+package fr.jamailun.reignofcubes2.api.events.player;
 
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.api.players.ScoreAddReason;

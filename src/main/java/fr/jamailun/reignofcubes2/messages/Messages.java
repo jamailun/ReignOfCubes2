@@ -1,6 +1,7 @@
 package fr.jamailun.reignofcubes2.messages;
 
 import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import lombok.NonNull;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -104,7 +105,7 @@ public class Messages {
         if(language == null)
             language = defaultLanguage;
         if(!messages.containsKey(language)) {
-            MainROC2.warning("Language not supported: " + language);
+            ReignOfCubes2.logWarning("Language not supported: " + language);
             language = defaultLanguage;
         }
         return messages.get(language).get(entry);

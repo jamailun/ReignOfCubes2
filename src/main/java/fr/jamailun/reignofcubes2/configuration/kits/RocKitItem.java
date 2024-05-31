@@ -12,20 +12,20 @@ import java.util.Map;
 
 @SerializableAs("KitItem")
 @Getter
-public class KitItem implements Cloneable, ConfigurationSerializable, Comparable<KitItem> {
+public class RocKitItem implements Cloneable, ConfigurationSerializable, Comparable<RocKitItem> {
 
     private int slot;
     private ItemStack item;
 
-    private KitItem() {}
+    private RocKitItem() {}
 
-    public KitItem(int slot, ItemStack item) {
+    public RocKitItem(int slot, ItemStack item) {
         this.slot = slot;
         this.item = item;
     }
 
-    public static KitItem deserialize(@NotNull Map<String, Object> map) {
-        KitItem config = new KitItem();
+    public static RocKitItem deserialize(@NotNull Map<String, Object> map) {
+        RocKitItem config = new RocKitItem();
 
         config.slot = (int) map.get("slot");
         config.item = (ItemStack) map.get("item");
@@ -49,18 +49,14 @@ public class KitItem implements Cloneable, ConfigurationSerializable, Comparable
         return map;
     }
 
-    public String slotString() {
-        return String.valueOf(slot);
-    }
-
     @Override
-    public int compareTo(@NotNull KitItem o) {
+    public int compareTo(@NotNull RocKitItem o) {
         return slot - o.slot;
     }
 
     @Override
-    public KitItem clone() {
-        KitItem clone = new KitItem();
+    public RocKitItem clone() {
+        RocKitItem clone = new RocKitItem();
         clone.item = item.clone();
         clone.slot = slot;
         return clone;

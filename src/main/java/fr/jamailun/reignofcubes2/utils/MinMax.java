@@ -13,10 +13,4 @@ public class MinMax {
     public boolean contains(double value) {
         return min <= value && value <= max;
     }
-
-    public boolean contains(double value, String debug) {
-        boolean contains = contains(value);
-        MainROC2.info("[contains-["+debug+"]] " + min + " <= " + value + " <= " + max + "  ?  " + contains);
-        return contains;
-    }
 }

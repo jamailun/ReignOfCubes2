@@ -1,10 +1,11 @@
 package fr.jamailun.reignofcubes2.configuration.kits;
 
 import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.api.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.api.tags.RocTag;
-import fr.jamailun.reignofcubes2.players.RocPlayerImpl;
-import fr.jamailun.reignofcubes2.tags.TagsRegistry;
+import fr.jamailun.reignofcubes2.api.tags.TagsRegistry;
 import fr.jamailun.reignofcubes2.utils.ItemBuilder;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,13 +14,17 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-public class Kit {
+/**
+ * Standard implementation of a Kit.
+ */
+public class RocKit implements Kit {
 
     @Getter private final String id;
     @Getter @Setter private String displayName;
@@ -29,23 +34,23 @@ public class Kit {
     @Getter private RocTag tag;
     @Getter private String tagId; //used when 'tag' is null.
 
-    private final Set<KitItem> items = new HashSet<>();
+    private final Set<RocKitItem> items = new HashSet<>();
 
     private final File file;
     private final YamlConfiguration config;
 
-    public Kit(File file) {
+    public RocKit(File file) {
         this.file = file;
         if(!file.exists()) {
             throw new RuntimeException("Kit file must exist ! " + file);
         }
         id = file.getName().replace(".yml", "");
-        MainROC2.info("Kit reading file " + file + ", ID is '" + id + "'.");
+        ReignOfCubes2.logInfo("Kit reading file " + file + ", ID is '" + id + "'.");
         config = YamlConfiguration.loadConfiguration(file);
         reload();
     }
 
-    public Kit(File folder, String id) {
+    public RocKit(File folder, String id) {
         file = new File(folder, id + ".yml");
         this.id = id;
         // create
@@ -58,6 +63,55 @@ public class Kit {
         config = YamlConfiguration.loadConfiguration(file);
     }
 
+    @Override
+    public void setTag(@Nullable String tagId) {
+        this.tagId = tagId;
+        this.tag = TagsRegistry.find(tagId);
+    }
+
+    private boolean assertContains(String key) {
+        if(!config.contains(key)) {
+            ReignOfCubes2.logError("Kit " + file + " does NOT contains key '" + key +"'.");
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void setFromInventory(@NotNull Player player) {
+        PlayerInventory inventory = player.getInventory();
+        items.clear();
+
+        for(int slot = 0; slot < inventory.getMaxStackSize(); slot++) {
+            if(slot == 8) continue;
+            ItemStack item = inventory.getItem(slot);
+            if(item != null) {
+                RocKitItem ki = new RocKitItem(slot, item);
+                items.add(ki);
+
+                if(ki.getItem().getType() == Material.AIR) {
+                    ReignOfCubes2.logError("[!] Item of slot " + ki.getSlot() + " has been corrupted in kit " + id);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void save() {
+        try {
+            config.set("name", displayName);
+            config.set("cost", cost);
+            config.set("icon-type", iconType.name());
+            config.set("tag", tagId);
+            config.set("items", items.stream().sorted(Comparator.comparing(RocKitItem::getSlot)).toList());
+
+            config.save(file);
+        } catch (IOException e) {
+            ReignOfCubes2.logError("Could not save kit '" + id + "' : " + e.getMessage());
+        }
+    }
+
+    @Override
     public void reload() {
         if(!(assertContains("name") && assertContains("cost") && assertContains("icon-type") && assertContains("items")))
             return;
@@ -71,7 +125,7 @@ public class Kit {
         try {
             iconType = Material.valueOf(iconTypeStr);
         } catch(IllegalArgumentException e) {
-            MainROC2.error("Invalid icon TYPE '" + iconTypeStr + "'.");
+            ReignOfCubes2.logError("Invalid icon TYPE '" + iconTypeStr + "'.");
             iconType = Material.BARRIER;
         }
 
@@ -83,77 +137,39 @@ public class Kit {
         items.clear();
         List<?> itemsList = config.getList("items");
         if(itemsList == null) {
-            MainROC2.error("No 'items' list in kit-file.");
+            ReignOfCubes2.logError("No 'items' list in kit-file.");
             return;
         }
         for(Object entry : itemsList) {
-            if(entry instanceof KitItem item) {
+            if(entry instanceof RocKitItem item) {
                 items.add(item);
             } else {
-                MainROC2.error("Unknown item type : " + entry + " | " + entry.getClass());
+                ReignOfCubes2.logError("Unknown item type : " + entry + " | " + entry.getClass());
             }
         }
     }
 
-    private boolean assertContains(String key) {
-        if(!config.contains(key)) {
-            MainROC2.error("Kit " + file + " does NOT contains key '" + key +"'.");
-            return false;
-        }
-        return true;
-    }
-
-    public void loadFromInventory(RocPlayer player) {
-        PlayerInventory inventory = player.getPlayer().getInventory();
-        items.clear();
-
-        for(int slot = 0; slot < inventory.getMaxStackSize(); slot++) {
-            if(slot == 8) continue;
-            ItemStack item = inventory.getItem(slot);
-            if(item != null) {
-                player.getPlayer().sendMessage("§fslot=§a"+slot+"§f, item=§e"+item.getType().name().toLowerCase());
-                KitItem ki = new KitItem(slot, item);
-                items.add(ki);
-
-                if(ki.getItem().getType() == Material.AIR) {
-                    MainROC2.error("[!] Item of slot " + ki.getSlot() + " has been corrupted in kit " + id);
-                }
-            }
-        }
-    }
-
-    public void save() {
-        try {
-            config.set("name", displayName);
-            config.set("cost", cost);
-            config.set("icon-type", iconType.name());
-            config.set("tag", tagId);
-            config.set("items", items.stream().sorted(Comparator.comparing(KitItem::getSlot)).toList());
-
-            config.save(file);
-        } catch (IOException e) {
-            MainROC2.error("Could not save kit '" + id + "' : " + e.getMessage());
-        }
-    }
-
+    @Override
     public int size() {
         return items.size();
     }
 
-    public ItemStack toIcon() {
+    @Override
+    public @NotNull ItemStack toIcon() {
         return new ItemBuilder(iconType)
                 .setName(displayName)
                 .hideAll()
                 .toItemStack();
     }
 
-    public void equip(RocPlayer player) {
+    @Override
+    public void equip(@NotNull RocPlayer player) {
         Player p = player.getPlayer();
         PlayerInventory inventory = p.getInventory();
         inventory.clear();
 
         // Add all items
-        for(KitItem item : items) {
+        for(RocKitItem item : items) {
             item.equip(inventory);
             //player.getPlayer().sendMessage("§f[>] slot=§e"+item.getSlot()+"§f, item=§a" + item.getItem().getType());
         }
@@ -171,22 +187,21 @@ public class Kit {
         player.setTag(tag);
     }
 
-    public List<KitItem> listItems(boolean equipment) {
+    @Override
+    public @NotNull List<ItemStack> listItems(boolean equipment) {
         return items.stream()
                 .filter(i -> i.isEquipment() == equipment)
-                .sorted(KitItem::compareTo)
+                .sorted(RocKitItem::compareTo)
+                .map(RocKitItem::getItem)
                 .toList();
     }
 
-    public void archiveFile(File folder) {
+    @Override
+    public void archiveFile(@NotNull File folder) {
         File newFile = new File(folder, id + "." + UUID.randomUUID().toString().substring(20) + ".removed");
         if( ! file.renameTo(newFile)) {
-            MainROC2.error("Could not rename kit file " + file + " to " + newFile);
+            ReignOfCubes2.logError("Could not rename kit file " + file + " to " + newFile);
         }
     }
 
-    public void setTagId(@Nullable String tagId) {
-        this.tagId = tagId;
-        this.tag = TagsRegistry.find(tagId);
-    }
 }

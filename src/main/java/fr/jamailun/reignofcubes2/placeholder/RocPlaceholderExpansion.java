@@ -111,7 +111,7 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
             case "prefix_tab" -> player.isKing() ? player.i18n("tab.prefix.king.tab") : player.i18n("tab.prefix.player.tab");
 
             default -> {
-                MainROC2.error("[PlaceHolder] Invalid param for ROC: '" + param + "'.");
+                ReignOfCubes2.logError("[PlaceHolder] Invalid param for ROC: '" + param + "'.");
                 yield null;
             }
         };

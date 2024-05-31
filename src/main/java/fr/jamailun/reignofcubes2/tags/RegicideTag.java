@@ -1,7 +1,8 @@
 package fr.jamailun.reignofcubes2.tags;
 
 import fr.jamailun.reignofcubes2.MainROC2;
-import fr.jamailun.reignofcubes2.api.events.RocPlayerAttacksPlayerEvent;
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.api.events.player.RocPlayerAttacksPlayerEvent;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.configuration.sections.TagsConfigurationSection;
 import org.bukkit.event.EventHandler;
@@ -18,12 +19,12 @@ public class RegicideTag extends AbstractRocTag {
 
     @Override
     public void playerAdded(@NotNull RocPlayer holder) {
-        MainROC2.info("[debug] " + holder.getName() + " is now REGICIDE");
+        ReignOfCubes2.logDebug(holder.getName() + " is now REGICIDE");
     }
 
     @Override
     public void playerRemoved(@NotNull RocPlayer holder) {
-        MainROC2.info("[debug] " + holder.getName() + " is not regicide anymore.");
+        ReignOfCubes2.logDebug(holder.getName() + " is not regicide anymore.");
     }
 
     @EventHandler

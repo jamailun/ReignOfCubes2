@@ -2,6 +2,7 @@ package fr.jamailun.reignofcubes2.listeners;
 
 import fr.jamailun.reignofcubes2.GameManagerImpl;
 import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.Listener;
@@ -13,7 +14,7 @@ abstract class RocListener implements Listener {
     public RocListener(MainROC2 plugin) {
         this.plugin = plugin;
         Bukkit.getPluginManager().registerEvents(this, plugin);
-        MainROC2.info("Registering events on " + getClass().getSimpleName());
+        ReignOfCubes2.logInfo("Registering events on " + getClass().getSimpleName());
     }
 
     protected MainROC2 plugin() {

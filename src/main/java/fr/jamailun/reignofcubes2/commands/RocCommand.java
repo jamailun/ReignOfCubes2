@@ -5,16 +5,17 @@ import com.sk89q.worldedit.regions.Region;
 import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.api.GameState;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.api.configuration.kits.Kit;
+import fr.jamailun.reignofcubes2.api.configuration.kits.KitAlreadyExistsException;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.configuration.sections.GameRulesSection;
 import fr.jamailun.reignofcubes2.configuration.sections.TagsConfigurationSection;
 import fr.jamailun.reignofcubes2.configuration.GameConfiguration;
-import fr.jamailun.reignofcubes2.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.configuration.pickups.PickupConfigEntry;
 import fr.jamailun.reignofcubes2.gui.AdminKitsGUI;
 import fr.jamailun.reignofcubes2.messages.Messages;
 import fr.jamailun.reignofcubes2.players.RocPlayerImpl;
-import fr.jamailun.reignofcubes2.tags.TagsRegistry;
+import fr.jamailun.reignofcubes2.api.tags.TagsRegistry;
 import fr.jamailun.reignofcubes2.utils.WorldEditHandler;
 import org.bukkit.*;
 import org.bukkit.command.Command;
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
@@ -570,7 +572,7 @@ public class RocCommand extends AbstractCommand {
             }
 
             if(arg.equalsIgnoreCase("kits")) {
-                MainROC2.getKits().reload();
+                ReignOfCubes2.getKits().reload();
                 return success(sender, "Kits configuration reloaded.");
             }
 
@@ -646,13 +648,14 @@ public class RocCommand extends AbstractCommand {
                 if(args.length < 2) return error(sender, "Argument missing. Syntax: \"/"+label+", kits " + arg + " §4<id> <display name>§c.\"");
                 String id = args[0];
                 String name = absorbRemaining(1, args);
-
-                Kit kit = MainROC2.getKits().create(id, name);
-                if(kit == null) {
+                Kit kit;
+                try {
+                    kit = ReignOfCubes2.getKits().create(id, name);
+                } catch(KitAlreadyExistsException ignored) {
                     return error(sender, "The id '§4"+id+"§c' already exists.");
                 }
 
-                kit.loadFromInventory(player);
+                kit.setFromInventory(pl);
                 kit.save();
 
                 return success(sender, "Kit created successfully. Edit it before using it.");
@@ -661,13 +664,14 @@ public class RocCommand extends AbstractCommand {
             // Kit
             if(args.length < 1) return error(sender, "You must specify what kit to use for this command.");
             String kitId = args[0];
-            Kit kit = MainROC2.getKits().getKit(kitId);
-            if(kit == null) return error(sender, "Unknown kit id : '" + kitId + "'.");
+            Optional<Kit> kitOpt = ReignOfCubes2.getKits().getKit(kitId);
+            if(kitOpt.isEmpty()) return error(sender, "Unknown kit id : '" + kitId + "'.");
+            Kit kit = kitOpt.get();
 
             // == actions as a console
             if(arg.equalsIgnoreCase("edit")) {
                 if("tag.remove".equalsIgnoreCase(args[1])) {
-                    kit.setTagId(null);
+                    kit.setTag(null);
                     return info(sender, "Removed tag from kit");
                 }
                 if(args.length < 3) return error(sender, "Specify value to change, and the new value.");
@@ -688,7 +692,7 @@ public class RocCommand extends AbstractCommand {
                         break;
                     case "tag":
                         String tag = args[2];
-                        kit.setTagId(tag);
+                        kit.setTag(tag);
                         if(TagsRegistry.find(tag) == null) {
                             kit.save();
                             return info(sender, "Kit saved, but tag §c" + tag + " §f is unknown.");
@@ -702,12 +706,12 @@ public class RocCommand extends AbstractCommand {
             }
 
             if(arg.equalsIgnoreCase("delete")) {
-                MainROC2.getKits().delete(kit);
+                ReignOfCubes2.getKits().delete(kit);
                 return success(sender, "Kit deleted.");
             }
 
             if(arg.equalsIgnoreCase("from-inventory.update")) {
-                kit.loadFromInventory(player);
+                kit.setFromInventory(pl);
                 kit.save();
                 return success(sender, "Content of kit " + kitId + " updated.");
             }
@@ -843,10 +847,10 @@ public class RocCommand extends AbstractCommand {
     private boolean saveConfiguration(CommandSender sender, GameConfiguration config) {
         try{
             config.save();
-            MainROC2.info("Configuration " + config.getName() + " saved successfully.");
+            ReignOfCubes2.logInfo("Configuration " + config.getName() + " saved successfully.");
             return true;
         } catch(IOException e) {
-            MainROC2.error("Could not save " + config.getName() + ": " + e.getMessage());
+            ReignOfCubes2.logError("Could not save " + config.getName() + ": " + e.getMessage());
             return error(sender,"Could not save " + config.getName() + ": " + e.getMessage());
         }
     }

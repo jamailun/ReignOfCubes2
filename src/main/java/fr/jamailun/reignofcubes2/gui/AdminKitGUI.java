@@ -1,8 +1,7 @@
 package fr.jamailun.reignofcubes2.gui;
 
+import fr.jamailun.reignofcubes2.api.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
-import fr.jamailun.reignofcubes2.configuration.kits.Kit;
-import fr.jamailun.reignofcubes2.configuration.kits.KitItem;
 import fr.jamailun.reignofcubes2.utils.ItemBuilder;
 import fr.jamailun.reignofcubes2.utils.MenuGUI;
 import org.bukkit.Material;
@@ -16,9 +15,8 @@ public class AdminKitGUI extends MenuGUI {
         // Armor
         int slot = 1;
         set(0, new ItemBuilder(Material.OAK_SIGN).setName("§bArmure:").toItemStack());
-        for(KitItem item : kit.listItems(true)) {
-            ItemBuilder ib = new ItemBuilder(item.getItem());
-            //if(item.getSlot() == 40) ib.addLoreLine("§4Slot: §eOFF_HAND");
+        for(ItemStack item : kit.listItems(true)) {
+            ItemBuilder ib = new ItemBuilder(item);
             set(slot, ib.toItemStack());
             slot ++;
         }
@@ -26,8 +24,8 @@ public class AdminKitGUI extends MenuGUI {
         // Armor
         set(9, new ItemBuilder(Material.OAK_SIGN).setName("§bObjets:").toItemStack());
         slot = 10;
-        for(KitItem item : kit.listItems(false)) {
-            ItemStack is = new ItemBuilder(item.getItem()).toItemStack();//.addLoreLine("§dSlot: §e"+item.slotString()).toItemStack();
+        for(ItemStack item : kit.listItems(false)) {
+            ItemStack is = new ItemStack(item);
             set(slot, is);
             slot ++;
         }

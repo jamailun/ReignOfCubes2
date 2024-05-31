@@ -1,18 +1,21 @@
 package fr.jamailun.reignofcubes2;
 
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.api.RocService;
+import fr.jamailun.reignofcubes2.api.configuration.kits.KitsManager;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.commands.*;
-import fr.jamailun.reignofcubes2.configuration.KitsConfiguration;
+import fr.jamailun.reignofcubes2.configuration.KitsConfigurationManager;
 import fr.jamailun.reignofcubes2.configuration.sections.TagsConfigurationSection;
 import fr.jamailun.reignofcubes2.configuration.GameConfiguration;
-import fr.jamailun.reignofcubes2.configuration.kits.KitItem;
+import fr.jamailun.reignofcubes2.configuration.kits.RocKitItem;
 import fr.jamailun.reignofcubes2.listeners.*;
 import fr.jamailun.reignofcubes2.music.MusicManagerImpl;
 import fr.jamailun.reignofcubes2.placeholder.RocPlaceholderExpansion;
 import fr.jamailun.reignofcubes2.tags.NinjaTag;
 import fr.jamailun.reignofcubes2.tags.RegicideTag;
 import fr.jamailun.reignofcubes2.tags.StealerTag;
-import fr.jamailun.reignofcubes2.tags.TagsRegistry;
+import fr.jamailun.reignofcubes2.api.tags.TagsRegistry;
 import io.papermc.paper.plugin.configuration.PluginMeta;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -23,29 +26,38 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
-public final class MainROC2 extends JavaPlugin {
+/**
+ * Main of the ReignOfCubes2 implementation.
+ */
+public final class MainROC2 extends JavaPlugin implements RocService {
 
     private static MainROC2 INSTANCE;
 
     @Getter private GameManagerImpl gameManager;
     @Getter private MusicManagerImpl musicManager;
-    private KitsConfiguration kitsConfiguration;
+    private KitsConfigurationManager kitsConfiguration;
     private NamespacedKey marker;
 
     // Register serializable
     static {
-        ConfigurationSerialization.registerClass(KitItem.class, "KitItem");
+        ConfigurationSerialization.registerClass(RocKitItem.class, "KitItem");
+    }
+
+    @Override
+    public void onLoad() {
+        ReignOfCubes2.setService(this);
     }
 
     @Override
     public void onEnable() {
         INSTANCE = this;
-        MainROC2.info("Enabling plugin.");
+        logInfo("Enabling plugin.");
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") == null) {
-            warning("Could not find PlaceholderAPI. Disabling.");
+            logWarning("Could not find PlaceholderAPI. Disabling.");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
@@ -59,7 +71,7 @@ public final class MainROC2 extends JavaPlugin {
         TagsRegistry.register(this, new StealerTag());
 
         // Load kits
-        kitsConfiguration = new KitsConfiguration(getFile("kits"));
+        kitsConfiguration = new KitsConfigurationManager(getFile("kits"));
 
         // default config
         saveDefaultConfig();
@@ -99,7 +111,7 @@ public final class MainROC2 extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        MainROC2.info("Disabling plugin.");
+        logInfo("Disabling plugin.");
         gameManager.purge();
     }
 
@@ -117,16 +129,6 @@ public final class MainROC2 extends JavaPlugin {
         return new File(INSTANCE.getDataFolder(), name);
     }
 
-    public static void info(String msg) {
-        INSTANCE.getLogger().info(msg);
-    }
-    public static void warning(String msg) {
-        INSTANCE.getLogger().warning(msg);
-    }
-    public static void error(String msg) {
-        INSTANCE.getLogger().severe(msg);
-    }
-
     public static ConfigurationSection getDefaultConfiguration() {
         return INSTANCE.getConfig();
     }
@@ -139,9 +141,41 @@ public final class MainROC2 extends JavaPlugin {
         return INSTANCE.getPluginMeta();
     }
 
-    public static KitsConfiguration getKits() {
-        return INSTANCE.kitsConfiguration;
+    @Override
+    public RocPlayer findPlayer(Player player) {
+        return null;
     }
+
+    @Override
+    public @NotNull String getI18n(String language, String key, Object... vars) {
+        return null;
+    }
+
+    @Override
+    public void logDebug(String message) {
+        getLogger().info("[DEBUG] " + message);
+    }
+
+    @Override
+    public void logInfo(String message) {
+        getLogger().info(message);
+    }
+
+    @Override
+    public void logWarning(String message) {
+        getLogger().warning(message);
+    }
+
+    @Override
+    public void logError(String message) {
+        getLogger().severe(message);
+    }
+
+    @Override
+    public @NotNull KitsManager getKits() {
+        return kitsConfiguration;
+    }
+
     public static TagsConfigurationSection getTags() {
         return INSTANCE.gameManager.getTagsConfiguration();
     }

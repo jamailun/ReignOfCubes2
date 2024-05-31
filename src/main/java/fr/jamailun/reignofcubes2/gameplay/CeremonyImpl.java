@@ -2,9 +2,10 @@ package fr.jamailun.reignofcubes2.gameplay;
 
 import fr.jamailun.reignofcubes2.GameManagerImpl;
 import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.gameplay.Ceremony;
 import fr.jamailun.reignofcubes2.api.music.MusicType;
-import fr.jamailun.reignofcubes2.configuration.SoundsLibrary;
+import fr.jamailun.reignofcubes2.music.SoundsLibrary;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import lombok.Getter;
 import org.bukkit.scheduler.BukkitTask;
@@ -33,7 +34,6 @@ public class CeremonyImpl implements Ceremony {
         this.duration = game.getRules().getCrownDuration();
         // Start
         task = MainROC2.runTaskTimer(this::tick, TICK_RATE);
-        MainROC2.info("[CEREMONY] Started.");
         game.getMusicManager().addPlayer(player.getUUID(), MusicType.CEREMONY);
         playsDings = ! game.getMusicManager().hasRadioFor(MusicType.CEREMONY);
 
@@ -65,7 +65,6 @@ public class CeremonyImpl implements Ceremony {
     public void stop() {
         if(!task.isCancelled()) {
             task.cancel();
-            MainROC2.info("[CEREMONY] Stopped.");
             if( ! success) {
                 game.broadcast("ceremony.fail", player.getName());
                 game.playSound(SoundsLibrary.CEREMONY_FAILS);

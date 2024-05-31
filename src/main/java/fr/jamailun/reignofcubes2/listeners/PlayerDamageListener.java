@@ -2,7 +2,7 @@ package fr.jamailun.reignofcubes2.listeners;
 
 import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
-import fr.jamailun.reignofcubes2.api.events.RocPlayerAttacksPlayerEvent;
+import fr.jamailun.reignofcubes2.api.events.player.RocPlayerAttacksPlayerEvent;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;

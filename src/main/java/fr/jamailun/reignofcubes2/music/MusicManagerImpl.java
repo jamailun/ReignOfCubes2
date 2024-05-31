@@ -5,6 +5,7 @@ import com.xxmicloxx.NoteBlockAPI.songplayer.Fade;
 import com.xxmicloxx.NoteBlockAPI.songplayer.RadioSongPlayer;
 import com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder;
 import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.music.MusicManager;
 import fr.jamailun.reignofcubes2.api.music.MusicType;
 import org.bukkit.Bukkit;
@@ -41,7 +42,7 @@ public class MusicManagerImpl implements MusicManager {
         for(MusicType type : MusicType.values()) {
             List<Song> songs = loadSongs(type);
             if(songs.isEmpty()) {
-                MainROC2.warning("No music for playlist " + type + " !");
+                ReignOfCubes2.logWarning("No music for playlist " + type + " !");
                 continue;
             }
 
@@ -51,7 +52,7 @@ public class MusicManagerImpl implements MusicManager {
             radio.setRepeatMode(RepeatMode.ALL);
             radios.put(type, radio);
 
-            MainROC2.info("Music type " + type + " loaded " + songs.size() + " songs.");
+            ReignOfCubes2.logInfo("Music type " + type + " loaded " + songs.size() + " songs.");
         }
 
         // refresh listeners
@@ -74,7 +75,7 @@ public class MusicManagerImpl implements MusicManager {
                 Song song = NBSDecoder.parse(file);
                 songs.add(song);
             } catch (Throwable e) {
-                MainROC2.error("Error when parsing " + file + " : " + e.getMessage());
+                ReignOfCubes2.logError("Error when parsing " + file + " : " + e.getMessage());
             }
         }
         return songs;
@@ -91,10 +92,10 @@ public class MusicManagerImpl implements MusicManager {
         if(type != null && radios.containsKey(type)) {
             RadioSongPlayer radio = radios.get(type);
             radio.removePlayer(uuid);
-            MainROC2.info("Player left radio " + type);
+            ReignOfCubes2.logInfo("Player left radio " + type);
             if(radio.getPlayerUUIDs().isEmpty()) {
                 radio.setPlaying(false);
-                MainROC2.info("Radio stopped.");
+                ReignOfCubes2.logInfo("Radio stopped.");
             }
         }
     }
@@ -116,10 +117,10 @@ public class MusicManagerImpl implements MusicManager {
             RadioSongPlayer radio = radios.get(type);
             radio.addPlayer(uuid);
             listeners.put(uuid, type);
-            MainROC2.info("Player joined radio " + type);
+            ReignOfCubes2.logInfo("Player joined radio " + type);
             if(!radio.isPlaying()) {
                 radio.setPlaying(true, new Fade(FadeType.LINEAR, 40));
-                MainROC2.info("Radio started (" + radio.getVolume() + ")");
+                ReignOfCubes2.logInfo("Radio started (" + radio.getVolume() + ")");
             }
         }
     }

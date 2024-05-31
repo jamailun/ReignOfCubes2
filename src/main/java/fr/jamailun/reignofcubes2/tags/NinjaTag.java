@@ -2,7 +2,7 @@ package fr.jamailun.reignofcubes2.tags;
 
 import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
-import fr.jamailun.reignofcubes2.api.events.RocPlayerAttacksPlayerEvent;
+import fr.jamailun.reignofcubes2.api.events.player.RocPlayerAttacksPlayerEvent;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
@@ -33,13 +33,13 @@ public class NinjaTag extends AbstractRocTag {
 
     @Override
     public void playerAdded(@NotNull RocPlayer holder) {
-        MainROC2.info("[debug] " + holder.getName() + " is now NINJA");
+        ReignOfCubes2.logDebug(holder.getName() + " is now NINJA");
         holder.getPlayer().showDemoScreen();
     }
 
     @Override
     public void playerRemoved(@NotNull RocPlayer holder) {
-        MainROC2.info("[debug] " + holder.getName() + " is not NINJA anymore.");
+        ReignOfCubes2.logDebug(holder.getName() + " is not NINJA anymore.");
         show(holder);
     }
 

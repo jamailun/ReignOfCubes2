@@ -59,6 +59,12 @@ public final class Ranking<T> {
         return Optional.of(ranking.get(index).element);
     }
 
+    public Optional<Integer> getScoreAtRank(int index) {
+        if(index < 0 || index >= size())
+            return Optional.empty();
+        return Optional.of(ranking.get(index).score);
+    }
+
     public Optional<Integer> getRankOf(T elem) {
         for(int i = 0; i < ranking.size(); i++) {
             if(ranking.get(i).element.equals(elem))

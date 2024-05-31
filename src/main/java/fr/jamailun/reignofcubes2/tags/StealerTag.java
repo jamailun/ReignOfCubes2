@@ -1,7 +1,8 @@
 package fr.jamailun.reignofcubes2.tags;
 
 import fr.jamailun.reignofcubes2.MainROC2;
-import fr.jamailun.reignofcubes2.api.events.RocPlayerAttacksPlayerEvent;
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.api.events.player.RocPlayerAttacksPlayerEvent;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.api.players.ScoreAddReason;
 import fr.jamailun.reignofcubes2.api.players.ScoreRemoveReason;
@@ -20,12 +21,12 @@ public class StealerTag extends AbstractRocTag {
 
     @Override
     public void playerAdded(@NotNull RocPlayer holder) {
-        MainROC2.info("[debug] " + holder.getName() + " is now stealer");
+        ReignOfCubes2.logDebug(holder.getName() + " is now stealer");
     }
 
     @Override
     public void playerRemoved(@NotNull RocPlayer holder) {
-        MainROC2.info("[debug] " + holder.getName() + " is NOT stealer anymore.");
+        ReignOfCubes2.logDebug(holder.getName() + " is NOT stealer anymore.");
     }
 
     @EventHandler

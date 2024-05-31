@@ -1,10 +1,11 @@
 package fr.jamailun.reignofcubes2.gui;
 
 import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.api.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.api.players.ScoreRemoveReason;
-import fr.jamailun.reignofcubes2.configuration.SoundsLibrary;
-import fr.jamailun.reignofcubes2.configuration.kits.Kit;
+import fr.jamailun.reignofcubes2.music.SoundsLibrary;
 import fr.jamailun.reignofcubes2.utils.ItemBuilder;
 import fr.jamailun.reignofcubes2.utils.MenuGUI;
 
@@ -61,7 +62,7 @@ public class ShopGUI extends MenuGUI {
     }
 
     private List<Kit> listKits() {
-        return MainROC2.getKits().getKits()
+        return ReignOfCubes2.getKits().getKits()
                 .stream()
                 .filter(k -> k.getCost() > 0)
                 .sorted(Comparator.comparing(Kit::getCost))

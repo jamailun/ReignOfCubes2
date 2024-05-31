@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -289,7 +290,7 @@ public class ItemBuilder {
             return this;
         ItemMeta im = item.getItemMeta();
         if(im == null) {
-            MainROC2.error("Invalid item... NO item meta ! " + item);
+            ReignOfCubes2.logError("Invalid item... NO item meta ! " + item);
             return this;
         }
 

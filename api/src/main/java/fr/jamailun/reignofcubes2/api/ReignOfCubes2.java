@@ -1,5 +1,6 @@
 package fr.jamailun.reignofcubes2.api;
 
+import fr.jamailun.reignofcubes2.api.configuration.kits.KitsManager;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +25,10 @@ public final class ReignOfCubes2 {
         return service.getI18n(language, key, vars);
     }
 
+    public static void logDebug(String message) {
+        service.logDebug(message);
+    }
+
     public static void logInfo(String message) {
         service.logInfo(message);
     }
@@ -34,6 +39,10 @@ public final class ReignOfCubes2 {
 
     public static void logError(String message) {
         service.logError(message);
+    }
+
+    public static @NotNull KitsManager getKits() {
+        return service.getKits();
     }
 
 }

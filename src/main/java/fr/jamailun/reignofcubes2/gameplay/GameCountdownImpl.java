@@ -3,8 +3,9 @@ package fr.jamailun.reignofcubes2.gameplay;
 import fr.jamailun.reignofcubes2.GameManagerImpl;
 import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.api.GameState;
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.gameplay.GameCountdown;
-import fr.jamailun.reignofcubes2.configuration.SoundsLibrary;
+import fr.jamailun.reignofcubes2.music.SoundsLibrary;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public class GameCountdownImpl implements GameCountdown {
     private void countdownTick() {
         // Check GameManager state.
         if(game.getState() != GameState.COUNT_DOWN) {
-            MainROC2.warning("Countdown expected game being in COUNTDOWN state.");
+            ReignOfCubes2.logWarning("Countdown expected game being in COUNTDOWN state.");
             cancel();
             return;
         }

@@ -1,21 +1,21 @@
-package fr.jamailun.reignofcubes2.api.events;
+package fr.jamailun.reignofcubes2.api.events.player;
 
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @Getter
-@RequiredArgsConstructor
-public class RocPlayerAttacksPlayerEvent extends Event {
+public class RocPlayerDeathEvent extends Event {
     private static final HandlerList HANDLERS_LIST = new HandlerList();
 
-    @NotNull private final RocPlayer attacker;
-    @NotNull private final RocPlayer victim;
-    @NotNull private final EntityDamageByEntityEvent bukkitEvent;
+    @NotNull private final RocPlayer player;
+
+    public RocPlayerDeathEvent(@NotNull RocPlayer player) {
+        this.player = player;
+    }
 
     @Override
     public @NotNull HandlerList getHandlers() {

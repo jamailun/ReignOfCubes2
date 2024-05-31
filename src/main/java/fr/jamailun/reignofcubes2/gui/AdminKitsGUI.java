@@ -1,7 +1,7 @@
 package fr.jamailun.reignofcubes2.gui;
 
+import fr.jamailun.reignofcubes2.api.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
-import fr.jamailun.reignofcubes2.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.utils.ItemBuilder;
 import fr.jamailun.reignofcubes2.utils.MenuGUI;
 import org.bukkit.Material;
@@ -36,8 +36,8 @@ public class AdminKitsGUI extends MenuGUI {
         int slot = 0;
         for(Kit kit : kits) {
             ItemBuilder is = new ItemBuilder(kit.toIcon());
-            if(kit.getTagId() != null) {
-                is.addLoreLine("Tag : " + (kit.getTag()==null?"§c":"§e") + kit.getTagId());
+            if(kit.getTag() != null) {
+                is.addLoreLine("Tag : §e" + kit.getTag().getId());
             }
             is.addLoreLine("Cost: " + (kit.getCost()<0?"§4invalid":"§a"+kit.getCost()));
             set(slot, is.toItemStack(), () -> clickOnKit(kit));

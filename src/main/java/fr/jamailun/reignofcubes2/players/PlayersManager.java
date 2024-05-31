@@ -2,6 +2,7 @@ package fr.jamailun.reignofcubes2.players;
 
 import fr.jamailun.reignofcubes2.GameManagerImpl;
 import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.api.utils.Ranking;
 import org.bukkit.Bukkit;
@@ -46,7 +47,7 @@ public class PlayersManager implements Iterable<RocPlayerImpl> {
         for(RocPlayerImpl player : new ArrayList<>(players.values())) {
             if( ! player.isValid()) {
                 players.remove(player.getUUID());
-                MainROC2.info("Removed '" + player.getName() + "' from players because he was offline.");
+                ReignOfCubes2.logInfo("Removed '" + player.getName() + "' from players because he was offline.");
             }
         }
     }

@@ -1,4 +1,4 @@
-package fr.jamailun.reignofcubes2.configuration;
+package fr.jamailun.reignofcubes2.music;
 
 import fr.jamailun.reignofcubes2.api.sounds.SoundEffect;
 import org.bukkit.Sound;

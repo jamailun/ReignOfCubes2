@@ -1,13 +1,15 @@
 package fr.jamailun.reignofcubes2.players;
 
 import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.api.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.api.players.ScoreAddReason;
 import fr.jamailun.reignofcubes2.api.players.ScoreRemoveReason;
 import fr.jamailun.reignofcubes2.api.sounds.SoundEffect;
 import fr.jamailun.reignofcubes2.api.tags.RocTag;
-import fr.jamailun.reignofcubes2.configuration.kits.Kit;
-import fr.jamailun.reignofcubes2.api.events.ScoreGainedEvent;
+import fr.jamailun.reignofcubes2.configuration.kits.RocKit;
+import fr.jamailun.reignofcubes2.api.events.player.ScoreGainedEvent;
 import fr.jamailun.reignofcubes2.messages.Messages;
 import lombok.Getter;
 import lombok.Setter;
@@ -149,9 +151,9 @@ public class RocPlayerImpl implements RocPlayer {
         player.clearActivePotionEffects();
 
         // Equip default kit
-        Kit defaultKit = MainROC2.getKits().getDefaultKit();
+        Kit defaultKit = ReignOfCubes2.getKits().getDefaultKit();
         if(defaultKit == null) {
-            MainROC2.error("No default kit !");
+            ReignOfCubes2.logError("No default kit !");
         } else {
             defaultKit.equip(this);
         }

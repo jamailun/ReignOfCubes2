@@ -1,6 +1,7 @@
 package fr.jamailun.reignofcubes2.configuration.sections;
 
 import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.configuration.BadConfigurationException;
 import fr.jamailun.reignofcubes2.api.configuration.sections.DeserializeConfiguration;
 import fr.jamailun.reignofcubes2.api.configuration.sections.RocConfigurationSection;
@@ -45,7 +46,7 @@ public class WorldSection extends RocConfigurationSection {
         // Shop item
         configuration.shopItem = config.getItemStack("shop-item");
 
-        MainROC2.info("Loaded configuration " + configuration);
+        ReignOfCubes2.logInfo("Loaded configuration " + configuration);
         return configuration;
     }
 

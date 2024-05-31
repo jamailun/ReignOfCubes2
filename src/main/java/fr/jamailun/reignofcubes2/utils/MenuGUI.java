@@ -1,8 +1,8 @@
 package fr.jamailun.reignofcubes2.utils;
 
-import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.api.configuration.kits.KitsManager;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
-import fr.jamailun.reignofcubes2.configuration.KitsConfiguration;
 import fr.jamailun.reignofcubes2.messages.Messages;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
@@ -115,8 +115,8 @@ public abstract class MenuGUI {
     public void afterClose(boolean internal) {}
 
 
-    protected final KitsConfiguration kits() {
-        return MainROC2.getKits();
+    protected final KitsManager kits() {
+        return ReignOfCubes2.getKits();
     }
 
     protected final void setDefaultFooter() {
@@ -156,7 +156,7 @@ public abstract class MenuGUI {
                 ){
                     gui.afterClose(false);
                     if(!GUIS.remove(gui)) {
-                        MainROC2.error("This way be a problem. Could not remove gui after having found it.");
+                        ReignOfCubes2.logError("This way be a problem. Could not remove gui after having found it.");
                     }
                     return;
                 }

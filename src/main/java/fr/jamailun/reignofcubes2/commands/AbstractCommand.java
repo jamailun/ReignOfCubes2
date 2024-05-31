@@ -2,9 +2,10 @@ package fr.jamailun.reignofcubes2.commands;
 
 import fr.jamailun.reignofcubes2.GameManagerImpl;
 import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.api.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.configuration.ConfigurationsList;
 import fr.jamailun.reignofcubes2.configuration.GameConfiguration;
-import fr.jamailun.reignofcubes2.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.players.RocPlayerImpl;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
@@ -26,7 +27,7 @@ abstract class AbstractCommand implements CommandExecutor, TabCompleter {
         cmd.setExecutor(this);
         cmd.setTabCompleter(this);
 
-        MainROC2.info("Command '"+command+"' enabled.");
+        ReignOfCubes2.logInfo("Command '"+command+"' enabled.");
     }
 
     @Override
@@ -122,7 +123,7 @@ abstract class AbstractCommand implements CommandExecutor, TabCompleter {
     }
 
     protected Stream<String> kitsIds() {
-        return MainROC2.getKits().getKits().stream().map(Kit::getId);
+        return ReignOfCubes2.getKits().getKits().stream().map(Kit::getId);
     }
 
     protected abstract boolean sendHelp(CommandSender sender);
