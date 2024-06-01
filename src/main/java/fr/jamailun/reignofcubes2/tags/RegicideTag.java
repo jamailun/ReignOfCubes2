@@ -1,6 +1,5 @@
 package fr.jamailun.reignofcubes2.tags;
 
-import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.events.player.RocPlayerAttacksPlayerEvent;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
@@ -29,7 +28,7 @@ public class RegicideTag extends AbstractRocTag {
 
     @EventHandler
     public void attackEvent(RocPlayerAttacksPlayerEvent event) {
-        TagsConfigurationSection config = MainROC2.getTags();
+        TagsConfigurationSection config = tags();
 
         // If the attacker is regicide
         if(event.getAttacker().isTag(this)) {

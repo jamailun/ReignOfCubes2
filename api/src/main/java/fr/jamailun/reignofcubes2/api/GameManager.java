@@ -1,6 +1,7 @@
 package fr.jamailun.reignofcubes2.api;
 
 import fr.jamailun.reignofcubes2.api.configuration.RocConfiguration;
+import fr.jamailun.reignofcubes2.api.configuration.RocConfigurationsManager;
 import fr.jamailun.reignofcubes2.api.gameplay.Ceremony;
 import fr.jamailun.reignofcubes2.api.gameplay.GameCountdown;
 import fr.jamailun.reignofcubes2.api.music.MusicManager;
@@ -62,9 +63,15 @@ public interface GameManager {
     void updateRankings(@NotNull RocPlayer player);
 
     /**
+     * Get the configurations-manager.
+     * @return a non-null singleton instance of the configuration manager.
+     */
+    @NotNull RocConfigurationsManager getConfigurations();
+
+    /**
      * Get the <b>current</b> configuration.
      * @return a configuration. Can be null if no configuration has been set.
      */
-    RocConfiguration getConfiguration();
+    RocConfiguration getActiveConfiguration();
 
 }

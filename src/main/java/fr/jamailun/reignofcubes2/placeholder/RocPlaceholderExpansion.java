@@ -101,6 +101,7 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
             //TODO more titles !!
             case "title" -> getRank(player) == 1 ? "&d&l[Top 1]" : "";
             case "score" -> String.valueOf(player.getScore());
+            case "gold" -> String.valueOf(player.getGold());
             case "is_king" -> player.isKing() ? "1" : "0";
             case "king" -> player.isKing() ? player.i18n("tab.player.you") : game.hasKing() ? game.getKing().getName() : player.i18n("tab.player.none");
             case "king_color" -> player.isKing() ? "GREEN" : "BLUE";
@@ -174,7 +175,7 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
     }
 
     private RocConfiguration config() {
-        return game.getConfiguration();
+        return game.getActiveConfiguration();
     }
 
     private String bool(boolean bool) {

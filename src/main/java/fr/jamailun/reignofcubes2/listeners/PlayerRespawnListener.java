@@ -21,7 +21,7 @@ public class PlayerRespawnListener extends RocListener {
             return; // Ignore completely
 
         // Change the respawn location.
-        event.setRespawnLocation(game().getConfiguration().getSafeSpawn(true));
+        event.setRespawnLocation(game().getActiveConfiguration().getSafeSpawn(true));
 
         // Signal respawn to the player class.
         player.respawned();

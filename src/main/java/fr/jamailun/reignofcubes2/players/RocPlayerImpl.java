@@ -159,7 +159,7 @@ public class RocPlayerImpl implements RocPlayer {
         }
 
         // Add shop item
-        ItemStack is = ReignOfCubes2.gameManager().getConfiguration().getSection(WorldSection.class).getShopItem();
+        ItemStack is = ReignOfCubes2.gameManager().getActiveConfiguration().getSection(WorldSection.class).getShopItem();
         if (is != null) {
             getPlayer().getInventory().setItem(8, is);
         }

@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class Messages {
+public final class Messages {
 
     private String defaultLanguage = "fr";
     private final Map<String, String> shared = new HashMap<>();

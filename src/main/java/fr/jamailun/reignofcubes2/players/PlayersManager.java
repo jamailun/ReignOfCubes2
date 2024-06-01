@@ -1,7 +1,6 @@
 package fr.jamailun.reignofcubes2.players;
 
 import fr.jamailun.reignofcubes2.GameManagerImpl;
-import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.api.utils.Ranking;
@@ -100,8 +99,8 @@ public class PlayersManager implements Iterable<RocPlayerImpl> {
     }
 
     public void backToLobby() {
-        assert game.getConfiguration().isValid();
-        Location lobby = game.getConfiguration().getLobby();
+        assert game.getActiveConfiguration().isValid();
+        Location lobby = game.getActiveConfiguration().getLobby();
 
         // tp ALL players instead
         for(Player player : Bukkit.getOnlinePlayers()) {

@@ -1,6 +1,5 @@
 package fr.jamailun.reignofcubes2.utils;
 
-import fr.jamailun.reignofcubes2.MainROC2;
 import lombok.Getter;
 
 @Getter

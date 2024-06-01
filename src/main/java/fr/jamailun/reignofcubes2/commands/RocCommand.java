@@ -5,12 +5,13 @@ import com.sk89q.worldedit.regions.Region;
 import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.api.GameState;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.api.configuration.RocConfiguration;
 import fr.jamailun.reignofcubes2.api.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.api.configuration.kits.KitAlreadyExistsException;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
+import fr.jamailun.reignofcubes2.configuration.GameConfiguration;
 import fr.jamailun.reignofcubes2.configuration.sections.GameRulesSection;
 import fr.jamailun.reignofcubes2.configuration.sections.TagsConfigurationSection;
-import fr.jamailun.reignofcubes2.configuration.GameConfiguration;
 import fr.jamailun.reignofcubes2.configuration.pickups.PickupConfigEntry;
 import fr.jamailun.reignofcubes2.gui.AdminKitsGUI;
 import fr.jamailun.reignofcubes2.messages.Messages;
@@ -100,9 +101,9 @@ public class RocCommand extends AbstractCommand {
                     return error(sender, "Cannot change configuration while playing.");
                 }
                 String name = args[0];
-                if(!configs().contains(name))
-                    return error(sender, "Unknown configuration: " + name);
                 GameConfiguration config = configs().get(name);
+                if(config == null)
+                    return error(sender, "Unknown configuration: " + name);
                 if(!config.isValid())
                     return error(sender, "Configuration " + name + " is not valid.");
                 info(sender, "Enabling configuration " + config + "...");
@@ -118,27 +119,27 @@ public class RocCommand extends AbstractCommand {
                     return error(sender, "Cannot change configuration while playing.");
                 }
                 String name = args[0];
-                if(!configs().contains(name))
+                RocConfiguration config = configs().get(name);
+                if(config == null)
                     return error(sender, "Unknown configuration: " + name);
-                GameConfiguration config = configs().get(name);
                 if(!config.isValid())
                     return error(sender, "Configuration " + name + " is not valid.");
-                configs().setDefault(config);
-                success(sender, "Set configuration " + config + " as default.");
+                configs().setDefault(name);
+                success(sender, "Set configuration " + name + " as default.");
                 return true;
             }
 
             // list of configurations names
             if(arg.equalsIgnoreCase("list")) {
-                if(configs().size() == 0) {
+                if(configs().count() == 0) {
                     return info(sender, "No configuration exist.");
                 }
-                info(sender, "§7Configurations list (" + configs().size() + "):");
+                info(sender, "§7Configurations list (" + configs().count() + "):");
                 configs().list().forEach(n ->
                         info(sender, "§6- " + n.getName() + "§7 by " + n.getAuthor() + " on " + n.getWorldName()
                                 + " : " + (n.isValid() ? "§a[VALID]" : "§c[INVALID]")
                 ));
-                GameConfiguration defaultConfig = configs().getDefault();
+                RocConfiguration defaultConfig = configs().getDefault();
                 if(defaultConfig != null) {
                     info(sender, "§7Default configuration : §6" + defaultConfig.getName());
                 } else {
@@ -175,9 +176,9 @@ public class RocCommand extends AbstractCommand {
                     return error(sender, "Specify the configuration to show.");
                 }
                 String configName = args[0];
-                if(!configs().contains(configName))
+                RocConfiguration config = configs().get(configName);
+                if(config == null)
                     return error(sender, "Unknown configuration: " + configName);
-                GameConfiguration config = configs().get(configName);
                 return info(sender, "§rConfiguration: " + config.nicePrint());
             }
 
@@ -186,9 +187,9 @@ public class RocCommand extends AbstractCommand {
                 if(args.length < 2) return error(sender, "Specify the config-name and the property to edit.");
                 String configName = args[0];
                 String property = args[1].toLowerCase();
-                if(!configs().contains(configName))
-                    return error(sender, "Unknown configuration: " + configName);
                 GameConfiguration config = configs().get(configName);
+                if(config == null)
+                    return error(sender, "Unknown configuration: " + configName);
                 if(args.length < 3)
                     return error(sender, "To change this tag-property, specify a value");
                 String value = args[2];
@@ -218,9 +219,9 @@ public class RocCommand extends AbstractCommand {
                 if(args.length < 2) return error(sender, "Specify the config-name and the property to edit.");
                 String configName = args[0];
                 String property = args[1].toLowerCase();
-                if(!configs().contains(configName))
-                    return error(sender, "Unknown configuration: " + configName);
                 GameConfiguration config = configs().get(configName);
+                if(config == null)
+                    return error(sender, "Unknown configuration: " + configName);
 
                 if(     property.equals("throne.pos_a")
                         || property.equals("throne.pos_b")
@@ -321,9 +322,9 @@ public class RocCommand extends AbstractCommand {
                 if(args.length < 2) return error(sender, "Specify the config and the mode.");
                 String configName = args[0];
                 arg = args[1].toLowerCase();
-                if(!configs().contains(configName))
-                    return error(sender, "Unknown configuration: " + configName);
                 GameConfiguration config = configs().get(configName);
+                if(config == null)
+                    return error(sender, "Unknown configuration: " + configName);
 
                 if(arg.equals("list")) {
                     if(config.spawnsList().isEmpty()) {
@@ -368,9 +369,9 @@ public class RocCommand extends AbstractCommand {
                 if(args.length < 2) return error(sender, "Specify the config and the mode.");
                 String configName = args[0];
                 arg = args[1].toLowerCase();
-                if(!configs().contains(configName))
-                    return error(sender, "Unknown configuration: " + configName);
                 GameConfiguration config = configs().get(configName);
+                if(config == null)
+                    return error(sender, "Unknown configuration: " + configName);
 
                 if(arg.equals("list")) {
                     if(config.listGenerators().isEmpty()) {
@@ -415,9 +416,9 @@ public class RocCommand extends AbstractCommand {
                 if(args.length < 2) return error(sender, "Specify the config and the mode.");
                 String configName = args[0];
                 arg = args[1].toLowerCase();
-                if(!configs().contains(configName))
-                    return error(sender, "Unknown configuration: " + configName);
                 GameConfiguration config = configs().get(configName);
+                if(config == null)
+                    return error(sender, "Unknown configuration: " + configName);
 
                 if("list".equalsIgnoreCase(arg)) {
                     if(config.getPickupsSection().isEmpty()) {
@@ -444,7 +445,7 @@ public class RocCommand extends AbstractCommand {
                         return error(sender, "Unknown pickup-entry: '" + id + "'.");
                     }
                     entry.spawnFirework(((Player)sender).getLocation());
-                    return info(sender, "§oWhooooosh");
+                    return info(sender, "§oBoom.");
                 }
 
                 if(arg.equals("add")) {
@@ -496,10 +497,10 @@ public class RocCommand extends AbstractCommand {
             if(game().isStatePlaying()) {
                 return error(sender, "Cannot interrupt game while playing. Stop-it first.");
             }
-            GameConfiguration config = game().getConfiguration();
+            RocConfiguration config = game().getActiveConfiguration();
             if(config == null || ! config.isValid())
                 return error(sender, "Invalid configuration. Either on-set or invalid.");
-            Location lobby = game().getConfiguration().getLobby();
+            Location lobby = game().getActiveConfiguration().getLobby();
             game().players()
                     .filter(RocPlayerImpl::isValid)
                     .map(RocPlayerImpl::getPlayer)
@@ -584,9 +585,9 @@ public class RocCommand extends AbstractCommand {
             if(args.length < 1) return error(sender, "Specify the config to show.");
 
             String name = args[0];
-            if(!configs().contains(name))
-                return error(sender, "Unknown configuration: " + name);
             GameConfiguration config = configs().get(name);
+            if(config == null)
+                return error(sender, "Unknown configuration: " + name);
             boolean result = config.debug.toggle((Player)sender);
             return info(sender, "Debug showing has been toggled (" + result + ").");
         }
@@ -630,7 +631,7 @@ public class RocCommand extends AbstractCommand {
         if(arg.equalsIgnoreCase("kits")) {
             if(!(sender instanceof Player pl)) return error(sender, "Cannot use 'kits' subcommand as a console.");
             RocPlayer player = ReignOfCubes2.findPlayer(pl);
-            if(player == null) return error(sender, "Tu n'es pas dans le jeu. déso");
+            if(player == null) return error(sender, "Tu n'es pas dans le jeu. Sorry.");
 
             if(args.length < 1) return missingArgument(sender, args_1_kits);
             arg = args[0];

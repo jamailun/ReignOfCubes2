@@ -2,6 +2,7 @@ package fr.jamailun.reignofcubes2.api.gameplay;
 
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import org.bukkit.Location;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
@@ -20,16 +21,24 @@ public interface Throne {
      */
     boolean isInside(Location loc);
 
-    void enters(RocPlayer player);
+    /**
+     * Signal the throne a player entered it.
+     * @param player the player to enter.
+     */
+    void enters(@NotNull RocPlayer player);
 
-    void leaves(RocPlayer player);
+    /**
+     * Signal the throne a player left it.
+     * @param player the player to leave.
+     */
+    void leaves(@NotNull RocPlayer player);
 
     boolean hasCeremony();
 
     void resetCeremony();
 
-    boolean isCooldownOk(UUID uuid);
-
     @Nullable Ceremony getCeremony();
+
+    boolean isCooldownOk(UUID uuid);
 
 }

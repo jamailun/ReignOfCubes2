@@ -3,13 +3,15 @@ package fr.jamailun.reignofcubes2;
 import fr.jamailun.reignofcubes2.api.GameManager;
 import fr.jamailun.reignofcubes2.api.GameState;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.api.configuration.RocConfigurationsManager;
 import fr.jamailun.reignofcubes2.api.gameplay.*;
 import fr.jamailun.reignofcubes2.api.music.MusicManager;
 import fr.jamailun.reignofcubes2.api.players.*;
 import fr.jamailun.reignofcubes2.api.sounds.SoundEffect;
 import fr.jamailun.reignofcubes2.api.music.MusicType;
 import fr.jamailun.reignofcubes2.api.utils.Ranking;
-import fr.jamailun.reignofcubes2.configuration.*;
+import fr.jamailun.reignofcubes2.configuration.GameConfiguration;
+import fr.jamailun.reignofcubes2.configuration.GameConfigurationsManager;
 import fr.jamailun.reignofcubes2.configuration.pickups.PickupConfigEntry;
 import fr.jamailun.reignofcubes2.configuration.sections.GameRulesSection;
 import fr.jamailun.reignofcubes2.configuration.sections.TagsConfigurationSection;
@@ -45,7 +47,7 @@ public class GameManagerImpl implements GameManager {
     private final MusicManagerImpl musicManager;
 
     @Getter private GameState state;
-    @Getter private final ConfigurationsList configurationsList = new ConfigurationsList();
+    @Getter private final GameConfigurationsManager configsManager = new GameConfigurationsManager();
     private GameConfiguration worldConfiguration;
     private World world;
     @Getter private RocPlayer king;
@@ -53,7 +55,7 @@ public class GameManagerImpl implements GameManager {
 
     // Score
     @Getter private final Ranking<RocPlayer> ranking = new Ranking<>(RocPlayer::getScore);
-    private final PickupsManager pickups = new PickupsManager(() -> getConfiguration().getPickupsSection().pickRandom());
+    private final PickupsManager pickups = new PickupsManager(() -> getActiveConfiguration().getPickupsSection().pickRandom());
     private BukkitTask gameTimer;
 
     // Countdown
@@ -64,7 +66,7 @@ public class GameManagerImpl implements GameManager {
 
     GameManagerImpl(MusicManagerImpl musicManager) {
         this.musicManager = musicManager;
-        loadConfiguration(configurationsList.getDefault());
+        loadConfiguration(configsManager.getDefault());
     }
 
     public boolean loadConfiguration(@Nullable GameConfiguration configuration) {
@@ -444,7 +446,7 @@ public class GameManagerImpl implements GameManager {
         players.backToLobby();
 
         // Reset throne
-        loadConfiguration(configurationsList.getDefault());
+        loadConfiguration(configsManager.getDefault());
         MainROC2.runTaskLater(this::testShouldStartGame, 2);
     }
 
@@ -525,7 +527,7 @@ public class GameManagerImpl implements GameManager {
 
         // clear stuff anyway, and teleport
         ReignOfCubes2.logInfo("Player re-joined : " + p.getName() + ".");
-        p.teleport(getConfiguration().getSafeSpawn(true));
+        p.teleport(getActiveConfiguration().getSafeSpawn(true));
         player.respawned();
         musicManager.addPlayer(p, MusicType.PLAY_NORMAL);
     }
@@ -567,12 +569,17 @@ public class GameManagerImpl implements GameManager {
         ranking.update(player);
     }
 
+    @Override
+    public @NotNull RocConfigurationsManager getConfigurations() {
+        return configsManager;
+    }
+
     public Optional<PickupConfigEntry> didPickedUpItem(Item item) {
         return pickups.tryPickupItem(item);
     }
 
     @Override
-    public GameConfiguration getConfiguration() {
+    public GameConfiguration getActiveConfiguration() {
         return worldConfiguration;
     }
 }

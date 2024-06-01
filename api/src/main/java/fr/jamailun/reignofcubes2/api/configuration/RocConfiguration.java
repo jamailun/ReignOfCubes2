@@ -83,6 +83,22 @@ public abstract class RocConfiguration {
         config.save(file);
     }
 
+    /**
+     * Fancy toString().
+     * @return a Bukkit-colored String.
+     */
+    public final @NotNull String nicePrint() {
+        String prefix = "§7{\n  author=§e"+author+"§7, world=§e"+worldName+"§7, name=\"§a" + name + "§7\",\n";
+        StringBuilder sb = new StringBuilder(prefix);
+        for(Map.Entry<Class<? extends RocConfigurationSection>, RocConfigurationSection> entry : sections.entrySet()) {
+            String p = "  §b" + entry.getKey().getSimpleName().toLowerCase() + "§7 = {\n";
+            String section = entry.getValue().nicePrint("    ", "  ");
+            String s = "  §7,\n";
+            sb.append(p).append(section).append(s);
+        }
+        return sb.append("§7}").toString();
+    }
+
     @SuppressWarnings("unchecked")
     public <T extends RocConfigurationSection> T getSection(Class<T> clazz) {
         return (T) sections.get(clazz);

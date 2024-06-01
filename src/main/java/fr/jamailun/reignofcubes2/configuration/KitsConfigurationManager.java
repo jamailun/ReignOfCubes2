@@ -1,6 +1,5 @@
 package fr.jamailun.reignofcubes2.configuration;
 
-import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.api.configuration.kits.KitAlreadyExistsException;

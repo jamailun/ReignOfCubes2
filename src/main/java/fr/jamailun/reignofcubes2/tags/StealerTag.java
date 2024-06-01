@@ -1,6 +1,5 @@
 package fr.jamailun.reignofcubes2.tags;
 
-import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.events.player.RocPlayerAttacksPlayerEvent;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
@@ -34,7 +33,7 @@ public class StealerTag extends AbstractRocTag {
         if(!event.getAttacker().isTag(this))
             return;
 
-        TagsConfigurationSection config = MainROC2.getTags();
+        TagsConfigurationSection config = tags();
         int stole = config.getStealerPointsPerHit();
 
         if(event.getVictim().hasScore(stole)) {

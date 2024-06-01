@@ -98,16 +98,6 @@ public class GameConfiguration extends RocConfiguration {
         return getSection(WorldSection.class).getShopItem();
     }
 
-    /**
-     * Fancy toString().
-     * @return a Bukkit-colored String.
-     */
-    public String nicePrint() {
-        String end = "\n  ";
-        String endl = "§r,"+end;
-        return "§r{todo...}";
-    }
-
     public Location getSafeSpawn(boolean trySafe) {
         // Get spawns, and shuffle
         List<Location> locations = generateSpawns();

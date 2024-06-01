@@ -1,6 +1,8 @@
 package fr.jamailun.reignofcubes2.tags;
 
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.tags.RocTag;
+import fr.jamailun.reignofcubes2.configuration.sections.TagsConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -21,6 +23,10 @@ abstract class AbstractRocTag implements RocTag {
     @Override
     public final @NotNull String getId() {
         return id;
+    }
+
+    protected final @NotNull TagsConfigurationSection tags() {
+        return ReignOfCubes2.gameManager().getActiveConfiguration().getSection(TagsConfigurationSection.class);
     }
 
 }

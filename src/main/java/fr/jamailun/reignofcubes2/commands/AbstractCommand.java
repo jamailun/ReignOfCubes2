@@ -3,9 +3,9 @@ package fr.jamailun.reignofcubes2.commands;
 import fr.jamailun.reignofcubes2.GameManagerImpl;
 import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.api.configuration.RocConfiguration;
 import fr.jamailun.reignofcubes2.api.configuration.kits.Kit;
-import fr.jamailun.reignofcubes2.configuration.ConfigurationsList;
-import fr.jamailun.reignofcubes2.configuration.GameConfiguration;
+import fr.jamailun.reignofcubes2.configuration.GameConfigurationsManager;
 import fr.jamailun.reignofcubes2.players.RocPlayerImpl;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
@@ -71,8 +71,8 @@ abstract class AbstractCommand implements CommandExecutor, TabCompleter {
         return plugin.getGameManager();
     }
 
-    protected ConfigurationsList configs() {
-        return game().getConfigurationsList();
+    protected GameConfigurationsManager configs() {
+        return game().getConfigsManager();
     }
 
     protected boolean setInt(CommandSender sender, String value, Consumer<Integer> consumer, String success) {
@@ -115,7 +115,7 @@ abstract class AbstractCommand implements CommandExecutor, TabCompleter {
 
 
     protected Stream<String> configurationsNames() {
-        return configs().list().stream().map(GameConfiguration::getName);
+        return configs().list().stream().map(RocConfiguration::getName);
     }
 
     protected Stream<String> playersNames() {

@@ -51,7 +51,7 @@ public class ThroneImpl implements Throne {
     }
 
     @Override
-    public void enters(RocPlayer player) {
+    public void enters(@NotNull RocPlayer player) {
         playersInside.add(player.getUUID());
 
         boolean canStart = true;
@@ -73,7 +73,7 @@ public class ThroneImpl implements Throne {
     }
 
     @Override
-    public void leaves(RocPlayer player) {
+    public void leaves(@NotNull RocPlayer player) {
         playersInside.remove(player.getUUID());
 
         if(!player.isKing())
@@ -127,7 +127,7 @@ public class ThroneImpl implements Throne {
             synchronized (pcKey) {
                 playersCooldowns.remove(uuid);
             }
-        }, game.getConfiguration().getRules().getThroneCooldown());
+        }, game.getActiveConfiguration().getRules().getThroneCooldown());
         return true;
     }
 

@@ -2,7 +2,6 @@ package fr.jamailun.reignofcubes2.gameplay;
 
 import fr.jamailun.reignofcubes2.GameManagerImpl;
 import fr.jamailun.reignofcubes2.MainROC2;
-import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.gameplay.Ceremony;
 import fr.jamailun.reignofcubes2.api.music.MusicType;
 import fr.jamailun.reignofcubes2.music.SoundsLibrary;
