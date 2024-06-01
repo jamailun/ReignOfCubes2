@@ -36,7 +36,7 @@ public class RocPlayerImpl implements RocPlayer {
     @Getter private Player player;
 
     @Getter private int score = 0;
-    @Getter private int gold = 0;
+    @Getter private float gold = 0;
     @Getter @Setter private boolean isKing = false;
     @Getter @Setter private String language = "fr";
     @Getter @Setter private int lastMoneySpent = 0;
@@ -79,19 +79,19 @@ public class RocPlayerImpl implements RocPlayer {
     }
 
     @Override
-    public boolean hasGold(int value) {
+    public boolean hasGold(float value) {
         return gold >= value;
     }
 
     @Override
-    public void addGold(int delta) {
+    public void addGold(float delta) {
         if(delta == 0) return;
         assert delta > 0;
         gold += delta;
     }
 
     @Override
-    public void removeGold(int delta) {
+    public void removeGold(float delta) {
         if(delta == 0) return;
         assert delta > 0;
         gold = Math.max(0, gold - delta);

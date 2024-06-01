@@ -4,6 +4,8 @@ import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Set;
+
 /**
  * A mine is a producer of gold.
  */
@@ -13,8 +15,12 @@ public interface Mine {
 
     double getRadius();
 
-    boolean hasOwner();
+    float getMaxStorage();
 
-    RocPlayer getOwner();
+    float getProductionRate();
+
+    float getStoredGold();
+
+    Set<RocPlayer> getPlayersInside();
 
 }

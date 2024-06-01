@@ -23,11 +23,11 @@ public interface RocPlayer extends RocTagHolder, RocDamageable, RocEntity, RocMe
 
     int getGold();
 
-    boolean hasGold(int value);
+    boolean hasGold(float value);
 
-    void addGold(int value);
+    void addGold(float value);
 
-    void removeGold(int delta);
+    void removeGold(float delta);
 
     int getScore();
 

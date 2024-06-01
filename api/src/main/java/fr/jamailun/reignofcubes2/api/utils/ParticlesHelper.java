@@ -6,23 +6,30 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import java.util.Collection;
+import java.util.Set;
+
 public final class ParticlesHelper {
     private ParticlesHelper() {}
 
-    public static void playCircleXZ(Player target, Location center, double radius, double delta, Particle particle) {
+    public static void playCircleXZ(Collection<Player> targets, Location center, double radius, double delta, Particle particle) {
         assert delta > 0;
         assert radius > 0;
         for(double theta = 0; theta < Math.PI * 2; theta += delta) {
             double cos = radius * Math.cos(theta);
             double sin = radius * Math.sin(theta);
-            target.spawnParticle(
+            targets.forEach(p -> p.spawnParticle(
                     particle,
                     center.getX() + cos, center.getY(), center.getZ() + sin,
                     1, // count
                     0, 0, 0, // offset
                     0 // speed
-            );
+            ));
         }
+    }
+
+    public static void playCircleXZ(Player target, Location center, double radius, double delta, Particle particle) {
+        playCircleXZ(Set.of(target), center, radius, delta, particle);
     }
 
     public static void playLine(Player target, Location a, Location b, double delta, Particle particle) {
