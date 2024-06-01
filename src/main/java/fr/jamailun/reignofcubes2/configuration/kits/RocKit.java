@@ -6,7 +6,7 @@ import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.api.tags.RocTag;
 import fr.jamailun.reignofcubes2.api.tags.TagsRegistry;
 import fr.jamailun.reignofcubes2.configuration.sections.WorldSection;
-import fr.jamailun.reignofcubes2.utils.ItemBuilder;
+import fr.jamailun.reignofcubes2.api.utils.ItemBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Material;

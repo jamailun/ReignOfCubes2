@@ -5,12 +5,12 @@ import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.api.configuration.BadConfigurationException;
 import fr.jamailun.reignofcubes2.api.configuration.RocConfiguration;
 import fr.jamailun.reignofcubes2.api.gameplay.Throne;
+import fr.jamailun.reignofcubes2.api.utils.ParticlesHelper;
 import fr.jamailun.reignofcubes2.configuration.pickups.PickupConfigurationSection;
 import fr.jamailun.reignofcubes2.configuration.sections.GameRulesSection;
 import fr.jamailun.reignofcubes2.configuration.sections.TagsConfigurationSection;
 import fr.jamailun.reignofcubes2.configuration.sections.WorldSection;
 import fr.jamailun.reignofcubes2.gameplay.ThroneImpl;
-import fr.jamailun.reignofcubes2.utils.ParticlesPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -136,31 +136,31 @@ public class GameConfiguration extends RocConfiguration {
                     Location a = section.getThroneA().toLocation(player.getWorld());
                     if(section.getThroneB() != null) {
                         Location b = section.getThroneB().toLocation(player.getWorld());
-                        ParticlesPlayer.playBox(player, a, b, 0.2, Particle.FLAME);
+                        ParticlesHelper.playBox(player, a, b, 0.2, Particle.FLAME);
                     } else {
-                        ParticlesPlayer.playLine(player, a, a.clone().add(0, 0.1, 0), 0.1, Particle.ENCHANTMENT_TABLE);
+                        ParticlesHelper.playLine(player, a, a.clone().add(0, 0.1, 0), 0.1, Particle.ENCHANTMENT_TABLE);
                     }
                 } else if(section.getThroneB() != null) {
                     Location b = section.getThroneB().toLocation(player.getWorld());
-                    ParticlesPlayer.playLine(player, b, b.clone().add(0, 0.1, 0), 0.1, Particle.ENCHANTMENT_TABLE);
+                    ParticlesHelper.playLine(player, b, b.clone().add(0, 0.1, 0), 0.1, Particle.ENCHANTMENT_TABLE);
                 }
 
                 // spawns
                 for(Vector v : section.getSpawns()) {
                     Location l = v.toLocation(player.getWorld());
-                    ParticlesPlayer.playCircleXZ(player, l, 1, Math.toRadians(6), Particle.DRAGON_BREATH);
+                    ParticlesHelper.playCircleXZ(player, l, 1, Math.toRadians(6), Particle.DRAGON_BREATH);
                 }
 
                 // Generators
                 for(Vector v : section.getGenerators()) {
                     Location l = v.toLocation(player.getWorld()).add(0, 0.1, 0);
-                    ParticlesPlayer.playCircleXZ(player, l, 1, Math.toRadians(6), Particle.TOTEM);
+                    ParticlesHelper.playCircleXZ(player, l, 1, Math.toRadians(6), Particle.TOTEM);
                 }
 
                 //lobby
                 if(section.getLobby() != null) {
                     Location l = section.getLobby().toLocation(player.getWorld());
-                    ParticlesPlayer.playCircleXZ(player, l, 2, Math.toRadians(12), Particle.ELECTRIC_SPARK);
+                    ParticlesHelper.playCircleXZ(player, l, 2, Math.toRadians(12), Particle.ELECTRIC_SPARK);
                 }
             },1);
             showing.put(uuid, task);

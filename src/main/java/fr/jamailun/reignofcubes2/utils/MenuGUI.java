@@ -3,6 +3,8 @@ package fr.jamailun.reignofcubes2.utils;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.configuration.kits.KitsManager;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
+import fr.jamailun.reignofcubes2.api.utils.ComponentApiHelper;
+import fr.jamailun.reignofcubes2.api.utils.ItemBuilder;
 import fr.jamailun.reignofcubes2.messages.Messages;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;

@@ -5,7 +5,7 @@ import fr.jamailun.reignofcubes2.api.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.api.players.ScoreRemoveReason;
 import fr.jamailun.reignofcubes2.music.SoundsLibrary;
-import fr.jamailun.reignofcubes2.utils.ItemBuilder;
+import fr.jamailun.reignofcubes2.api.utils.ItemBuilder;
 import fr.jamailun.reignofcubes2.utils.MenuGUI;
 
 import java.util.Comparator;

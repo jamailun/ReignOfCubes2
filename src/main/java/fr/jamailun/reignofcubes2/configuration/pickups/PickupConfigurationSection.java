@@ -3,7 +3,7 @@ package fr.jamailun.reignofcubes2.configuration.pickups;
 import fr.jamailun.reignofcubes2.api.configuration.BadConfigurationException;
 import fr.jamailun.reignofcubes2.api.configuration.sections.DeserializeConfiguration;
 import fr.jamailun.reignofcubes2.api.configuration.sections.RocConfigurationSection;
-import fr.jamailun.reignofcubes2.utils.RandomBag;
+import fr.jamailun.reignofcubes2.api.utils.RandomBag;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 

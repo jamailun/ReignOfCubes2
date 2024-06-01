@@ -5,7 +5,7 @@ import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.api.gameplay.Ceremony;
 import fr.jamailun.reignofcubes2.api.gameplay.Throne;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
-import fr.jamailun.reignofcubes2.utils.MinMax;
+import fr.jamailun.reignofcubes2.api.utils.MinMax;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
