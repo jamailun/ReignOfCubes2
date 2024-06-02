@@ -1,6 +1,5 @@
-package fr.jamailun.reignofcubes2.utils;
+package fr.jamailun.reignofcubes2.api.utils;
 
-import fr.jamailun.reignofcubes2.api.utils.ComponentApiHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

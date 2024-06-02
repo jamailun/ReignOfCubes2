@@ -4,11 +4,14 @@ import fr.jamailun.reignofcubes2.api.GameManager;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.RocService;
 import fr.jamailun.reignofcubes2.api.configuration.kits.KitsManager;
+import fr.jamailun.reignofcubes2.api.configuration.sections.RocConfigurationSectionsRegistry;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.commands.*;
 import fr.jamailun.reignofcubes2.configuration.KitsConfigurationManager;
-import fr.jamailun.reignofcubes2.configuration.GameConfiguration;
 import fr.jamailun.reignofcubes2.configuration.kits.RocKitItem;
+import fr.jamailun.reignofcubes2.configuration.sections.GameRulesSection;
+import fr.jamailun.reignofcubes2.configuration.sections.TagsConfigurationSection;
+import fr.jamailun.reignofcubes2.configuration.sections.WorldSection;
 import fr.jamailun.reignofcubes2.listeners.*;
 import fr.jamailun.reignofcubes2.music.MusicManagerImpl;
 import fr.jamailun.reignofcubes2.placeholder.RocPlaceholderExpansion;
@@ -42,9 +45,13 @@ public final class MainROC2 extends JavaPlugin implements RocService {
     private KitsConfigurationManager kitsConfiguration;
     private NamespacedKey marker;
 
-    // Register serializable
     static {
+        // Register serializable
         ConfigurationSerialization.registerClass(RocKitItem.class, "KitItem");
+        // Register configuration sections
+        RocConfigurationSectionsRegistry.registerSection(GameRulesSection.class);
+        RocConfigurationSectionsRegistry.registerSection(WorldSection.class);
+        RocConfigurationSectionsRegistry.registerSection(TagsConfigurationSection.class);
     }
 
     @Override

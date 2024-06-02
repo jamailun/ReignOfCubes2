@@ -2,7 +2,7 @@ package fr.jamailun.reignofcubes2.api.configuration;
 
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.configuration.sections.RocConfigurationSection;
-import fr.jamailun.reignofcubes2.api.configuration.sections.SectionsConfigurationSectionRegistry;
+import fr.jamailun.reignofcubes2.api.configuration.sections.RocConfigurationSectionsRegistry;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -54,7 +54,7 @@ public abstract class RocConfiguration {
 
     protected void reloadSections() {
         sections.clear();
-        for(RocConfigurationSection section : SectionsConfigurationSectionRegistry.generateSections(config)) {
+        for(RocConfigurationSection section : RocConfigurationSectionsRegistry.generateSections(config)) {
             sections.put(section.getClass(), section);
         }
     }
