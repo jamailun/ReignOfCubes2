@@ -3,7 +3,6 @@ package fr.jamailun.reignofcubes2.gui;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
-import fr.jamailun.reignofcubes2.api.players.ScoreRemoveReason;
 import fr.jamailun.reignofcubes2.music.SoundsLibrary;
 import fr.jamailun.reignofcubes2.api.utils.ItemBuilder;
 import fr.jamailun.reignofcubes2.utils.MenuGUI;
@@ -47,10 +46,7 @@ public class ShopGUI extends MenuGUI {
         }
 
         // Buy it
-        getPlayer().playSound(SoundsLibrary.KIT_BOUGHT);
-        getPlayer().removeScore(cost, ScoreRemoveReason.BUY_KIT);
-        kit.equip(getPlayer());
-        getPlayer().sendMessage("score.messages.kit-bought");
+        getPlayer().buyKit(kit);
         getPlayer().getPlayer().closeInventory();
         ReignOfCubes2.gameManager().updateRankings(getPlayer());
     }

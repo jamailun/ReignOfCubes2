@@ -1,5 +1,6 @@
 package fr.jamailun.reignofcubes2.api.players;
 
+import fr.jamailun.reignofcubes2.api.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.api.entities.RocDamageable;
 import fr.jamailun.reignofcubes2.api.entities.RocEntity;
 import fr.jamailun.reignofcubes2.api.entities.RocMessager;
@@ -9,6 +10,10 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * A player in the ROC environment.
+ * @see fr.jamailun.reignofcubes2.api.ReignOfCubes2#findPlayer(Player) 
+ */
 public interface RocPlayer extends RocTagHolder, RocDamageable, RocEntity, RocMessager {
 
     @NotNull Player getPlayer();
@@ -19,9 +24,13 @@ public interface RocPlayer extends RocTagHolder, RocDamageable, RocEntity, RocMe
 
     int getLastMoneySpent();
 
-    void setLastMoneySpent(int value);
+    /**
+     * Make the player buy and equip a kit.
+     * @param kit the bought kit.
+     */
+    void buyKit(@NotNull Kit kit);
 
-    int getGold();
+    float getGold();
 
     boolean hasGold(float value);
 

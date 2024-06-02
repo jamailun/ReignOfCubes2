@@ -11,6 +11,7 @@ import fr.jamailun.reignofcubes2.api.tags.RocTag;
 import fr.jamailun.reignofcubes2.api.events.player.ScoreGainedEvent;
 import fr.jamailun.reignofcubes2.configuration.sections.WorldSection;
 import fr.jamailun.reignofcubes2.messages.Messages;
+import fr.jamailun.reignofcubes2.music.SoundsLibrary;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -39,7 +40,7 @@ public class RocPlayerImpl implements RocPlayer {
     @Getter private float gold = 0;
     @Getter @Setter private boolean isKing = false;
     @Getter @Setter private String language = "fr";
-    @Getter @Setter private int lastMoneySpent = 0;
+    @Getter private int lastMoneySpent = 0;
     private RocPlayer lastDamager;
     private long lastDamageTook = 0;
 
@@ -76,6 +77,15 @@ public class RocPlayerImpl implements RocPlayer {
         score = Math.max(0, score - delta);
         if(reason.hasMessage())
             sendMessage("score.base.loose", String.valueOf(delta), reason.toString(language));
+    }
+
+    @Override
+    public void buyKit(@NotNull Kit kit) {
+        kit.equip(this);
+        // Effects
+        playSound(SoundsLibrary.KIT_BOUGHT);
+        removeScore(kit.getCost(), ScoreRemoveReason.BUY_KIT);
+        sendMessage("score.messages.kit-bought");
     }
 
     @Override

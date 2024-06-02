@@ -2,19 +2,13 @@ package fr.jamailun.reignofcubes2.api.players;
 
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 
-public enum ScoreRemoveReason {
+public record ScoreRemoveReason(String entry) {
 
-    BUY_KIT("score.reason.buy-kit"),
-    DEATH_PENALTY("score.reason.death-penalty"),
-    KILL_STEAL("score.reason.kill-steal"),
-    ADMINISTRATOR("score.reason.administrator"),
-
-    TAG_STEALER("score.reason.tags.steal");
-
-    private final String entry;
-    ScoreRemoveReason(String entry) {
-        this.entry = entry;
-    }
+    public static final ScoreRemoveReason BUY_KIT = new ScoreRemoveReason("score.reason.buy-kit");
+    public static final ScoreRemoveReason DEATH_PENALTY = new ScoreRemoveReason("score.reason.death-penalty");
+    public static final ScoreRemoveReason KILL_STEAL = new ScoreRemoveReason("score.reason.kill-steal");
+    public static final ScoreRemoveReason ADMINISTRATOR = new ScoreRemoveReason("score.reason.administrator");
+    public static final ScoreRemoveReason TAG_STEALER = new ScoreRemoveReason("score.reason.tags.steal");
 
     public String toString(String language) {
         if(entry == null) return null;
