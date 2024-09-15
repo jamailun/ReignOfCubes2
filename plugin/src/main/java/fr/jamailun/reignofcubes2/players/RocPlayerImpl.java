@@ -201,9 +201,14 @@ public class RocPlayerImpl implements RocPlayer {
         if(obj == null) return false;
         if(obj == this) return true;
         if(obj instanceof RocPlayerImpl rp) {
-            return rp.getUUID().equals(getUUID());
+            return Objects.equals(rp.getUUID(), getUUID());
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return getUUID().hashCode();
     }
 
     public void playSound(@NotNull Sound sound, float volume, float pitch) {

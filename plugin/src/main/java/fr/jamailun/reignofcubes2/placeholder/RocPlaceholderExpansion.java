@@ -4,7 +4,7 @@ import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.api.GameManager;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.configuration.RocConfiguration;
-import fr.jamailun.reignofcubes2.api.gameplay.Ceremony;
+import fr.jamailun.reignofcubes2.api.gameplay.CaptureProcess;
 import fr.jamailun.reignofcubes2.api.gameplay.GameCountdown;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.messages.Messages;
@@ -78,17 +78,17 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
             // Ceremony
             case "is_ceremony" -> bool(game.isStatePlaying() && game.getCeremony() != null);
             case "ceremony_text" -> {
-                Ceremony ceremony = game.getCeremony();
+                CaptureProcess ceremony = game.getCeremony();
                 if (ceremony == null) yield "§cNo ceremony.";
                 yield Messages.format(lan, "tab.bars.ceremony", ceremony.getPlayer().getName());
             }
             case "ceremony_ratio" -> {
-                Ceremony ceremony = game.getCeremony();
+                CaptureProcess ceremony = game.getCeremony();
                 if (ceremony == null) yield "0";
                 yield String.valueOf(ceremony.getRatio() * 100);
             }
             case "ceremony_color" -> {
-                Ceremony ceremony = game.getCeremony();
+                CaptureProcess ceremony = game.getCeremony();
                 yield ceremony == null ? "RED" : ceremony.getColor();
             }
             default -> null;

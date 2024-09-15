@@ -4,9 +4,9 @@ import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * A ceremony is a {@link Throne} capture by a {@link RocPlayer}.
+ * A capture process for a {@link CapturableRegion}, with a {@link RocPlayer}.
  */
-public interface Ceremony {
+public interface CaptureProcess {
 
     /**
      * Force the ceremony to stop.

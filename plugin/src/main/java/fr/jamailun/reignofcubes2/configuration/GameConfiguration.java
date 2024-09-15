@@ -10,7 +10,7 @@ import fr.jamailun.reignofcubes2.configuration.pickups.PickupConfigurationSectio
 import fr.jamailun.reignofcubes2.configuration.sections.GameRulesSection;
 import fr.jamailun.reignofcubes2.configuration.sections.TagsConfigurationSection;
 import fr.jamailun.reignofcubes2.configuration.sections.WorldSection;
-import fr.jamailun.reignofcubes2.gameplay.ThroneImpl;
+import fr.jamailun.reignofcubes2.gameplay.throne.ThroneImpl;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;

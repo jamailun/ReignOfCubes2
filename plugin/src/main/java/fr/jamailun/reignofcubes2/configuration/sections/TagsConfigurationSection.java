@@ -2,6 +2,10 @@ package fr.jamailun.reignofcubes2.configuration.sections;
 
 import fr.jamailun.reignofcubes2.api.configuration.sections.DeserializeConfiguration;
 import fr.jamailun.reignofcubes2.api.configuration.sections.RocConfigurationSection;
+import fr.jamailun.reignofcubes2.api.tags.RocTag;
+import fr.jamailun.reignofcubes2.api.tags.TagsRegistry;
+import fr.jamailun.reignofcubes2.configuration.TagName;
+import fr.jamailun.reignofcubes2.configuration.TagProperty;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.configuration.ConfigurationSection;
@@ -9,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.lang.reflect.Field;
 
 /**
  * Configuration for native tags.
@@ -17,44 +22,44 @@ import javax.annotation.Nullable;
 @Setter
 public class TagsConfigurationSection extends RocConfigurationSection {
 
-    // Regicide
-    private double regicideAttackFlatKing;
-    private double regicideAttackMultiplicativeKing;
-    private double regicideAttackFlatOthers;
-    private double regicideAttackMultiplicativeOthers;
-    private double regicideDefendFlatKing;
-    private double regicideDefendMultiplicativeKing;
-    private double regicideDefendFlatOthers;
-    private double regicideDefendMultiplicativeOthers;
-
-    // Stealer
-    private int stealerPointsPerHit;
+    private static @NotNull String configurationNameOfTag(@NotNull Class<? extends RocTag> tagClass) {
+        TagName tagName = tagClass.getAnnotation(TagName.class);
+        return (tagName == null) ? tagClass.getSimpleName().toLowerCase() : tagName.value();
+    }
 
     @DeserializeConfiguration
     public static @Nonnull TagsConfigurationSection load(@Nullable ConfigurationSection config) {
         if(config == null)
             return defaultConfiguration();
 
-        TagsConfigurationSection rules = new TagsConfigurationSection();
-        // Regicide
-        ConfigurationSection regicide = config.getConfigurationSection("regicide");
-        if(regicide != null) {
-            rules.regicideAttackFlatKing = regicide.getDouble("attack-king-flat", 0);
-            rules.regicideAttackMultiplicativeKing = regicide.getDouble("attack-king-mult", 1);
-            rules.regicideAttackFlatOthers = regicide.getDouble("attack-others-flat", 0);
-            rules.regicideAttackMultiplicativeOthers = regicide.getDouble("attack-others-mult", 1);
-            rules.regicideDefendFlatKing = regicide.getDouble("defend-king-flat", 0);
-            rules.regicideDefendMultiplicativeKing = regicide.getDouble("defend-king-mult", 1);
-            rules.regicideDefendFlatOthers = regicide.getDouble("defend-others-flat", 0);
-            rules.regicideDefendMultiplicativeOthers = regicide.getDouble("defend-others-mult", 1);
-        }
-        // Stealer
-        ConfigurationSection stealer = config.getConfigurationSection("stealer");
-        if(stealer != null) {
-            rules.stealerPointsPerHit = stealer.getInt("points-per-hit", 0);
+        for(RocTag tag : TagsRegistry.list()) {
+            String name = configurationNameOfTag(tag.getClass());
+            ConfigurationSection section = config.getConfigurationSection(name);
+            if(section == null) section = config.createSection(name);
+
+            for(Field field : tag.getClass().getDeclaredFields()) {
+                TagProperty annotation = field.getAnnotation(TagProperty.class);
+                if(annotation == null) continue;
+
+                Object value;
+                if(int.class.equals(field.getType()) || Integer.class.equals(field.getType())) {
+                    value = section.getInt(annotation.name(), (int) annotation.defaultValue());
+                } else if(double.class.equals(field.getType()) || Double.class.equals(field.getType())) {
+                    value = section.getDouble(annotation.name(), annotation.defaultValue());
+                } else {
+                    throw new RuntimeException("Bad plugin value. Unexpected type '" + field.getType() + "' in tag " + name + ".");
+                }
+
+                try {
+                    field.setAccessible(true);
+                    field.set(tag, value);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
 
-        return rules;
+        return new TagsConfigurationSection();
     }
 
     @Override

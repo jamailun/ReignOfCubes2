@@ -1,17 +1,19 @@
-package fr.jamailun.reignofcubes2.gameplay;
+package fr.jamailun.reignofcubes2.gameplay.throne;
 
 import fr.jamailun.reignofcubes2.GameManagerImpl;
 import fr.jamailun.reignofcubes2.MainROC2;
-import fr.jamailun.reignofcubes2.api.gameplay.Ceremony;
+import fr.jamailun.reignofcubes2.api.gameplay.CaptureProcess;
 import fr.jamailun.reignofcubes2.api.gameplay.Throne;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.api.utils.MinMax;
 import lombok.Getter;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -23,24 +25,32 @@ public class ThroneImpl implements Throne {
 
     private final GameManagerImpl game;
     private final Vector vectorA, vectorB;
-    private final Set<UUID> playersInside = new HashSet<>();
+    @Getter private final Location center;
+    private final Set<RocPlayer> playersInside = new HashSet<>();
 
     // current
-    @Getter @Nullable private Ceremony ceremony;
+    private RocPlayer king;
+    @Nullable private ThroneCapture capture;
 
-    public ThroneImpl(GameManagerImpl game, Vector vectorA, Vector vectorB) {
-        this.game = game;
-        this.vectorA = vectorA;
-        this.vectorB = vectorB;
+    public ThroneImpl(@NotNull World world, @NotNull Vector vectorA, @NotNull Vector vectorB) {
+        this.game = GameManagerImpl.instance();
+        this.vectorA = Vector.getMinimum(vectorA, vectorB);
+        this.vectorB = Vector.getMaximum(vectorA, vectorB);
+        this.center = this.vectorB.clone().subtract(this.vectorA).toLocation(world);
+    }
+
+    @Override
+    public @NotNull Set<RocPlayer> playersInside() {
+        return Collections.unmodifiableSet(playersInside);
     }
 
     @Override
     public boolean isAlreadyInside(@NotNull RocPlayer player) {
-        return playersInside.contains(player.getUUID());
+        return playersInside.contains(player);
     }
 
     @Override
-    public boolean isInside(Location loc) {
+    public boolean isInside(@NotNull Location loc) {
         MinMax x = new MinMax(vectorA.getX(), vectorB.getX());
         MinMax y = new MinMax(vectorA.getY(), vectorB.getY());
         MinMax z = new MinMax(vectorA.getZ(), vectorB.getZ());
@@ -52,7 +62,7 @@ public class ThroneImpl implements Throne {
 
     @Override
     public void enters(@NotNull RocPlayer player) {
-        playersInside.add(player.getUUID());
+        playersInside.add(player);
 
         boolean canStart = true;
         if(game.hasKing()) {
@@ -67,45 +77,50 @@ public class ThroneImpl implements Throne {
             player.sendMessage("throne.enters");
         }
 
-        if(playersInside.size() == 1 && canStart && !hasCeremony()) {
-            startCeremony(player);
+        if(playersInside.size() == 1 && canStart && !hasCaptureOngoing()) {
+            startCapture(player);
         }
     }
 
     @Override
     public void leaves(@NotNull RocPlayer player) {
-        playersInside.remove(player.getUUID());
+        playersInside.remove(player);
 
         if(!player.isKing())
             player.sendMessage("throne.leaves");
 
-        if(hasCeremony() && ceremony.isPlayer(player)) {
-            stopCeremony();
+        if(capture != null && capture.isPlayer(player)) {
+            stopCapture();
         }
     }
 
-    @Override
-    public boolean hasCeremony() {
-        return ceremony != null;
+    private void startCapture(@NotNull RocPlayer player) {
+        assert capture == null : "A ceremony already exists.";
+        capture = new ThroneCapture(player);
     }
 
-    private void startCeremony(RocPlayer player) {
-        assert ceremony == null : "A ceremony already exists.";
-        ceremony = new CeremonyImpl(game, player);
-    }
-
-    private void stopCeremony() {
-        assert ceremony != null : "No ceremony to stop.";
-        ceremony.stop();
-        ceremony = null;
+    private void stopCapture() {
+        assert capture != null : "No ceremony to stop.";
+        capture.stop();
+        capture = null;
     }
 
     @Override
-    public void resetCeremony() {
+    public void resetCapture() {
         playersInside.clear();
-        if(ceremony != null) {
-            stopCeremony();
+        if(capture != null) {
+            stopCapture();
         }
+    }
+
+    @Override
+    public @Nullable RocPlayer getOwner() {
+        return king;
+    }
+
+    @Override
+    public @Nullable CaptureProcess getCaptureProcess() {
+        return capture;
     }
 
     // COOLDOWNS
@@ -130,5 +145,4 @@ public class ThroneImpl implements Throne {
         }, game.getActiveConfiguration().getRules().getThroneCooldown());
         return true;
     }
-
 }

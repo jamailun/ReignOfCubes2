@@ -69,6 +69,10 @@ public class GameManagerImpl implements GameManager {
         loadConfiguration(configsManager.getDefault());
     }
 
+    public static @NotNull GameManagerImpl instance() {
+        return null;//FIXME
+    }
+
     public boolean loadConfiguration(@Nullable GameConfiguration configuration) {
         if(isStatePlaying()) {
             ReignOfCubes2.logError("Cannot change configuration while playing !");
@@ -466,7 +470,7 @@ public class GameManagerImpl implements GameManager {
         return players.size();
     }
 
-    public @Nullable Ceremony getCeremony() {
+    public @Nullable CaptureProcess getCeremony() {
         if(throne == null || ! throne.hasCeremony())
             return null;
         return throne.getCeremony();

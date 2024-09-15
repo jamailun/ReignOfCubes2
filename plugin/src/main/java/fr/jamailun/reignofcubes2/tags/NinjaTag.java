@@ -4,6 +4,7 @@ import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.events.player.RocPlayerAttacksPlayerEvent;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
+import fr.jamailun.reignofcubes2.configuration.TagName;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,6 +20,7 @@ import java.util.*;
  * <br/>
  * A ninja can sneak to become COMPLETELY INVISIBLE.
  */
+@TagName("ninja")
 public class NinjaTag extends AbstractRocTag {
 
     public NinjaTag() {

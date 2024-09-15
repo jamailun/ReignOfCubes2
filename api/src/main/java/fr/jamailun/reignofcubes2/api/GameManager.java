@@ -2,7 +2,7 @@ package fr.jamailun.reignofcubes2.api;
 
 import fr.jamailun.reignofcubes2.api.configuration.RocConfiguration;
 import fr.jamailun.reignofcubes2.api.configuration.RocConfigurationsManager;
-import fr.jamailun.reignofcubes2.api.gameplay.Ceremony;
+import fr.jamailun.reignofcubes2.api.gameplay.CaptureProcess;
 import fr.jamailun.reignofcubes2.api.gameplay.GameCountdown;
 import fr.jamailun.reignofcubes2.api.music.MusicManager;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
@@ -40,7 +40,7 @@ public interface GameManager {
 
     int getOnlinePlayersCount();
 
-    Ceremony getCeremony();
+    CaptureProcess getCeremony();
 
     GameCountdown getCountdown();
 

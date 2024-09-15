@@ -6,8 +6,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Registry for tags.
@@ -36,6 +35,14 @@ public final class TagsRegistry {
     public static @Nullable RocTag find(@Nullable String id) {
         if(id == null) return null;
         return tags.get(id);
+    }
+
+    /**
+     * List all registered tags.
+     * @return a nn-null and non-mutable list of non-null tags.
+     */
+    public static @NotNull List<RocTag> list() {
+        return List.copyOf(tags.values());
     }
 
 }

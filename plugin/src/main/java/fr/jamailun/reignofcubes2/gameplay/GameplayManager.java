@@ -2,6 +2,7 @@ package fr.jamailun.reignofcubes2.gameplay;
 
 import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.api.gameplay.Throne;
+import fr.jamailun.reignofcubes2.gameplay.mine.MineImpl;
 import lombok.Getter;
 import org.bukkit.scheduler.BukkitRunnable;
 

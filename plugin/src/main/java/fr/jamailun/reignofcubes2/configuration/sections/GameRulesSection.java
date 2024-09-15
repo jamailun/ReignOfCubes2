@@ -38,6 +38,8 @@ public class GameRulesSection extends RocConfigurationSection {
     private double scoreKillSteal = -1;
     private int scoreDeathPenalty = -1;
 
+    private double mineCaptureDuration = -1;
+
     @DeserializeConfiguration
     public static @Nonnull GameRulesSection load(@Nullable ConfigurationSection config) {
         if(config == null)

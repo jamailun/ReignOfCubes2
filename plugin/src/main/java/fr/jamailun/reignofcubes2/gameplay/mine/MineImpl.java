@@ -1,6 +1,7 @@
-package fr.jamailun.reignofcubes2.gameplay;
+package fr.jamailun.reignofcubes2.gameplay.mine;
 
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.api.gameplay.CaptureProcess;
 import fr.jamailun.reignofcubes2.api.gameplay.Mine;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.api.utils.ParticlesHelper;
@@ -8,6 +9,7 @@ import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -65,8 +67,37 @@ public class MineImpl implements Mine {
     }
 
     @Override
-    public Set<RocPlayer> getPlayersInside() {
+    public @Nullable RocPlayer getOwner() {
+        return null;
+    }
+
+    @Override
+    public @Nullable CaptureProcess getCaptureProcess() {
+        return null;
+    }
+
+    @Override
+    public @NotNull Location getCenter() {
+        return null;
+    }
+
+    @Override
+    public @NotNull Set<RocPlayer> playersInside() {
         return Collections.unmodifiableSet(playersInside);
     }
 
+    @Override
+    public void enters(@NotNull RocPlayer player) {
+
+    }
+
+    @Override
+    public void leaves(@NotNull RocPlayer player) {
+
+    }
+
+    @Override
+    public boolean isInside(@NotNull Location location) {
+        return false;
+    }
 }
