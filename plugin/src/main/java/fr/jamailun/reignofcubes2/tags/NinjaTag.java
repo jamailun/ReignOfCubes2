@@ -2,9 +2,10 @@ package fr.jamailun.reignofcubes2.tags;
 
 import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.api.configuration.PersistedProperty;
 import fr.jamailun.reignofcubes2.api.events.player.RocPlayerAttacksPlayerEvent;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
-import fr.jamailun.reignofcubes2.configuration.TagName;
+import fr.jamailun.reignofcubes2.api.tags.TagName;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,12 +24,8 @@ import java.util.*;
 @TagName("ninja")
 public class NinjaTag extends AbstractRocTag {
 
-    public NinjaTag() {
-        super("ninja");
-    }
-
-    //TODO configurable
-    private static final double COOLDOWN = 5000;
+    @PersistedProperty(section = "all", name = "cooldown")
+    double COOLDOWN = 5000;
 
     private final Set<UUID> hiddenPlayers = new HashSet<>();
     private final Map<UUID, Long> cooldowns = new HashMap<>();
@@ -67,7 +64,7 @@ public class NinjaTag extends AbstractRocTag {
                 p.hidePlayer(MainROC2.plugin(), player);
             }
         });
-        player.getWorld().spawnParticle(Particle.SMOKE_LARGE, player.getLocation().clone().add(0, 0.6, 0), 2);
+        player.getWorld().spawnParticle(Particle.LARGE_SMOKE, player.getLocation().clone().add(0, 0.6, 0), 2);
     }
 
     public void show(RocPlayer rocPlayer) {
@@ -85,12 +82,12 @@ public class NinjaTag extends AbstractRocTag {
             }
         });
 
-        player.getWorld().spawnParticle(Particle.SMOKE_LARGE, player.getLocation().clone().add(0, 0.6, 0), 2);
+        player.getWorld().spawnParticle(Particle.LARGE_SMOKE, player.getLocation().clone().add(0, 0.6, 0), 2);
     }
 
 
     @EventHandler
-    public void attackEvent(RocPlayerAttacksPlayerEvent event) {
+    void attackEvent(@NotNull RocPlayerAttacksPlayerEvent event) {
         if(event.getAttacker().isTag(this)) {
             show(event.getAttacker());
             event.getBukkitEvent().setDamage(event.getBukkitEvent().getDamage() / 2);
@@ -103,7 +100,7 @@ public class NinjaTag extends AbstractRocTag {
 
 
     @EventHandler
-    public void playerSneak(PlayerToggleSneakEvent event) {
+    void playerSneak(@NotNull PlayerToggleSneakEvent event) {
         RocPlayer player = ReignOfCubes2.findPlayer(event.getPlayer());
         if(player != null && player.isTag(this)) {
             if(event.getPlayer().isSneaking()) {
@@ -114,4 +111,8 @@ public class NinjaTag extends AbstractRocTag {
         }
     }
 
+    @Override
+    public boolean isPlayable() {
+        return COOLDOWN > 0;
+    }
 }

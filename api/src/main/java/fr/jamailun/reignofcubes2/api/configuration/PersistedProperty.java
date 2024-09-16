@@ -1,4 +1,4 @@
-package fr.jamailun.reignofcubes2.configuration;
+package fr.jamailun.reignofcubes2.api.configuration;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -6,9 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface TagName {
+@Target(ElementType.FIELD)
+public @interface PersistedProperty {
+    String section();
 
-    String value();
+    String name();
 
+    Class<?> type() default Object.class;
 }

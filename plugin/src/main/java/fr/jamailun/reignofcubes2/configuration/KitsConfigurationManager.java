@@ -15,7 +15,7 @@ import java.util.*;
 /**
  * Manager of kits configuration.
  */
-public class KitsConfigurationManager implements KitsManager {
+public final class KitsConfigurationManager implements KitsManager {
 
     private final File folder;
     private final Map<String, Kit> kits = new HashMap<>();

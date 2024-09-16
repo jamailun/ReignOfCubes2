@@ -17,6 +17,7 @@ public class GameplayManager {
     private BukkitRunnable minesTask;
 
     public void gameStart() {
+        mines.forEach(MineImpl::reset);
         minesTask = new BukkitRunnable() {
             @Override
             public void run() {

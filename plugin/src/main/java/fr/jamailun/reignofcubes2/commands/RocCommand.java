@@ -104,7 +104,7 @@ public class RocCommand extends AbstractCommand {
                 GameConfiguration config = configs().get(name);
                 if(config == null)
                     return error(sender, "Unknown configuration: " + name);
-                if(!config.isValid())
+                if(!config.isPlayable())
                     return error(sender, "Configuration " + name + " is not valid.");
                 info(sender, "Enabling configuration " + config + "...");
                 if(game().loadConfiguration(config)) {
@@ -122,7 +122,7 @@ public class RocCommand extends AbstractCommand {
                 RocConfiguration config = configs().get(name);
                 if(config == null)
                     return error(sender, "Unknown configuration: " + name);
-                if(!config.isValid())
+                if(!config.isPlayable())
                     return error(sender, "Configuration " + name + " is not valid.");
                 configs().setDefault(name);
                 success(sender, "Set configuration " + name + " as default.");
@@ -137,7 +137,7 @@ public class RocCommand extends AbstractCommand {
                 info(sender, "§7Configurations list (" + configs().count() + "):");
                 configs().list().forEach(n ->
                         info(sender, "§6- " + n.getName() + "§7 by " + n.getAuthor() + " on " + n.getWorldName()
-                                + " : " + (n.isValid() ? "§a[VALID]" : "§c[INVALID]")
+                                + " : " + (n.isPlayable() ? "§a[VALID]" : "§c[INVALID]")
                 ));
                 RocConfiguration defaultConfig = configs().getDefault();
                 if(defaultConfig != null) {
@@ -498,7 +498,7 @@ public class RocCommand extends AbstractCommand {
                 return error(sender, "Cannot interrupt game while playing. Stop-it first.");
             }
             RocConfiguration config = game().getActiveConfiguration();
-            if(config == null || ! config.isValid())
+            if(config == null || ! config.isPlayable())
                 return error(sender, "Invalid configuration. Either on-set or invalid.");
             Location lobby = game().getActiveConfiguration().getLobby();
             game().players()

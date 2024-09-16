@@ -6,6 +6,7 @@ import fr.jamailun.reignofcubes2.api.entities.RocEntity;
 import fr.jamailun.reignofcubes2.api.entities.RocMessager;
 import fr.jamailun.reignofcubes2.api.sounds.SoundEffect;
 import fr.jamailun.reignofcubes2.api.tags.RocTagHolder;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -49,5 +50,7 @@ public interface RocPlayer extends RocTagHolder, RocDamageable, RocEntity, RocMe
     void playSound(@NotNull SoundEffect effect);
 
     void playSound(@NotNull Sound sound, float volume, float pitch);
+
+    @NotNull Location getLocation();
 
 }

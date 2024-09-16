@@ -199,4 +199,8 @@ public final class MainROC2 extends JavaPlugin implements RocService {
         return INSTANCE;
     }
 
+    public static GameManagerImpl game() {
+        return INSTANCE.gameManager;
+    }
+
 }

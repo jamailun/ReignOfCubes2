@@ -2,6 +2,8 @@ package fr.jamailun.reignofcubes2.gameplay.throne;
 
 import fr.jamailun.reignofcubes2.GameManagerImpl;
 import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.GameManager;
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.gameplay.CaptureProcess;
 import fr.jamailun.reignofcubes2.api.gameplay.Throne;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
@@ -23,7 +25,7 @@ import java.util.UUID;
  */
 public class ThroneImpl implements Throne {
 
-    private final GameManagerImpl game;
+    private final GameManager game;
     private final Vector vectorA, vectorB;
     @Getter private final Location center;
     private final Set<RocPlayer> playersInside = new HashSet<>();
@@ -33,7 +35,7 @@ public class ThroneImpl implements Throne {
     @Nullable private ThroneCapture capture;
 
     public ThroneImpl(@NotNull World world, @NotNull Vector vectorA, @NotNull Vector vectorB) {
-        this.game = GameManagerImpl.instance();
+        this.game = ReignOfCubes2.game();
         this.vectorA = Vector.getMinimum(vectorA, vectorB);
         this.vectorB = Vector.getMaximum(vectorA, vectorB);
         this.center = this.vectorB.clone().subtract(this.vectorA).toLocation(world);

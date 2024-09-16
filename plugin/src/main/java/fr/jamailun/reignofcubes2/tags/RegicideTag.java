@@ -1,10 +1,10 @@
 package fr.jamailun.reignofcubes2.tags;
 
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.api.configuration.PersistedProperty;
 import fr.jamailun.reignofcubes2.api.events.player.RocPlayerAttacksPlayerEvent;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
-import fr.jamailun.reignofcubes2.configuration.TagName;
-import fr.jamailun.reignofcubes2.configuration.TagProperty;
+import fr.jamailun.reignofcubes2.api.tags.TagName;
 import org.bukkit.event.EventHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,32 +14,29 @@ import org.jetbrains.annotations.NotNull;
 @TagName("regicide")
 public class RegicideTag extends AbstractRocTag {
 
-    @TagProperty(name = "attack.king.flat", defaultValue = 0)
-    double attackKingFlat;
+    @PersistedProperty(section = "attack", name = "king.flat")
+    double attackKingFlat = 0;
+    @PersistedProperty(section = "attack", name = "king.ratio")
+    double attackKingRatio = 1.2;
 
-    @TagProperty(name = "attack.king.ratio", defaultValue = 1.2)
-    double attackKingRatio;
+    @PersistedProperty(section = "attack", name = "other.flat")
+    double attackOtherFlat = 0;
+    @PersistedProperty(section = "attack", name = "other.ratio")
+    double attackOtherRatio = 0.8;
 
-    @TagProperty(name = "attack.other.flat", defaultValue = 0)
-    double attackOtherFlat;
+    @PersistedProperty(section = "defend", name = "king.flat")
+    double defendKingFlat = 0;
+    @PersistedProperty(section = "defend", name = "king.ratio")
+    double defendKingRatio = 0.85;
 
-    @TagProperty(name = "attack.other.ratio", defaultValue = 0.8)
-    double attackOtherRatio;
+    @PersistedProperty(section = "defend", name = "other.flat")
+    double defendOtherFlat = 0;
+    @PersistedProperty(section = "defend", name = "other.ratio")
+    double defendOtherRatio = 1.15;
 
-    @TagProperty(name = "defend.king.flat", defaultValue = 0)
-    double defendKingFlat;
-
-    @TagProperty(name = "defend.king.ratio", defaultValue = 0.85)
-    double defendKingRatio;
-
-    @TagProperty(name = "defend.other.flat", defaultValue = 0)
-    double defendOtherFlat;
-
-    @TagProperty(name = "defend.other.ratio", defaultValue = 1.15)
-    double defendOtherRatio;
-
-    public RegicideTag() {
-        super("regicide");
+    @Override
+    public boolean isPlayable() {
+        return false;
     }
 
     @Override

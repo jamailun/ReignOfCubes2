@@ -45,7 +45,7 @@ public final class ReignOfCubes2 {
      * Obtain a reference to the GameManager singleton.
      * @return the reference to the game-manager.
      */
-    public static @NotNull GameManager gameManager() {
+    public static @NotNull GameManager game() {
         return service.gameManager();
     }
 

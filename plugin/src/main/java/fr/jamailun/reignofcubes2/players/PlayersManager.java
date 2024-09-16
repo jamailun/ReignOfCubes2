@@ -71,6 +71,10 @@ public class PlayersManager implements Iterable<RocPlayerImpl> {
         }
     }
 
+    public Collection<RocPlayer> list() {
+        return Collections.unmodifiableCollection(players.values());
+    }
+
     @Override
     public @NotNull Iterator<RocPlayerImpl> iterator() {
         return players.values().iterator();
@@ -99,7 +103,7 @@ public class PlayersManager implements Iterable<RocPlayerImpl> {
     }
 
     public void backToLobby() {
-        assert game.getActiveConfiguration().isValid();
+        assert game.getActiveConfiguration().isPlayable();
         Location lobby = game.getActiveConfiguration().getLobby();
 
         // tp ALL players instead

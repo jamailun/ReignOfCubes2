@@ -2,11 +2,15 @@ package fr.jamailun.reignofcubes2.api.configuration;
 
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.configuration.sections.RocConfigurationSection;
-import fr.jamailun.reignofcubes2.api.configuration.sections.RocConfigurationSectionsRegistry;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,18 +22,23 @@ import java.util.Map;
  * <br/>
  * Specific to a world.
  */
-public abstract class RocConfiguration {
+public abstract class RocConfiguration extends PropertiesHolder {
 
     private final File file;
     protected final YamlConfiguration config;
 
-    @Getter private final String name, author, worldName;
-    protected final Map<Class<? extends RocConfigurationSection>, RocConfigurationSection> sections = new HashMap<>();
+    @PersistedProperty(section = "metadata", name = "name")
+    @Getter String name;
+    @PersistedProperty(section = "metadata", name = "author")
+    @Getter String author;
+    @PersistedProperty(section = "metadata", name = "world-name")
+    @Getter String worldName;
+
+    protected final Map<String, PropertiesHolder> rulesHolder = new HashMap<>();
 
     /**
      * Load a WorldConfiguration from a file.
      * @param file the file to load.
-     * @return a deserialized WorldConfiguration.
      * @throws BadConfigurationException if something is invalid.
      */
     public RocConfiguration(@NotNull File file) throws BadConfigurationException {
@@ -38,28 +47,29 @@ public abstract class RocConfiguration {
             throw new BadConfigurationException("File does not exist: " + file);
         config = YamlConfiguration.loadConfiguration(file);
 
-        // Shared
-        name = config.getString("name", "unknown");
-        author = config.getString("author", "unknown");
-        worldName = config.getString("world");
+        // Load sections
+        reloadHolders();
+
+        // Read sections
+        for(Map.Entry<String, PropertiesHolder> holder : rulesHolder.entrySet()) {
+            ConfigurationSection section = config.createSection(holder.getKey());
+            holder.getValue().read(section);
+        }
+
+        // Read metadata
         if(worldName == null) throw new BadConfigurationException("World not specified in file " + file);
         if(Bukkit.getWorld(worldName) == null) throw new BadConfigurationException("World '"+worldName+"' does not exist. File " + file);
-
-        // load sections
-        reloadSections();
 
         // Conclusion
         ReignOfCubes2.logInfo("Loaded configuration " + this);
     }
 
-    protected void reloadSections() {
-        sections.clear();
-        for(RocConfigurationSection section : RocConfigurationSectionsRegistry.generateSections(config)) {
-            sections.put(section.getClass(), section);
-        }
-    }
+    /**
+     * Clear and recreate all parts.
+     */
+    protected abstract void reloadHolders();
 
-    public RocConfiguration(File file, String name, String author, String worldName) {
+    public RocConfiguration(@NotNull File file, @NotNull String name, @NotNull String author, @NotNull String worldName) {
         this.file = file;
         this.config = YamlConfiguration.loadConfiguration(file);
         this.name = name;
@@ -69,14 +79,11 @@ public abstract class RocConfiguration {
 
     public void save() throws IOException {
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
-        // Basics
-        config.set("name", name);
-        config.set("author", author);
-        config.set("world", worldName);
 
-        // Sections
-        for(RocConfigurationSection section : sections.values()) {
-            section.write(config);
+        // Save parts
+        for(Map.Entry<String, PropertiesHolder> holder : rulesHolder.entrySet()) {
+            ConfigurationSection section = config.createSection(holder.getKey());
+            holder.getValue().save(section);
         }
 
         // Save
@@ -99,13 +106,22 @@ public abstract class RocConfiguration {
         return sb.append("§7}").toString();
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends RocConfigurationSection> T getSection(Class<T> clazz) {
-        return (T) sections.get(clazz);
+    @Contract(pure = true)
+    public @Nullable World getWorld() {
+        return Bukkit.getWorld(worldName);
     }
 
-    public boolean isValid() {
-        return sections.values().stream().allMatch(RocConfigurationSection::isValid);
+    @Override
+    public boolean isPlayable() {
+        if(worldName == null || Bukkit.getWorld(worldName) == null)
+            return false;
+        return rulesHolder.values().stream().allMatch(PropertiesHolder::isPlayable);
     }
+
+    public <T extends PropertiesHolder> T holder(@NotNull String name, @NotNull Class<T> holderClass) {
+        return holderClass.cast(rulesHolder.get(name));
+    }
+
+    public abstract ItemStack getShopItem();
 
 }

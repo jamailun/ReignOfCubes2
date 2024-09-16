@@ -17,7 +17,7 @@ import java.util.*;
 /**
  * Configurations manager.
  */
-public class GameConfigurationsManager implements RocConfigurationsManager {
+public final class GameConfigurationsManager implements RocConfigurationsManager {
 
     private final File directory;
     private GameConfiguration defaultConfiguration;
@@ -27,7 +27,6 @@ public class GameConfigurationsManager implements RocConfigurationsManager {
         // Load configurations
         directory = MainROC2.getFile("configurations");
         assert directory.exists() || (directory.mkdirs() && directory.mkdir()) : "Could not generate directories to '"+directory+"'";
-        ReignOfCubes2.logInfo("CONFIG_LIST = " + directory);
 
         File[] files = directory.listFiles();
         if(files == null || files.length == 0) {
@@ -57,7 +56,7 @@ public class GameConfigurationsManager implements RocConfigurationsManager {
             ReignOfCubes2.logError("Unknown default configuration: '" + defaultName + "'.");
             return;
         }
-        if(!configuration.isValid()) {
+        if(!configuration.isPlayable()) {
             ReignOfCubes2.logError("Invalid default configuration: '" + defaultName + "'.");
             return;
         }
@@ -88,7 +87,7 @@ public class GameConfigurationsManager implements RocConfigurationsManager {
 
         // validity
         GameConfiguration config = get(configurationName);
-        if(config == null || ! config.isValid()) {
+        if(config == null || ! config.isPlayable()) {
             ReignOfCubes2.logError("Cannot set "+ configurationName + " has default configuration : it is invalid/null.");
             return;
         }
@@ -151,7 +150,7 @@ public class GameConfigurationsManager implements RocConfigurationsManager {
         return configuration;
     }
 
-    private static boolean isYaml(File file) {
+    private static boolean isYaml(@NotNull File file) {
         if(!file.isFile() || !file.exists())
             return false;
         String path = file.getAbsolutePath().toLowerCase();

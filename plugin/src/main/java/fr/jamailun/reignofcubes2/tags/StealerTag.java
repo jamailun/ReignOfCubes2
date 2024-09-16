@@ -1,25 +1,25 @@
 package fr.jamailun.reignofcubes2.tags;
 
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.api.configuration.PersistedProperty;
 import fr.jamailun.reignofcubes2.api.events.player.RocPlayerAttacksPlayerEvent;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.api.players.ScoreAddReason;
 import fr.jamailun.reignofcubes2.api.players.ScoreRemoveReason;
-import fr.jamailun.reignofcubes2.configuration.TagProperty;
+import fr.jamailun.reignofcubes2.api.tags.TagName;
 import org.bukkit.event.EventHandler;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * A tag for a points-stealer.
  */
+@TagName("stealer")
 public class StealerTag extends AbstractRocTag {
 
-    @TagProperty(name = "points-steal", defaultValue = 10)
-    int stolenPoints;
-
-    public StealerTag() {
-        super("stealer");
-    }
+    @PersistedProperty(section = "points", name = "steal-flat")
+    int stolenFlat = 0;
+    @PersistedProperty(section = "points", name = "steal-ratio")
+    double stolenRatio = 0;
 
     @Override
     public void playerAdded(@NotNull RocPlayer holder) {
@@ -32,15 +32,21 @@ public class StealerTag extends AbstractRocTag {
     }
 
     @EventHandler
-    public void attackEvent(RocPlayerAttacksPlayerEvent event) {
+    void attackEvent(@NotNull RocPlayerAttacksPlayerEvent event) {
         if(!event.getAttacker().isTag(this))
             return;
 
-        int stole = stolenPoints;
-        if(event.getVictim().hasScore(stole)) {
-            event.getVictim().removeScore(stole, ScoreRemoveReason.TAG_STEALER);
-            event.getAttacker().addScore(stole, ScoreAddReason.TAG_STEALER);
+        double victimPoints = event.getVictim().getScore();
+        int stolen = (int) Math.min(victimPoints, victimPoints * stolenRatio + stolenFlat);
+
+        if(stolen > 0) {
+            event.getVictim().removeScore(stolen, ScoreRemoveReason.TAG_STEALER);
+            event.getAttacker().addScore(stolen, ScoreAddReason.TAG_STEALER);
         }
     }
 
+    @Override
+    public boolean isPlayable() {
+        return stolenFlat > 0 || stolenRatio > 0;
+    }
 }

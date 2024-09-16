@@ -36,6 +36,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -82,7 +83,7 @@ public class GameManagerImpl implements GameManager {
             ReignOfCubes2.logWarning("Setting GameManager configuration as null.");
             worldConfiguration = null;
             if(throne != null) {
-                throne.resetCeremony();
+                throne.resetCapture();
                 throne = null;
             }
             world = null;
@@ -91,12 +92,12 @@ public class GameManagerImpl implements GameManager {
             pickups.purgeAndClear();
             return true;
         }
-        if(!configuration.isValid()) {
+        if(!configuration.isPlayable()) {
             ReignOfCubes2.logError("Could not load invalid configuration " + configuration);
             return false;
         }
         worldConfiguration = configuration;
-        throne = worldConfiguration.generateThrone(this);
+        throne = worldConfiguration.generateThrone();
         world = Bukkit.getWorld(worldConfiguration.getWorldName());
         assert world != null;
         WorldSetter.configure(world);
@@ -133,7 +134,7 @@ public class GameManagerImpl implements GameManager {
         playSound(SoundsLibrary.PLAYER_JOINED);
 
         // Go to lobby on join
-        if(worldConfiguration != null && worldConfiguration.isValid()) {
+        if(worldConfiguration != null && worldConfiguration.isPlayable()) {
             makePlayerJoinsLobby(p);
         }
 
@@ -203,7 +204,7 @@ public class GameManagerImpl implements GameManager {
 
     private void testShouldStartGame() {
         if(state != GameState.WAITING) return;
-        if(worldConfiguration == null || ! worldConfiguration.isValid()) return;
+        if(worldConfiguration == null || ! worldConfiguration.isPlayable()) return;
         int minPlayers = getRules().getPlayerCountMin();
         if(players.size() >= minPlayers) {
             ReignOfCubes2.logInfo("Enough players (" + players.size() + " >= " + minPlayers + ") ! Will start the game now.");
@@ -327,7 +328,7 @@ public class GameManagerImpl implements GameManager {
         // set king
         setKing(player);
         // remove ceremony stuff
-        throne.resetCeremony();
+        throne.resetCapture();
     }
 
     /**
@@ -371,7 +372,7 @@ public class GameManagerImpl implements GameManager {
 
     public void start() {
         assert state != GameState.NOT_CONFIGURED && state != GameState.PLAYING;
-        assert worldConfiguration != null && worldConfiguration.isValid();
+        assert worldConfiguration != null && worldConfiguration.isPlayable();
         state = GameState.PLAYING;
         isVictory = false;
         pickups.start(worldConfiguration.getGeneratorsList(world), getRules().getGeneratorFrequency());
@@ -391,7 +392,7 @@ public class GameManagerImpl implements GameManager {
                 king.addScore(getRules().getScoreKingPerSecond(), ScoreAddReason.KING_EVERY_SECOND);
                 king.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 40, 0, false, false, true));
                 if(throne != null && throne.isAlreadyInside(king)) {
-                    king.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 40, 0, false, false, true));
+                    king.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 40, 0, false, false, true));
                 }
                 ranking.update(king);
             }
@@ -435,7 +436,7 @@ public class GameManagerImpl implements GameManager {
             king.setKing(false);
             king = null;
         }
-        throne.resetCeremony();
+        throne.resetCapture();
         throne = null;
         state = GameState.WAITING;
         isVictory = false;
@@ -471,9 +472,9 @@ public class GameManagerImpl implements GameManager {
     }
 
     public @Nullable CaptureProcess getCeremony() {
-        if(throne == null || ! throne.hasCeremony())
+        if(throne == null || ! throne.hasCaptureOngoing())
             return null;
-        return throne.getCeremony();
+        return throne.getCaptureProcess();
     }
 
     public void checkVictory(@Nonnull RocPlayer player) {
@@ -493,7 +494,7 @@ public class GameManagerImpl implements GameManager {
         }
 
         // Cancel stuff
-        throne.resetCeremony();
+        throne.resetCapture();
         gameTimer.cancel();
         pickups.purgeAndStop();
 
@@ -540,6 +541,11 @@ public class GameManagerImpl implements GameManager {
      * Public access to cheats. Allows disabling easily.
      */
     public final Cheat cheat = new Cheat();
+
+    public Collection<RocPlayer> getPlayers() {
+        return players.list();
+    }
+
     public class Cheat {
         public void forceKing(@Nullable RocPlayerImpl player) {
             if(player == null) {

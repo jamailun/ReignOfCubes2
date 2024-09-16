@@ -1,5 +1,6 @@
 package fr.jamailun.reignofcubes2.gameplay.mine;
 
+import fr.jamailun.reignofcubes2.GameManagerImpl;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.gameplay.CaptureProcess;
 import fr.jamailun.reignofcubes2.api.gameplay.Mine;
@@ -14,34 +15,57 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Standard implementation for a Mine.
+ */
 public class MineImpl implements Mine {
 
-    @Getter @NotNull private final Location location;
-    @Getter private final double radius;
+    private final GameManagerImpl game;
+    @Getter @NotNull private final Location center;
+    @Getter private final double radius, radiusSquared;
     @Getter private final float productionRate;
     @Getter private final float maxStorage;
 
     @Getter private float storedGold = 0;
-    private Set<RocPlayer> playersInside = new HashSet<>();
+    private final Set<RocPlayer> playersInside = new HashSet<>();
+
+    // Transient
+    @Getter @Nullable private RocPlayer owner;
+    private MineCapture capture;
 
     public MineImpl(@NotNull Location location, double radius, float productionRate, float maxStorage) {
-        this.location = location;
+        game = GameManagerImpl.instance();
+        this.center = location;
         this.radius = radius;
+        this.radiusSquared = radius * radius;
         this.productionRate = productionRate;
         this.maxStorage = maxStorage;
     }
 
+    private int playersCount() {
+        return playersInside.size() + (owner == null ? 0 : 1);
+    }
+
     public void tick(float multiplier) {
-        computePlayersInside();
+        // Pour tous les joueurs, on rajoute (ou retire) ceux qui sont ou non plus dans la zone.
+        for(RocPlayer player : game.getPlayers()) {
+            if(isInside(player.getPlayer().getLocation())) {
+                enters(player);
+            } else {
+                leaves(player);
+            }
+        }
+
+        float produced = productionRate * multiplier;
 
         // Redistribute to players inside
         if( ! playersInside.isEmpty()) {
-            float toConsume = Math.max(10 * multiplier, storedGold);
-            float perPlayer = toConsume / playersInside.size();
-            playersInside.forEach(r -> r.addGold(perPlayer));
+            float toConsume = Math.max(produced, storedGold);
+            float perPlayer = toConsume / playersCount();
+            playersInside.forEach(r -> addGold(r, perPlayer));
             ParticlesHelper.playCircleXZ(
                     playersInside.stream().map(RocPlayer::getPlayer).toList(),
-                    location,
+                    center,
                     radius,
                     0.5,
                     Particle.DRIPPING_HONEY
@@ -49,16 +73,14 @@ public class MineImpl implements Mine {
         }
 
         // Store more gold
-        storedGold += (productionRate * multiplier);
+        storedGold += produced;
         if(storedGold > maxStorage)
             storedGold = maxStorage;
     }
 
-    private void computePlayersInside() {
-        playersInside = location.getNearbyPlayers(radius).stream()
-                .map(ReignOfCubes2::findPlayer)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toCollection(HashSet::new));
+    private void addGold(@NotNull RocPlayer player, float perPlayer) {
+        boolean isOwner = isOwner(player);
+        player.addGold(perPlayer * (isOwner ? 2f : 1f));
     }
 
     public void reset() {
@@ -67,18 +89,8 @@ public class MineImpl implements Mine {
     }
 
     @Override
-    public @Nullable RocPlayer getOwner() {
-        return null;
-    }
-
-    @Override
-    public @Nullable CaptureProcess getCaptureProcess() {
-        return null;
-    }
-
-    @Override
-    public @NotNull Location getCenter() {
-        return null;
+    public @Nullable MineCapture getCaptureProcess() {
+        return capture;
     }
 
     @Override
@@ -88,16 +100,16 @@ public class MineImpl implements Mine {
 
     @Override
     public void enters(@NotNull RocPlayer player) {
-
+        playersInside.add(player);
     }
 
     @Override
     public void leaves(@NotNull RocPlayer player) {
-
+        playersInside.remove(player);
     }
 
     @Override
     public boolean isInside(@NotNull Location location) {
-        return false;
+        return getCenter().distanceSquared(location) <= radiusSquared;
     }
 }
