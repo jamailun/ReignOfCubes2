@@ -50,7 +50,9 @@ public class ThroneCapture extends AbstractCapture {
     @Override
     protected void captureEnded() {
         if(isSuccess()) {
-
+            game.playSound(SoundsLibrary.KING_CROWNED);
+            getPlayer().sendMessage("throne.end-ceremony");
+            game.throneCaptureCompleted(getPlayer());
         } else {
             game.broadcast("ceremony.fail", getPlayerName());
             game.playSound(SoundsLibrary.CEREMONY_FAILS);

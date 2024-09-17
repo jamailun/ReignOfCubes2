@@ -107,7 +107,7 @@ public abstract class RocConfiguration extends PropertiesHolder {
     }
 
     @Contract(pure = true)
-    public @Nullable World getWorld() {
+    public World getWorld() {
         return Bukkit.getWorld(worldName);
     }
 

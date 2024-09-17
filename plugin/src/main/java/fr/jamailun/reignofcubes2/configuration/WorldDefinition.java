@@ -14,6 +14,7 @@ import java.util.List;
 
 @Getter
 public final class WorldDefinition extends PropertiesHolder {
+    public static final String NAME = "world";
 
     @PersistedProperty(section = "objects", name = "spawns", type = Vector.class)
     List<Vector> spawns = new ArrayList<>();

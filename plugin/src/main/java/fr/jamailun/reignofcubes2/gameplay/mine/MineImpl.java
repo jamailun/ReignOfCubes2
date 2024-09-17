@@ -1,8 +1,6 @@
 package fr.jamailun.reignofcubes2.gameplay.mine;
 
 import fr.jamailun.reignofcubes2.GameManagerImpl;
-import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
-import fr.jamailun.reignofcubes2.api.gameplay.CaptureProcess;
 import fr.jamailun.reignofcubes2.api.gameplay.Mine;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.api.utils.ParticlesHelper;
@@ -13,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Standard implementation for a Mine.

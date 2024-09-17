@@ -4,6 +4,8 @@ import fr.jamailun.reignofcubes2.api.GameManager;
 import fr.jamailun.reignofcubes2.api.GameState;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.configuration.RocConfigurationsManager;
+import fr.jamailun.reignofcubes2.api.events.player.KingChangedEvent;
+import fr.jamailun.reignofcubes2.api.events.player.RocPlayerDeathEvent;
 import fr.jamailun.reignofcubes2.api.gameplay.*;
 import fr.jamailun.reignofcubes2.api.music.MusicManager;
 import fr.jamailun.reignofcubes2.api.players.*;
@@ -30,6 +32,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
@@ -107,7 +110,7 @@ public class GameManagerImpl implements GameManager {
         return true;
     }
 
-    public void playerJoinsServer(Player p) {
+    public void playerJoinsServer(@NotNull Player p) {
         // The game already started : try to rejoin
         if(isStatePlaying()) {
             // If existed, re-join the game
@@ -213,9 +216,12 @@ public class GameManagerImpl implements GameManager {
         }
     }
 
-    public void playerDies(@Nonnull RocPlayer victim) {
-        RocPlayer killer = victim.getLastDamager();
+    @EventHandler
+    void onPlayerDies(@Nonnull RocPlayerDeathEvent event) {
+        RocPlayer victim = event.getPlayer();
+        RocPlayer killer = event.getKiller();
 
+        // No killer : suicide
         if(killer == null) {
             if(victim.isKing()) {
                 setKing(null);
@@ -261,34 +267,35 @@ public class GameManagerImpl implements GameManager {
         ranking.update(victim, killer);
     }
 
-    private void setKing(RocPlayer player) {
-        if(player == null) {
-            if(king != null) {
-                broadcast("event.king.death", king.getName());
-                king.playSound(SoundsLibrary.DEAD_AS_KING);
-                playSound(SoundsLibrary.KING_KILLED);
+    @EventHandler
+    void setKing(@NotNull KingChangedEvent event) {
+        RocPlayer oldKing = event.getOldKing();
+        RocPlayer newKing = event.getNewKing();
 
-                king.setKing(false);
-                king = null;
-            }
+        // Always do those actions
+        if(oldKing != null) {
+            musicManager.addPlayer(oldKing.getPlayer(), MusicType.PLAY_NORMAL);
+            oldKing.setKing(false);
+        }
+        if(newKing != null) {
+            musicManager.addPlayer(newKing.getPlayer(), MusicType.PLAY_KING);
+            newKing.setKing(true);
+            broadcast("event.king.new", newKing.getName());
+            newKing.addScore(getRules().getScoreKingBonus(), ScoreAddReason.KING_FLAT_BONUS);
+            ranking.update(newKing);
+        }
+        king = newKing;
+
+        // King killed himself
+        if (event.getReason().equals(KingChangedReason.OLD_KING_DIED_ALONE)) {
+            assert oldKing != null;
+
+            broadcast("event.king.death", oldKing.getName());
+            oldKing.playSound(SoundsLibrary.DEAD_AS_KING);
+            playSound(SoundsLibrary.KING_KILLED);
+
             return;
         }
-        // remove king from old king.
-        if(king != null) {
-            assert king != player : "The king wanted to become the king again...";
-            musicManager.addPlayer(king.getPlayer(), MusicType.PLAY_NORMAL);
-            king.setKing(false);
-        }
-
-        // set new king
-        player.setKing(true);
-        king = player;
-        broadcast("event.king.new", king.getName());
-        musicManager.addPlayer(king.getPlayer(), MusicType.PLAY_KING);
-
-        // Add score
-        king.addScore(getRules().getScoreKingBonus(), ScoreAddReason.KING_FLAT_BONUS);
-        ranking.update(king);
     }
 
     public boolean isInWorld(World w) {
@@ -307,29 +314,16 @@ public class GameManagerImpl implements GameManager {
         return state == GameState.COUNT_DOWN;
     }
 
-    public @Nullable RocPlayerImpl getPlayerImplementation(@Nullable Player p) {
-        if(p == null) return null;
-        if(isStatePlaying()) {
-            if(players.exists(p))
-                return players.get(p);
-            return null;
-        }
-        return players.join(p);
-    }
-
     @Override
     public boolean hasKing() {
         return king != null;
     }
 
-    public void ceremonyIsOver(RocPlayer player) {
-        assert king == null : "How can a ceremony be ver if there is already a king ?";
-        // GG message
-        player.sendMessage("throne.end-ceremony");
-        // set king
-        setKing(player);
-        // remove ceremony stuff
+    public void throneCaptureCompleted(@NotNull RocPlayer player) {
         throne.resetCapture();
+        // Propagate
+        KingChangedEvent event = new KingChangedEvent(king, player, KingChangedReason.CROWNING_ON_THRONE);
+        Bukkit.getPluginManager().callEvent(event);
     }
 
     /**

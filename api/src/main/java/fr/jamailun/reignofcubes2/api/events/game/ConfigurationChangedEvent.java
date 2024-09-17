@@ -1,24 +1,21 @@
-package fr.jamailun.reignofcubes2.api.events.player;
+package fr.jamailun.reignofcubes2.api.events.game;
 
-import fr.jamailun.reignofcubes2.api.players.RocPlayer;
+import fr.jamailun.reignofcubes2.api.configuration.RocConfiguration;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@AllArgsConstructor
 @Getter
-public class PlayerCrowningEvent extends Event {
+public class ConfigurationChangedEvent extends Event {
     private static final HandlerList HANDLERS_LIST = new HandlerList();
 
-    @NotNull private final RocPlayer king;
-    @Nullable private final RocPlayer oldKing;
-    //TODO reason !
-
-    public PlayerCrowningEvent(@NotNull RocPlayer king, @Nullable RocPlayer oldKing) {
-        this.king = king;
-        this.oldKing = oldKing;
-    }
+    @Nullable
+    private final RocConfiguration oldConfig;
+    @NotNull private final RocConfiguration newConfig;
 
     @Override
     public @NotNull HandlerList getHandlers() {

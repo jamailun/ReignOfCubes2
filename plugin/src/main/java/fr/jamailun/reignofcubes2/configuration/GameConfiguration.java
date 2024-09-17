@@ -39,8 +39,8 @@ public class GameConfiguration extends RocConfiguration {
     protected void reloadHolders() {
         rulesHolder.clear();
         rulesHolder.put("metadata", this);
-        rulesHolder.put("rules", new GameRules());
-        rulesHolder.put("world", new WorldDefinition());
+        rulesHolder.put(GameRules.NAME, new GameRules());
+        rulesHolder.put(WorldDefinition.NAME, new WorldDefinition());
         rulesHolder.put("tags", new TagsHolder());
     }
 
@@ -58,31 +58,6 @@ public class GameConfiguration extends RocConfiguration {
         holder.set(primary[1], value);
     }
 
-    public @NotNull Throne generateThrone() {
-        if(!isPlayable())
-            throw new RuntimeException("Can only generate a throne if the configuration is valid.");
-        if(getWorld() == null)
-            throw new RuntimeException("Invalid world: "+getWorldName()+".");
-        WorldDefinition worldSection = getWorldDefinition();
-        return new ThroneImpl(getWorld(), worldSection.getThroneA(), worldSection.getThroneB());
-    }
-
-    public Location getLobby() {
-        WorldDefinition worldSection = getWorldDefinition();
-        assert getWorld() != null;
-        return worldSection.getLobby().toLocation(getWorld());
-    }
-
-    public List<Location> generateSpawns() {
-        if(!isPlayable())
-            throw new RuntimeException("Can only generate spawns if the configuration is valid.");
-        assert getWorld() != null;
-
-        return getWorldDefinition().getSpawns().stream()
-                .map(v -> v.toLocation(getWorld()))
-                .collect(Collectors.toCollection(ArrayList::new));
-    }
-
     public List<Vector> spawnsList() {
         return getWorldDefinition().getSpawns();
     }
@@ -92,33 +67,11 @@ public class GameConfiguration extends RocConfiguration {
         return new ItemStack(getWorldDefinition().getShopItem());
     }
 
-    public Location getSafeSpawn(boolean trySafe) {
-        // Get spawns, and shuffle
-        List<Location> locations = generateSpawns();
-        Collections.shuffle(locations);
-
-        // Iterate over spawns, check safety
-        if(trySafe) {
-            for(Location spawn : locations) {
-                if(isSafe(spawn)) {
-                    return spawn;
-                }
-            }
-        }
-
-        return locations.getFirst();
-    }
-
-    private boolean isSafe(Location location) {
-        assert getWorld() != null;
-        return getWorld().getNearbyPlayers(location, 10).isEmpty();
-    }
-
     public final Debugger debug = new Debugger();
 
     public class Debugger {
         private final Map<UUID, BukkitTask> showing = new HashMap<>();
-        public boolean toggle(Player player) {
+        public boolean toggle(@NotNull Player player) {
             UUID uuid = player.getUniqueId();
             if(showing.containsKey(uuid)) {
                 showing.remove(uuid).cancel();
@@ -164,10 +117,10 @@ public class GameConfiguration extends RocConfiguration {
     }
 
     public @NotNull GameRules getRulesHolder() {
-        return holder("rules", GameRules.class);
+        return holder(GameRules.NAME, GameRules.class);
     }
     public @NotNull WorldDefinition getWorldDefinition() {
-        return holder("world", WorldDefinition.class);
+        return holder(WorldDefinition.NAME, WorldDefinition.class);
     }
 
 }

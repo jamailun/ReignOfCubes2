@@ -56,8 +56,7 @@ public abstract class AbstractCapture implements CaptureProcess {
         //ReignOfCubes2.info("[CEREMONY] " + elapsed + "/" + duration);
         if(elapsed >= duration) {
             success = true;
-            game.ceremonyIsOver(player);
-            game.playSound(SoundsLibrary.KING_CROWNED);
+            captureEnded();
             return;
         }
         ticked();

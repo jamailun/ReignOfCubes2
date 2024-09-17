@@ -3,13 +3,13 @@ package fr.jamailun.reignofcubes2.players;
 import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.configuration.kits.Kit;
+import fr.jamailun.reignofcubes2.api.events.player.ScoreLostEvent;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.api.players.ScoreAddReason;
 import fr.jamailun.reignofcubes2.api.players.ScoreRemoveReason;
 import fr.jamailun.reignofcubes2.api.sounds.SoundEffect;
 import fr.jamailun.reignofcubes2.api.tags.RocTag;
 import fr.jamailun.reignofcubes2.api.events.player.ScoreGainedEvent;
-import fr.jamailun.reignofcubes2.configuration.sections.WorldSection;
 import fr.jamailun.reignofcubes2.messages.Messages;
 import fr.jamailun.reignofcubes2.music.SoundsLibrary;
 import lombok.Getter;
@@ -55,12 +55,15 @@ public class RocPlayerImpl implements RocPlayer {
         if(delta == 0) return;
         assert delta > 0;
 
+        // Event propagation
+        ScoreGainedEvent event = new ScoreGainedEvent(this, delta, reason);
+        Bukkit.getPluginManager().callEvent(event);
+        if(event.isCancelled()) return;
+
+        // Delta
         score += delta;
         if(reason.hasMessage())
             sendMessage("score.base.gain", String.valueOf(delta), reason.toString(language));
-
-        ScoreGainedEvent event = new ScoreGainedEvent(this, delta, reason);
-        Bukkit.getPluginManager().callEvent(event);
     }
 
     @Override
@@ -74,6 +77,12 @@ public class RocPlayerImpl implements RocPlayer {
         if(delta == 0) return;
         assert delta > 0;
 
+        // Event propagation
+        ScoreLostEvent event = new ScoreLostEvent(this, delta, reason);
+        Bukkit.getPluginManager().callEvent(event);
+        if(event.isCancelled()) return;
+
+        // Delta
         score = Math.max(0, score - delta);
         if(reason.hasMessage())
             sendMessage("score.base.loose", String.valueOf(delta), reason.toString(language));
@@ -214,6 +223,11 @@ public class RocPlayerImpl implements RocPlayer {
     public void playSound(@NotNull Sound sound, float volume, float pitch) {
         if(!isValid()) return;
         player.playSound(player.getLocation(), sound, volume, pitch);
+    }
+
+    @Override
+    public @NotNull Location getLocation() {
+        return player.getLocation();
     }
 
     public void changePlayerInstance(Player player) {

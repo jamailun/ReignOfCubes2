@@ -6,6 +6,7 @@ import lombok.Getter;
 
 @Getter
 public final class GameRules extends PropertiesHolder {
+    public static final String NAME = "rules";
 
     @PersistedProperty(section = "players", name = "count-min")
     int playerCountMin = -1;
