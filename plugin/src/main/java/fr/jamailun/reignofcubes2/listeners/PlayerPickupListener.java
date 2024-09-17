@@ -7,6 +7,7 @@ import fr.jamailun.reignofcubes2.configuration.pickups.PickupConfigEntry;
 import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class PlayerPickupListener extends RocListener {
     public PlayerPickupListener(MainROC2 plugin) {
@@ -14,7 +15,7 @@ public class PlayerPickupListener extends RocListener {
     }
 
     @EventHandler
-    public void playerPickupItem(PlayerAttemptPickupItemEvent event) {
+    void playerPickupItem(@NotNull PlayerAttemptPickupItemEvent event) {
         if( ! game().isStatePlaying())
             return;
 
@@ -24,21 +25,7 @@ public class PlayerPickupListener extends RocListener {
             return;
         }
 
-        Item item = event.getItem();
-        game().didPickedUpItem(item).ifPresent(entry -> {
-            event.setCancelled(true);
-            pickupItem(player, item, entry);
-        });
-    }
-
-    private void pickupItem(RocPlayer player, Item item, PickupConfigEntry entry) {
-        // Score
-       //TODO REMOVE player.addScore(entry.score(), ScoreAddReason.PICKUP);
-        ReignOfCubes2.game().updateRankings(player);
-        // Effect
-        entry.spawnFirework(item.getLocation());
-        // Remove item
-        item.remove();
+        //FIXME delete that
     }
 
 }

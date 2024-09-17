@@ -12,6 +12,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class PlayerMovementListener extends RocListener {
 
@@ -20,7 +21,7 @@ public class PlayerMovementListener extends RocListener {
     }
 
     @EventHandler
-    public void playerMoved(PlayerMoveEvent event) {
+    void playerMoved(@NotNull PlayerMoveEvent event) {
         if(shouldIgnore(event.getPlayer().getWorld())) {
             return;
         }
@@ -67,7 +68,7 @@ public class PlayerMovementListener extends RocListener {
         }
     }
 
-    private void killVoid(Player player) {
+    private void killVoid(@NotNull Player player) {
         player.damage(9999999);
     }
 }

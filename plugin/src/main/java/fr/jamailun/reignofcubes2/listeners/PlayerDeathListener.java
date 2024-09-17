@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class PlayerDeathListener extends RocListener {
     public PlayerDeathListener(MainROC2 plugin) {
@@ -15,7 +16,7 @@ public class PlayerDeathListener extends RocListener {
     }
 
     @EventHandler
-    public void playerKilledEvent(PlayerDeathEvent event) {
+    void playerKilledEvent(@NotNull PlayerDeathEvent event) {
         Player v = event.getPlayer();
         RocPlayer victim = ReignOfCubes2.findPlayer(v);
         if(victim == null || shouldIgnore(v.getWorld())) {
@@ -26,7 +27,7 @@ public class PlayerDeathListener extends RocListener {
     }
 
     @EventHandler
-    public void savePunchingBallInLobby(EntityDeathEvent event) {
+    void savePunchingBallInLobby(@NotNull EntityDeathEvent event) {
         if(game().isStatePlaying())
             return;
         if(!(event.getEntity() instanceof Player)) {

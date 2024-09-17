@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class PlayerInteractionListener extends RocListener {
     public PlayerInteractionListener(MainROC2 plugin) {
@@ -15,7 +16,7 @@ public class PlayerInteractionListener extends RocListener {
     }
 
     @EventHandler
-    public void playerInteract(PlayerInteractEvent e) {
+    void playerInteract(@NotNull PlayerInteractEvent e) {
         // Disabled ALL physical interaction (i.e. breaking wheat blocks)
         if(e.getAction() == Action.PHYSICAL) {
             e.setCancelled(true);

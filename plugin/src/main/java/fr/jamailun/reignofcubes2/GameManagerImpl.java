@@ -12,6 +12,7 @@ import fr.jamailun.reignofcubes2.api.music.MusicType;
 import fr.jamailun.reignofcubes2.api.utils.Ranking;
 import fr.jamailun.reignofcubes2.configuration.GameConfiguration;
 import fr.jamailun.reignofcubes2.configuration.GameConfigurationsManager;
+import fr.jamailun.reignofcubes2.configuration.GameRules;
 import fr.jamailun.reignofcubes2.configuration.pickups.PickupConfigEntry;
 import fr.jamailun.reignofcubes2.configuration.sections.GameRulesSection;
 import fr.jamailun.reignofcubes2.configuration.sections.TagsConfigurationSection;
@@ -336,12 +337,8 @@ public class GameManagerImpl implements GameManager {
      * @return an instance of the game rules.
      * @throws NullPointerException if no configuration has been set.
      */
-    public GameRulesSection getRules() {
-        return worldConfiguration.getRules();
-    }
-
-    public TagsConfigurationSection getTagsConfiguration() {
-        return worldConfiguration.getTagsSection();
+    public GameRules getRules() {
+        return worldConfiguration.getRulesHolder();
     }
 
     public void startCountdown() {

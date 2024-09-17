@@ -4,6 +4,7 @@ import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.players.RocPlayerImpl;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class PlayerRespawnListener extends RocListener {
 
@@ -12,7 +13,7 @@ public class PlayerRespawnListener extends RocListener {
     }
 
     @EventHandler
-    public void playerRespawn(PlayerRespawnEvent event) {
+    void playerRespawn(@NotNull PlayerRespawnEvent event) {
         if(shouldIgnore(event.getPlayer().getWorld())) {
             return;
         }

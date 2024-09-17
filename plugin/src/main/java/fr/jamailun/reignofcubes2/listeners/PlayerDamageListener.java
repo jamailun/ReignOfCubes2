@@ -13,6 +13,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -25,14 +26,14 @@ public class PlayerDamageListener extends RocListener {
     private final Map<UUID, UUID> safeThorns = new HashMap<>();
 
     @EventHandler(priority = EventPriority.LOW)
-    public void playerDamageLobby(EntityDamageEvent event) {
+    void playerDamageLobby(@NotNull EntityDamageEvent event) {
         if( ! game().isStatePlaying()) {
             event.setCancelled(shouldCancelNonPlaying(event));
         }
     }
 
     @EventHandler
-    public void entityDamageEvent(EntityDamageByEntityEvent event) {
+    void entityDamageEvent(@NotNull EntityDamageByEntityEvent event) {
         if( ! game().isStatePlaying()) {
             event.setCancelled(shouldCancelNonPlaying(event));
             return;
@@ -90,12 +91,12 @@ public class PlayerDamageListener extends RocListener {
         }
     }
 
-    private void playerAttacked(RocPlayer damager, RocPlayer victim, EntityDamageByEntityEvent event) {
+    private void playerAttacked(@NotNull RocPlayer damager, RocPlayer victim, @NotNull EntityDamageByEntityEvent event) {
         victim.setLastDamager(damager);
         Bukkit.getPluginManager().callEvent(new RocPlayerAttacksPlayerEvent(damager, victim, event));
     }
 
-    private boolean shouldCancelNonPlaying(EntityDamageEvent e) {
+    private boolean shouldCancelNonPlaying(@NotNull EntityDamageEvent e) {
         if(e.getEntity() instanceof Player) {
             boolean isVoid = e.getCause() == EntityDamageEvent.DamageCause.KILL || e.getCause() == EntityDamageEvent.DamageCause.VOID;
             return ! isVoid;
