@@ -3,13 +3,13 @@ package fr.jamailun.reignofcubes2.players;
 import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.configuration.kits.Kit;
-import fr.jamailun.reignofcubes2.api.events.player.ScoreLostEvent;
+import fr.jamailun.reignofcubes2.api.events.player.PlayerScoreLostEvent;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.api.players.ScoreAddReason;
 import fr.jamailun.reignofcubes2.api.players.ScoreRemoveReason;
 import fr.jamailun.reignofcubes2.api.sounds.SoundEffect;
 import fr.jamailun.reignofcubes2.api.tags.RocTag;
-import fr.jamailun.reignofcubes2.api.events.player.ScoreGainedEvent;
+import fr.jamailun.reignofcubes2.api.events.player.PlayerScoreGainedEvent;
 import fr.jamailun.reignofcubes2.messages.Messages;
 import fr.jamailun.reignofcubes2.music.SoundsLibrary;
 import lombok.Getter;
@@ -56,7 +56,7 @@ public class RocPlayerImpl implements RocPlayer {
         assert delta > 0;
 
         // Event propagation
-        ScoreGainedEvent event = new ScoreGainedEvent(this, delta, reason);
+        PlayerScoreGainedEvent event = new PlayerScoreGainedEvent(this, delta, reason);
         Bukkit.getPluginManager().callEvent(event);
         if(event.isCancelled()) return;
 
@@ -78,7 +78,7 @@ public class RocPlayerImpl implements RocPlayer {
         assert delta > 0;
 
         // Event propagation
-        ScoreLostEvent event = new ScoreLostEvent(this, delta, reason);
+        PlayerScoreLostEvent event = new PlayerScoreLostEvent(this, delta, reason);
         Bukkit.getPluginManager().callEvent(event);
         if(event.isCancelled()) return;
 

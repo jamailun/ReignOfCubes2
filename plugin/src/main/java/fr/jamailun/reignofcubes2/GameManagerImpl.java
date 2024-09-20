@@ -4,7 +4,9 @@ import fr.jamailun.reignofcubes2.api.GameManager;
 import fr.jamailun.reignofcubes2.api.GameState;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.configuration.RocConfigurationsManager;
+import fr.jamailun.reignofcubes2.api.events.game.GameStopEvent;
 import fr.jamailun.reignofcubes2.api.events.player.KingChangedEvent;
+import fr.jamailun.reignofcubes2.api.events.player.PlayerScoreChangedEvent;
 import fr.jamailun.reignofcubes2.api.events.player.RocPlayerDeathEvent;
 import fr.jamailun.reignofcubes2.api.gameplay.*;
 import fr.jamailun.reignofcubes2.api.music.MusicManager;
@@ -30,9 +32,9 @@ import lombok.Getter;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
@@ -60,7 +62,6 @@ public class GameManagerImpl implements GameManager {
 
     // Score
     @Getter private final Ranking<RocPlayer> ranking = new Ranking<>(RocPlayer::getScore);
-    private final PickupsManager pickups = new PickupsManager(() -> getActiveConfiguration().getPickupsSection().pickRandom());
     private BukkitTask gameTimer;
 
     // Countdown
@@ -151,7 +152,7 @@ public class GameManagerImpl implements GameManager {
 
     private void makePlayerJoinsLobby(Player p) {
         // Teleport to lobby
-        p.teleport(worldConfiguration.getLobby());
+        p.teleport(worldConfiguration.lobby());
 
         // Clear inventory & adventure mode
         p.getInventory().clear();
@@ -173,7 +174,7 @@ public class GameManagerImpl implements GameManager {
             // not anymore
             players.broadcast("event.left-king", p.getName());
             player.setKing(false);
-            setKing(null);
+            Bukkit.getPluginManager().callEvent(new KingChangedEvent(null, player, KingChangedReason.OLD_KING_LEFT));
         } else {
             players.broadcast("event.left", p.getName());
         }
@@ -224,8 +225,7 @@ public class GameManagerImpl implements GameManager {
         // No killer : suicide
         if(killer == null) {
             if(victim.isKing()) {
-                setKing(null);
-                // le setKing va faire les sons dans ce cas
+                Bukkit.getPluginManager().callEvent(new KingChangedEvent(null, victim, KingChangedReason.OLD_KING_DIED_ALONE));
             } else {
                 broadcast("event.death.alone", victim.getName());
                 victim.playSound(SoundsLibrary.DEAD);
@@ -242,7 +242,7 @@ public class GameManagerImpl implements GameManager {
             killer.playSound(SoundsLibrary.KILLED_AS_KING);
         } else if(victim.isKing()) {
             broadcast("event.death.killed-king", victim.getName(), killer.getName());
-            setKing(killer);
+            Bukkit.getPluginManager().callEvent(new KingChangedEvent(killer, victim, KingChangedReason.OLD_KING_KILLED));
             victim.playSound(SoundsLibrary.DEAD_AS_KING);
             killer.playSound(SoundsLibrary.KILLED_KING);
             playSound(SoundsLibrary.KING_KILLED);
@@ -267,8 +267,8 @@ public class GameManagerImpl implements GameManager {
         ranking.update(victim, killer);
     }
 
-    @EventHandler
-    void setKing(@NotNull KingChangedEvent event) {
+    @EventHandler(ignoreCancelled = true)
+    void onKingChanged(@NotNull KingChangedEvent event) {
         RocPlayer oldKing = event.getOldKing();
         RocPlayer newKing = event.getNewKing();
 
@@ -276,6 +276,7 @@ public class GameManagerImpl implements GameManager {
         if(oldKing != null) {
             musicManager.addPlayer(oldKing.getPlayer(), MusicType.PLAY_NORMAL);
             oldKing.setKing(false);
+            oldKing.playSound(SoundsLibrary.DEAD_AS_KING);
         }
         if(newKing != null) {
             musicManager.addPlayer(newKing.getPlayer(), MusicType.PLAY_KING);
@@ -291,7 +292,6 @@ public class GameManagerImpl implements GameManager {
             assert oldKing != null;
 
             broadcast("event.king.death", oldKing.getName());
-            oldKing.playSound(SoundsLibrary.DEAD_AS_KING);
             playSound(SoundsLibrary.KING_KILLED);
 
             return;
@@ -362,11 +362,14 @@ public class GameManagerImpl implements GameManager {
     }
 
     public void start() {
+        if(state == GameState.NOT_CONFIGURED) throw new RuntimeException("Cannot start game, if not configured.");
+        if(state == GameState.PLAYING) {
+
+        }
         assert state != GameState.NOT_CONFIGURED && state != GameState.PLAYING;
         assert worldConfiguration != null && worldConfiguration.isPlayable();
         state = GameState.PLAYING;
         isVictory = false;
-        pickups.start(worldConfiguration.getGeneratorsList(world), getRules().getGeneratorFrequency());
 
         // Remove countdown
         if(countdown != null) {
@@ -446,48 +449,44 @@ public class GameManagerImpl implements GameManager {
         MainROC2.runTaskLater(this::testShouldStartGame, 2);
     }
 
-    /**
-     * To call before shutdown : clear elements.
-     */
-    public void purge() {
-        // Reset all
-        pickups.purgeAndStop();
-    }
-
+    @Override
     public void broadcast(String entry, Object... args) {
         players.broadcast(entry, args);
     }
 
-    public int getPlayersCount() {
-        return players.size();
+    /**
+     * Test if the game as enough players.
+     * @return true if the players size is greater than the minimum required amount.
+     */
+    public boolean asEnoughPlayers() {
+        return getOnlinePlayersCount() >= getRules().getPlayerCountMin();
     }
 
-    public @Nullable CaptureProcess getCeremony() {
-        if(throne == null || ! throne.hasCaptureOngoing())
-            return null;
-        return throne.getCaptureProcess();
-    }
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    void onScoreChanged(@NotNull PlayerScoreChangedEvent event) {
+        if(state != GameState.PLAYING) return;
 
-    public void checkVictory(@Nonnull RocPlayer player) {
-        assert isStatePlaying();
+        // update rankings
+        ranking.update(event.getPlayer());
 
-        if(player.getScore() >= getRules().getScoreGoal()) {
-            victory(player);
+        // Check for victory.
+        if(event.getPlayer().getScore() >= getRules().getScoreGoal()) {
+            victory(event.getPlayer());
         }
     }
 
-    private void victory(RocPlayer player) {
-        if(player == null) {
-            ReignOfCubes2.logWarning("Unexpected NULL player for victory.");
-        } else {
-            broadcast("game.end-victory", player.getName(), player.getScore());
-            ReignOfCubes2.logInfo("Player " + player.getName() + " won.");
-        }
+    private void victory(@NotNull RocPlayer player) {
+        // Print messages
+        broadcast("game.end-victory", player.getName(), player.getScore());
+        ReignOfCubes2.logInfo("Player " + player.getName() + " won.");
+
+        // Propagates
+        Bukkit.getPluginManager().callEvent(new GameStopEvent(player, ranking));
 
         // Cancel stuff
+        //TODO clean that
         throne.resetCapture();
         gameTimer.cancel();
-        pickups.purgeAndStop();
 
         // set victory
         isVictory = true;
@@ -500,7 +499,7 @@ public class GameManagerImpl implements GameManager {
         return StreamSupport.stream(players.spliterator(), false);
     }
 
-    public Optional<RocPlayerImpl> findPlayer(String playerName) {
+    public Optional<RocPlayerImpl> findPlayer(@NotNull String playerName) {
         return players()
                 .filter(p -> p.getName().equalsIgnoreCase(playerName))
                 .findFirst();
@@ -523,7 +522,7 @@ public class GameManagerImpl implements GameManager {
 
         // clear stuff anyway, and teleport
         ReignOfCubes2.logInfo("Player re-joined : " + p.getName() + ".");
-        p.teleport(getActiveConfiguration().getSafeSpawn(true));
+        p.teleport(getActiveConfiguration().get(true));
         player.respawned();
         musicManager.addPlayer(p, MusicType.PLAY_NORMAL);
     }
@@ -537,13 +536,12 @@ public class GameManagerImpl implements GameManager {
         return players.list();
     }
 
+    /**
+     * Handle "administration tools".
+     */
     public class Cheat {
         public void forceKing(@Nullable RocPlayerImpl player) {
-            if(player == null) {
-                setKing(null);
-                return;
-            }
-            setKing(player);
+            Bukkit.getPluginManager().callEvent(new KingChangedEvent(player, king, KingChangedReason.ADMINISTRATOR));
         }
 
         public void forceScore(@Nonnull RocPlayerImpl player, int score) {
@@ -566,17 +564,8 @@ public class GameManagerImpl implements GameManager {
     }
 
     @Override
-    public void updateRankings(@NotNull RocPlayer player) {
-        ranking.update(player);
-    }
-
-    @Override
     public @NotNull RocConfigurationsManager getConfigurations() {
         return configsManager;
-    }
-
-    public Optional<PickupConfigEntry> didPickedUpItem(Item item) {
-        return pickups.tryPickupItem(item);
     }
 
     @Override

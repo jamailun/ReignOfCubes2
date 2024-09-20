@@ -3,24 +3,20 @@ package fr.jamailun.reignofcubes2.api.events.player;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.api.players.ScoreAddReason;
 import lombok.Getter;
-import lombok.Setter;
-import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Event called when a {@link RocPlayer} score went UP.
+ */
 @Getter
-public class ScoreGainedEvent extends Event implements Cancellable {
+public class PlayerScoreGainedEvent extends PlayerScoreChangedEvent {
     private static final HandlerList HANDLERS_LIST = new HandlerList();
 
-    private final RocPlayer player;
-    private final int delta;
     private final ScoreAddReason reason;
-    @Setter private boolean cancelled = false;
 
-    public ScoreGainedEvent(RocPlayer player, int delta, ScoreAddReason reason) {
-        this.player = player;
-        this.delta = delta;
+    public PlayerScoreGainedEvent(@NotNull RocPlayer player, int delta, @NotNull ScoreAddReason reason) {
+        super(player, delta);
         this.reason = reason;
     }
 

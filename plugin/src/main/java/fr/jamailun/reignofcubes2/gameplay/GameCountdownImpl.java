@@ -39,7 +39,7 @@ public class GameCountdownImpl implements GameCountdown {
         }
 
         // Check enough players
-        if(game.getPlayersCount() < game.getRules().getPlayerCountMin()) {
+        if(! game.asEnoughPlayers()) {
             game.broadcast("countdown.cancelled-players");
             game.stopCountdown();
             return;

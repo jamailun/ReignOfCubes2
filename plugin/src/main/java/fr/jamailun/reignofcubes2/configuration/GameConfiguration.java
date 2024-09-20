@@ -67,6 +67,12 @@ public class GameConfiguration extends RocConfiguration {
         return new ItemStack(getWorldDefinition().getShopItem());
     }
 
+    public Location lobby() {
+        Vector lobby = getWorldDefinition().getLobby();
+        if(lobby == null) return null;
+        return lobby.toLocation(getWorld());
+    }
+
     public final Debugger debug = new Debugger();
 
     public class Debugger {

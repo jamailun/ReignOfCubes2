@@ -8,6 +8,9 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Called when the King changed.
+ */
 @Getter
 public class KingChangedEvent extends Event {
     private static final HandlerList HANDLERS_LIST = new HandlerList();
