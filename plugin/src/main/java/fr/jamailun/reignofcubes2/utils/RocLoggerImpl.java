@@ -36,6 +36,12 @@ public class RocLoggerImpl implements RocLogger {
     }
 
     @Override
+    public @NotNull RocLogger clone(@Nullable String prefix) {
+        String newPrefix = Objects.requireNonNullElse(this.prefix, "") + Objects.requireNonNullElse(prefix, "");
+        return new RocLoggerImpl(newPrefix);
+    }
+
+    @Override
     public void debug(@NotNull String message) {
         sender.sendMessage(prefix("§3") + "[Debug]" + prefix + "§7 " + message);
     }

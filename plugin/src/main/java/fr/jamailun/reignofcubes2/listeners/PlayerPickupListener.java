@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.jetbrains.annotations.NotNull;
 
+@Deprecated(forRemoval = true)
 public class PlayerPickupListener extends RocListener {
     public PlayerPickupListener(MainROC2 plugin) {
         super(plugin);

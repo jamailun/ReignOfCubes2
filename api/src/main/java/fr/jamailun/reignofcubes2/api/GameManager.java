@@ -23,7 +23,7 @@ public interface GameManager {
 
     void broadcast(String entry, Object... args);
 
-    void playSound(SoundEffect soundEffect);
+    void playSound(@NotNull SoundEffect soundEffect);
 
     /**
      * Test if the game currently has a King.

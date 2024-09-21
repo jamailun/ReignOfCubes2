@@ -5,6 +5,7 @@ import com.xxmicloxx.NoteBlockAPI.songplayer.Fade;
 import com.xxmicloxx.NoteBlockAPI.songplayer.RadioSongPlayer;
 import com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder;
 import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.RocScheduler;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.music.MusicManager;
 import fr.jamailun.reignofcubes2.api.music.MusicType;
@@ -30,7 +31,7 @@ public class MusicManagerImpl implements MusicManager {
         reload();
 
         // Every 30 seconds, disable vanilla sounds
-        MainROC2.runTaskTimer(() -> {
+        RocScheduler.runTaskTimer(() -> {//XX can be async ??
             Bukkit.getOnlinePlayers().forEach(p -> p.stopSound(org.bukkit.SoundCategory.MUSIC));
         }, 30);
     }
@@ -63,7 +64,7 @@ public class MusicManagerImpl implements MusicManager {
         }
     }
 
-    private List<Song> loadSongs(MusicType type) {
+    private @NotNull List<Song> loadSongs(@NotNull MusicType type) {
         File typeFolder = new File(folder, type.name().toLowerCase());
         assertFolder(typeFolder);
         File[] files = typeFolder.listFiles();
@@ -82,12 +83,12 @@ public class MusicManagerImpl implements MusicManager {
     }
 
     @Override
-    public void removePlayer(Player player) {
+    public void removePlayer(@NotNull Player player) {
         removePlayer(player.getUniqueId());
     }
 
     @Override
-    public void removePlayer(UUID uuid) {
+    public void removePlayer(@NotNull UUID uuid) {
         MusicType type = listeners.remove(uuid);
         if(type != null && radios.containsKey(type)) {
             RadioSongPlayer radio = radios.get(type);
@@ -101,15 +102,15 @@ public class MusicManagerImpl implements MusicManager {
     }
 
     @Override
-    public void addPlayer(Player player, MusicType type) {
+    public void addPlayer(@NotNull Player player, @NotNull MusicType type) {
         addPlayer(player.getUniqueId(), type);
         player.stopSound(org.bukkit.SoundCategory.MUSIC);
     }
 
     @Override
-    public void addPlayer(UUID uuid, MusicType type) {
+    public void addPlayer(@NotNull UUID uuid, @NotNull MusicType type) {
         MusicType current = listeners.get(uuid);
-        if(current != null && current == type)
+        if(current == type)
             return;
         removePlayer(uuid);
 
@@ -126,11 +127,11 @@ public class MusicManagerImpl implements MusicManager {
     }
 
     @Override
-    public boolean hasRadioFor(MusicType type) {
+    public boolean hasRadioFor(@NotNull MusicType type) {
         return radios.containsKey(type);
     }
 
-    private static void assertFolder(File folder) {
+    private static void assertFolder(@NotNull File folder) {
         if(!folder.exists()) {
             if(!folder.mkdirs()) {
                 throw new RuntimeException("Could not assert folder existence : '" + folder + "'.");

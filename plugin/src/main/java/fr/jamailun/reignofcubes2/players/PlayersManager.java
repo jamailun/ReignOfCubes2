@@ -21,8 +21,8 @@ public class PlayersManager implements Iterable<RocPlayerImpl> {
     private final GameManagerImpl game;
     private final Map<UUID, RocPlayerImpl> players = new HashMap<>();
 
-    public PlayersManager(GameManagerImpl game) {
-        this.game = game;
+    public PlayersManager() {
+        this.game = GameManagerImpl.instance();
     }
 
     public RocPlayerImpl join(Player player) {

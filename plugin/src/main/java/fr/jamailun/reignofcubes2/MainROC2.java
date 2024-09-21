@@ -1,11 +1,13 @@
 package fr.jamailun.reignofcubes2;
 
 import fr.jamailun.reignofcubes2.api.GameManager;
+import fr.jamailun.reignofcubes2.api.GameState;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.RocService;
 import fr.jamailun.reignofcubes2.api.configuration.kits.KitsManager;
 import fr.jamailun.reignofcubes2.api.configuration.sections.RocConfigurationSectionsRegistry;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
+import fr.jamailun.reignofcubes2.api.utils.RocLogger;
 import fr.jamailun.reignofcubes2.commands.*;
 import fr.jamailun.reignofcubes2.configuration.KitsConfigurationManager;
 import fr.jamailun.reignofcubes2.configuration.kits.RocKitItem;
@@ -13,12 +15,14 @@ import fr.jamailun.reignofcubes2.configuration.sections.GameRulesSection;
 import fr.jamailun.reignofcubes2.configuration.sections.TagsConfigurationSection;
 import fr.jamailun.reignofcubes2.configuration.sections.WorldSection;
 import fr.jamailun.reignofcubes2.listeners.*;
+import fr.jamailun.reignofcubes2.messages.Messages;
 import fr.jamailun.reignofcubes2.music.MusicManagerImpl;
 import fr.jamailun.reignofcubes2.placeholder.RocPlaceholderExpansion;
 import fr.jamailun.reignofcubes2.tags.NinjaTag;
 import fr.jamailun.reignofcubes2.tags.RegicideTag;
 import fr.jamailun.reignofcubes2.tags.StealerTag;
 import fr.jamailun.reignofcubes2.api.tags.TagsRegistry;
+import fr.jamailun.reignofcubes2.utils.RocLoggerImpl;
 import io.papermc.paper.plugin.configuration.PluginMeta;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -30,8 +34,10 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Main of the ReignOfCubes2 implementation.
@@ -44,27 +50,25 @@ public final class MainROC2 extends JavaPlugin implements RocService {
     @Getter private MusicManagerImpl musicManager;
     private KitsConfigurationManager kitsConfiguration;
     private NamespacedKey marker;
+    private RocLogger logger;
 
     static {
         // Register serializable
         ConfigurationSerialization.registerClass(RocKitItem.class, "KitItem");
-        // Register configuration sections
-        RocConfigurationSectionsRegistry.registerSection(GameRulesSection.class);
-        RocConfigurationSectionsRegistry.registerSection(WorldSection.class);
-        RocConfigurationSectionsRegistry.registerSection(TagsConfigurationSection.class);
     }
 
     @Override
     public void onLoad() {
+        logger = new RocLoggerImpl();
         ReignOfCubes2.setService(this);
     }
 
     @Override
     public void onEnable() {
         INSTANCE = this;
-        logInfo("Enabling plugin.");
+        logger().info("Enabling plugin.");
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") == null) {
-            logWarning("Could not find PlaceholderAPI. Disabling.");
+            logger().warn("Could not find PlaceholderAPI. Disabling.");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
@@ -99,9 +103,7 @@ public final class MainROC2 extends JavaPlugin implements RocService {
         new DisabledActionsListener(this);
         new PlayerRespawnListener(this);
         new PlayerSaturationChangedListener(this);
-        new RocScoreListener(this);
         new GuiListener(this);
-        new PlayerPickupListener(this);
 
         // Commands
         new RocCommand(this);
@@ -118,18 +120,8 @@ public final class MainROC2 extends JavaPlugin implements RocService {
 
     @Override
     public void onDisable() {
-        logInfo("Disabling plugin.");
+        logger.info("Disabling plugin.");
         gameManager.purge();
-    }
-
-    public static BukkitTask runTaskTimer(Runnable runnable, double periodSeconds) {
-        long period = (long)( periodSeconds * 20L );
-        return Bukkit.getScheduler().runTaskTimer(INSTANCE, runnable, 0L, period);
-    }
-
-    public static BukkitTask runTaskLater(Runnable runnable, double waitSeconds) {
-        long wait = (long)( waitSeconds * 20L );
-        return Bukkit.getScheduler().runTaskLater(INSTANCE, runnable, wait);
     }
 
     public static File getFile(String name) {
@@ -144,38 +136,19 @@ public final class MainROC2 extends JavaPlugin implements RocService {
         INSTANCE.saveConfig();
     }
 
-    public static PluginMeta getMeta() {
+    @SuppressWarnings("all")
+    public static @NotNull PluginMeta getMeta() {
         return INSTANCE.getPluginMeta();
     }
 
     @Override
-    public RocPlayer findPlayer(Player player) {
+    public @Nullable RocPlayer findPlayer(@NotNull Player player) {
         return null;
     }
 
     @Override
-    public @NotNull String i18n(String language, String key, Object... vars) {
-        return null;
-    }
-
-    @Override
-    public void logDebug(String message) {
-        getLogger().info("[DEBUG] " + message);
-    }
-
-    @Override
-    public void logInfo(String message) {
-        getLogger().info(message);
-    }
-
-    @Override
-    public void logWarning(String message) {
-        getLogger().warning(message);
-    }
-
-    @Override
-    public void logError(String message) {
-        getLogger().severe(message);
+    public @NotNull String i18n(@NotNull String language, @NotNull String key, Object... vars) {
+        return Messages.format(language, key, vars);
     }
 
     @Override
@@ -188,6 +161,21 @@ public final class MainROC2 extends JavaPlugin implements RocService {
         return gameManager;
     }
 
+    @Override
+    public @NotNull RocLogger logger() {
+        return logger;
+    }
+
+    @Override
+    public @NotNull List<RocPlayer> players() {
+        return gameManager.
+    }
+
+    @Override
+    public @NotNull GameState state() {
+        return gameManager.getState();
+    }
+
     public static NamespacedKey marker() {
         if(INSTANCE.marker == null) {
             INSTANCE.marker = new NamespacedKey(INSTANCE, "marker");
@@ -197,10 +185,6 @@ public final class MainROC2 extends JavaPlugin implements RocService {
 
     public static Plugin plugin() {
         return INSTANCE;
-    }
-
-    public static GameManagerImpl game() {
-        return INSTANCE.gameManager;
     }
 
 }

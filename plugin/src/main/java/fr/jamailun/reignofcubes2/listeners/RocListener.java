@@ -6,15 +6,16 @@ import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.Listener;
+import org.jetbrains.annotations.NotNull;
 
 abstract class RocListener implements Listener {
 
     private final MainROC2 plugin;
 
-    public RocListener(MainROC2 plugin) {
+    public RocListener(@NotNull MainROC2 plugin) {
         this.plugin = plugin;
         Bukkit.getPluginManager().registerEvents(this, plugin);
-        ReignOfCubes2.logInfo("Registering events on " + getClass().getSimpleName());
+        ReignOfCubes2.logger().info("Registering events on " + getClass().getSimpleName());
     }
 
     protected MainROC2 plugin() {

@@ -1,5 +1,6 @@
 package fr.jamailun.reignofcubes2.api.music;
 
+import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,15 +16,23 @@ public interface MusicManager {
      */
     void reload();
 
-    void removePlayer(Player player) ;
+    default void removePlayer(@NotNull RocPlayer player) {
+        removePlayer(player.getPlayer());
+    }
 
-    void removePlayer(UUID uuid);
+    void removePlayer(@NotNull Player player) ;
 
-    void addPlayer(Player player, MusicType type);
+    void removePlayer(@NotNull UUID uuid);
 
-    void addPlayer(UUID uuid, MusicType type);
+    default void addPlayer(@NotNull RocPlayer player, @NotNull MusicType type) {
+        addPlayer(player.getPlayer(), type);
+    }
 
-    boolean hasRadioFor(MusicType type);
+    void addPlayer(@NotNull Player player, @NotNull MusicType type);
+
+    void addPlayer(@NotNull UUID uuid, @NotNull MusicType type);
+
+    boolean hasRadioFor(@NotNull MusicType type);
 
     @NotNull String getHeardSongTitle(@NotNull Player player);
 

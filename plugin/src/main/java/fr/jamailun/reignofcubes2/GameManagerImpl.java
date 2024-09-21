@@ -17,14 +17,10 @@ import fr.jamailun.reignofcubes2.api.utils.Ranking;
 import fr.jamailun.reignofcubes2.configuration.GameConfiguration;
 import fr.jamailun.reignofcubes2.configuration.GameConfigurationsManager;
 import fr.jamailun.reignofcubes2.configuration.GameRules;
-import fr.jamailun.reignofcubes2.configuration.pickups.PickupConfigEntry;
-import fr.jamailun.reignofcubes2.configuration.sections.GameRulesSection;
-import fr.jamailun.reignofcubes2.configuration.sections.TagsConfigurationSection;
 import fr.jamailun.reignofcubes2.messages.Messages;
 import fr.jamailun.reignofcubes2.music.MusicManagerImpl;
 import fr.jamailun.reignofcubes2.gameplay.GameCountdownImpl;
 import fr.jamailun.reignofcubes2.music.SoundsLibrary;
-import fr.jamailun.reignofcubes2.pickup.PickupsManager;
 import fr.jamailun.reignofcubes2.players.PlayersManager;
 import fr.jamailun.reignofcubes2.players.RocPlayerImpl;
 import fr.jamailun.reignofcubes2.utils.WorldSetter;
@@ -50,8 +46,7 @@ import java.util.stream.StreamSupport;
 
 public class GameManagerImpl implements GameManager {
 
-    private final PlayersManager players = new PlayersManager(this);
-    private final MusicManagerImpl musicManager;
+    private final PlayersManager players = new PlayersManager();
 
     @Getter private GameState state;
     @Getter private final GameConfigurationsManager configsManager = new GameConfigurationsManager();
@@ -70,8 +65,7 @@ public class GameManagerImpl implements GameManager {
     // is over with a victory ?
     private boolean isVictory;
 
-    GameManagerImpl(MusicManagerImpl musicManager) {
-        this.musicManager = musicManager;
+    GameManagerImpl() {
         loadConfiguration(configsManager.getDefault());
     }
 
@@ -81,11 +75,11 @@ public class GameManagerImpl implements GameManager {
 
     public boolean loadConfiguration(@Nullable GameConfiguration configuration) {
         if(isStatePlaying()) {
-            ReignOfCubes2.logError("Cannot change configuration while playing !");
+            ReignOfCubes2.logger().error("Cannot change configuration while playing !");
             return false;
         }
         if(configuration == null) {
-            ReignOfCubes2.logWarning("Setting GameManager configuration as null.");
+            ReignOfCubes2.logger().warn("Setting GameManager configuration as null.");
             worldConfiguration = null;
             if(throne != null) {
                 throne.resetCapture();
@@ -94,11 +88,10 @@ public class GameManagerImpl implements GameManager {
             world = null;
             ranking.clear();
             state = GameState.NOT_CONFIGURED;
-            pickups.purgeAndClear();
             return true;
         }
         if(!configuration.isPlayable()) {
-            ReignOfCubes2.logError("Could not load invalid configuration " + configuration);
+            ReignOfCubes2.logger().error("Could not load invalid configuration " + configuration);
             return false;
         }
         worldConfiguration = configuration;
@@ -107,7 +100,6 @@ public class GameManagerImpl implements GameManager {
         assert world != null;
         WorldSetter.configure(world);
         state = GameState.WAITING;
-        pickups.regenerateAll(configuration.getGeneratorsList(world), getRules().getGeneratorFrequency());
         return true;
     }
 
@@ -122,7 +114,7 @@ public class GameManagerImpl implements GameManager {
             }
 
             // A player connected while the game was on. Spectator !
-            MainROC2.runTaskLater(() -> {
+            RocScheduler.runTaskLater(() -> {
                 p.setGameMode(GameMode.SPECTATOR);
                 p.teleport(players.iterator().next().getPlayer());
             }, 0.5);
@@ -142,9 +134,6 @@ public class GameManagerImpl implements GameManager {
         if(worldConfiguration != null && worldConfiguration.isPlayable()) {
             makePlayerJoinsLobby(p);
         }
-
-        // Add to musics
-        musicManager.addPlayer(p, MusicType.LOBBY);
 
         // Test if the game should start.
         testShouldStartGame();
@@ -185,25 +174,23 @@ public class GameManagerImpl implements GameManager {
         }
 
         // After one second, test if no/one player are remaining.
-        MainROC2.runTaskLater(this::testGameOverMissingPlayers, 1);
+        RocScheduler.runTaskLater(this::testGameOverMissingPlayers, 1);
         player.setTag(null);
     }
 
     private void testGameOverMissingPlayers() {
         if(!isStatePlaying()) return;
         int remainingPlayers = getOnlinePlayersCount();
-        ReignOfCubes2.logInfo("A player left. Remaining online = " + remainingPlayers);
-        if(isStatePlaying() && remainingPlayers <= 1) {
-            if(remainingPlayers == 0) {
-                ReignOfCubes2.logInfo("No players remaining. Stopping game.");
-                stop();
-            } else {
-                RocPlayerImpl alone = players()
-                        .filter(rp -> rp.getPlayer().isOnline())
-                        .findFirst().orElseThrow();
-                alone.sendMessage("game.alone");
-                victory(alone);
-            }
+        ReignOfCubes2.logger().info("A player left. Remaining online = " + remainingPlayers);
+        if(remainingPlayers == 0) {
+            ReignOfCubes2.logger().info("No players remaining. Stopping game.");
+            stop();
+        } else  if(remainingPlayers == 1) {
+            RocPlayerImpl alone = players()
+                    .filter(rp -> rp.getPlayer().isOnline())
+                    .findFirst().orElseThrow();
+            alone.sendMessage("game.alone");
+            victory(alone);
         }
     }
 
@@ -212,7 +199,7 @@ public class GameManagerImpl implements GameManager {
         if(worldConfiguration == null || ! worldConfiguration.isPlayable()) return;
         int minPlayers = getRules().getPlayerCountMin();
         if(players.size() >= minPlayers) {
-            ReignOfCubes2.logInfo("Enough players (" + players.size() + " >= " + minPlayers + ") ! Will start the game now.");
+            ReignOfCubes2.logger().info("Enough players (" + players.size() + " >= " + minPlayers + ") ! Will start the game now.");
             startCountdown();
         }
     }
@@ -267,6 +254,7 @@ public class GameManagerImpl implements GameManager {
         ranking.update(victim, killer);
     }
 
+    @Deprecated(forRemoval = true)
     @EventHandler(ignoreCancelled = true)
     void onKingChanged(@NotNull KingChangedEvent event) {
         RocPlayer oldKing = event.getOldKing();
@@ -337,7 +325,7 @@ public class GameManagerImpl implements GameManager {
 
     public void startCountdown() {
         if(isStatePlaying()) {
-            ReignOfCubes2.logWarning("Tried to start countdown... Game already started.");
+            ReignOfCubes2.logger().warn("Tried to start countdown... Game already started.");
             return;
         }
         assert state == GameState.WAITING;
@@ -350,11 +338,11 @@ public class GameManagerImpl implements GameManager {
 
     public void stopCountdown() {
         if(state != GameState.COUNT_DOWN) {
-            ReignOfCubes2.logWarning("GameManager#stopCountdown() called in state " + state);
+            ReignOfCubes2.logger().warn("GameManager#stopCountdown() called in state " + state);
             return;
         }
         if(countdown == null) {
-            ReignOfCubes2.logWarning("GameManager#stopCountdown() has a... null countdown ??");
+            ReignOfCubes2.logger().warn("GameManager#stopCountdown() has a... null countdown ??");
             return;
         }
         countdown.cancel();
@@ -381,7 +369,7 @@ public class GameManagerImpl implements GameManager {
         players.updateRanking(ranking);
 
         // Start score timer
-        gameTimer = MainROC2.runTaskTimer(() -> {
+        gameTimer = RocScheduler.runTaskTimer(() -> {
             if(hasKing()) {
                 king.addScore(getRules().getScoreKingPerSecond(), ScoreAddReason.KING_EVERY_SECOND);
                 king.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 40, 0, false, false, true));
@@ -393,8 +381,8 @@ public class GameManagerImpl implements GameManager {
         }, 1);
 
         // Clear entities after loading (
-        MainROC2.runTaskLater(() -> {
-            ReignOfCubes2.logInfo("Clear all entities of world.");
+        RocScheduler.runTaskLater(() -> {
+            ReignOfCubes2.logger().info("Clear all entities of world.");
             world.getEntities().stream()
                     .filter(e -> !(e instanceof Player))
                     .forEach(Entity::remove);
@@ -407,13 +395,13 @@ public class GameManagerImpl implements GameManager {
         }
 
         broadcast("game.start");
-        ReignOfCubes2.logInfo("Game started.");
+        ReignOfCubes2.logger().info("Game started.");
     }
 
     public void stop() {
         // Not playing ? Why are we here ??
         if(state != GameState.PLAYING) {
-            ReignOfCubes2.logWarning("Useless GameManager#stop(), because state is " + state);
+            ReignOfCubes2.logger().warn("Useless GameManager#stop(), because state is " + state);
             return;
         }
 
@@ -434,10 +422,9 @@ public class GameManagerImpl implements GameManager {
         throne = null;
         state = GameState.WAITING;
         isVictory = false;
-        pickups.purgeAndStop();
 
         // Message and go back to spawn
-        ReignOfCubes2.logInfo("Game stopped.");
+        ReignOfCubes2.logger().info("Game stopped.");
         for(RocPlayerImpl pl : players) {
             musicManager.addPlayer(pl.getPlayer(), MusicType.LOBBY);
             pl.reset();
@@ -446,7 +433,7 @@ public class GameManagerImpl implements GameManager {
 
         // Reset throne
         loadConfiguration(configsManager.getDefault());
-        MainROC2.runTaskLater(this::testShouldStartGame, 2);
+        RocScheduler.runTaskLater(this::testShouldStartGame, 2);
     }
 
     @Override
@@ -478,7 +465,7 @@ public class GameManagerImpl implements GameManager {
     private void victory(@NotNull RocPlayer player) {
         // Print messages
         broadcast("game.end-victory", player.getName(), player.getScore());
-        ReignOfCubes2.logInfo("Player " + player.getName() + " won.");
+        ReignOfCubes2.logger().info("Player " + player.getName() + " won.");
 
         // Propagates
         Bukkit.getPluginManager().callEvent(new GameStopEvent(player, ranking));
@@ -492,7 +479,7 @@ public class GameManagerImpl implements GameManager {
         isVictory = true;
 
         // In X seconds, stop and restart
-        MainROC2.runTaskLater(this::stop, 7);
+        RocScheduler.runTaskLater(this::stop, 7);
     }
 
     public Stream<RocPlayerImpl> players() {
@@ -511,7 +498,7 @@ public class GameManagerImpl implements GameManager {
     }
 
     @Override
-    public void playSound(SoundEffect effect) {
+    public void playSound(@NotNull SoundEffect effect) {
         players().forEach(p -> p.playSound(effect.sound(), effect.volume(), effect.pitch()));
     }
 
@@ -521,10 +508,9 @@ public class GameManagerImpl implements GameManager {
         player.changePlayerInstance(p);
 
         // clear stuff anyway, and teleport
-        ReignOfCubes2.logInfo("Player re-joined : " + p.getName() + ".");
+        ReignOfCubes2.logger().info("Player re-joined : " + p.getName() + ".");
         p.teleport(getActiveConfiguration().get(true));
         player.respawned();
-        musicManager.addPlayer(p, MusicType.PLAY_NORMAL);
     }
 
     /**
