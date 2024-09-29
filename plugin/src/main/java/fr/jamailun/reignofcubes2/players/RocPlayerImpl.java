@@ -1,23 +1,19 @@
 package fr.jamailun.reignofcubes2.players;
 
-import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.RocScheduler;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.api.events.player.PlayerScoreLostEvent;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.api.players.ScoreAddReason;
 import fr.jamailun.reignofcubes2.api.players.ScoreRemoveReason;
-import fr.jamailun.reignofcubes2.api.sounds.SoundEffect;
 import fr.jamailun.reignofcubes2.api.tags.RocTag;
 import fr.jamailun.reignofcubes2.api.events.player.PlayerScoreGainedEvent;
-import fr.jamailun.reignofcubes2.messages.Messages;
 import fr.jamailun.reignofcubes2.music.SoundsLibrary;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -26,15 +22,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Wrap players for the RoC game.
  */
 
-public class RocPlayerImpl implements RocPlayer {
-
-    @Getter private Player player;
+public class RocPlayerImpl extends BasicRocPlayer {
 
     @Getter private int score = 0;
     @Getter private float gold = 0;
@@ -46,8 +39,8 @@ public class RocPlayerImpl implements RocPlayer {
 
     private RocTag tag;
 
-    public RocPlayerImpl(Player player) {
-        this.player = player;
+    public RocPlayerImpl(@NotNull Player player) {
+        super(player);
     }
 
     @Override
@@ -117,39 +110,6 @@ public class RocPlayerImpl implements RocPlayer {
     }
 
     @Override
-    public void playSound(@NotNull SoundEffect effect) {
-        playSound(effect.sound(), effect.volume(), effect.pitch());
-    }
-
-    @Override
-    public void sendMessage(String entry, Object... args) {
-        Messages.send(player, language, entry, args);
-    }
-
-    public String i18n(String entry, Object... args) {
-        return Messages.format(language, entry, args);
-    }
-
-    @Override
-    public @NotNull UUID getUUID() {
-        return player.getUniqueId();
-    }
-
-    @Override
-    public @NotNull String getName() {
-        return player.getName();
-    }
-
-    @Override
-    public boolean isValid() {
-        return player.isValid() && player.isOnline();
-    }
-
-    @Override
-    public void teleport(@NotNull Location location) {
-        player.teleport(location);
-    }
-
     public void reset() {
         score = 0;
         lastMoneySpent = 0;
@@ -162,17 +122,11 @@ public class RocPlayerImpl implements RocPlayer {
         player.setSaturation(20);
         player.clearActivePotionEffects();
         clearTag();
-    }
-
-    public void respawned() {
-        lastMoneySpent = 0;
-        lastDamager = null;
-        player.clearActivePotionEffects();
 
         // Equip default kit
         Kit defaultKit = ReignOfCubes2.kits().getDefaultKit();
         if(defaultKit == null) {
-            ReignOfCubes2.logError("No default kit !");
+            ReignOfCubes2.logger().error("No default kit !");
         } else {
             defaultKit.equip(this);
         }
@@ -183,8 +137,8 @@ public class RocPlayerImpl implements RocPlayer {
             getPlayer().getInventory().setItem(8, is);
         }
 
-        // Heal
-        MainROC2.runTaskLater(() -> {
+        // Heal (after small delay, in case of respawn).
+        RocScheduler.runTaskLater(() -> {
             player.updateInventory();
             player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue());
         }, 0.5);
@@ -213,21 +167,6 @@ public class RocPlayerImpl implements RocPlayer {
             return Objects.equals(rp.getUUID(), getUUID());
         }
         return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return getUUID().hashCode();
-    }
-
-    public void playSound(@NotNull Sound sound, float volume, float pitch) {
-        if(!isValid()) return;
-        player.playSound(player.getLocation(), sound, volume, pitch);
-    }
-
-    @Override
-    public @NotNull Location getLocation() {
-        return player.getLocation();
     }
 
     public void changePlayerInstance(Player player) {
@@ -260,4 +199,21 @@ public class RocPlayerImpl implements RocPlayer {
         return Optional.ofNullable(tag);
     }
 
+    @Override
+    public boolean isSpectator() {
+        return false;
+    }
+
+    @Override
+    public void resetAndGoToLobby() {
+        if(ReignOfCubes2.isLobbySet())
+            teleport(ReignOfCubes2.getLobby());
+
+        player.setGameMode(GameMode.ADVENTURE);
+        player.setSaturation(20);
+        player.setFoodLevel(20);
+        player.getInventory().clear();
+
+        player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue());
+    }
 }

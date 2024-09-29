@@ -1,6 +1,8 @@
 package fr.jamailun.reignofcubes2.listeners;
 
 import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.players.RocPlayerImpl;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -17,7 +19,7 @@ public class PlayerRespawnListener extends RocListener {
         if(shouldIgnore(event.getPlayer().getWorld())) {
             return;
         }
-        RocPlayerImpl player = game().getPlayerImplementation(event.getPlayer());
+        RocPlayer player = ReignOfCubes2.findPlayer(event.getPlayer());
         if(player == null)
             return; // Ignore completely
 
@@ -25,7 +27,7 @@ public class PlayerRespawnListener extends RocListener {
         event.setRespawnLocation(game().getActiveConfiguration().getSafeSpawn(true));
 
         // Signal respawn to the player class.
-        player.respawned();
+        player.reset();
     }
 
 }

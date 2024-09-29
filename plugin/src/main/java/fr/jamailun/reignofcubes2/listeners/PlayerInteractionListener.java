@@ -25,7 +25,7 @@ public class PlayerInteractionListener extends RocListener {
         // Ignore non-playing state or non right-click.
         Player p = e.getPlayer();
         if(! (
-                game().isStatePlaying() &&
+                ReignOfCubes2.isPlaying() &&
                 (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) &&
                 p.getInventory().getHeldItemSlot() == 8
         )) {

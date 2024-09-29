@@ -4,6 +4,7 @@ import fr.jamailun.reignofcubes2.api.GameManager;
 import fr.jamailun.reignofcubes2.api.GameState;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.configuration.RocConfigurationsManager;
+import fr.jamailun.reignofcubes2.api.events.game.CountdownStartEvent;
 import fr.jamailun.reignofcubes2.api.events.game.GameStopEvent;
 import fr.jamailun.reignofcubes2.api.events.player.KingChangedEvent;
 import fr.jamailun.reignofcubes2.api.events.player.PlayerScoreChangedEvent;
@@ -18,7 +19,6 @@ import fr.jamailun.reignofcubes2.configuration.GameConfiguration;
 import fr.jamailun.reignofcubes2.configuration.GameConfigurationsManager;
 import fr.jamailun.reignofcubes2.configuration.GameRules;
 import fr.jamailun.reignofcubes2.messages.Messages;
-import fr.jamailun.reignofcubes2.music.MusicManagerImpl;
 import fr.jamailun.reignofcubes2.gameplay.GameCountdownImpl;
 import fr.jamailun.reignofcubes2.music.SoundsLibrary;
 import fr.jamailun.reignofcubes2.players.PlayersManager;
@@ -153,8 +153,7 @@ public class GameManagerImpl implements GameManager {
     }
 
     public void playerLeftServer(Player p) {
-        musicManager.removePlayer(p);
-        players.maybeLeave(p);
+        players.playerLeft(p);
         if(!players.exists(p)) {
             return;
         }
@@ -194,13 +193,15 @@ public class GameManagerImpl implements GameManager {
         }
     }
 
-    private void testShouldStartGame() {
+    private synchronized void testShouldStartGame() {
         if(state != GameState.WAITING) return;
         if(worldConfiguration == null || ! worldConfiguration.isPlayable()) return;
+
         int minPlayers = getRules().getPlayerCountMin();
         if(players.size() >= minPlayers) {
             ReignOfCubes2.logger().info("Enough players (" + players.size() + " >= " + minPlayers + ") ! Will start the game now.");
-            startCountdown();
+            state = GameState.COUNT_DOWN;
+            Bukkit.getPluginManager().callEvent(new CountdownStartEvent(CountdownStartEvent.Reason.ENOUGH_PLAYERS));
         }
     }
 
@@ -262,12 +263,10 @@ public class GameManagerImpl implements GameManager {
 
         // Always do those actions
         if(oldKing != null) {
-            musicManager.addPlayer(oldKing.getPlayer(), MusicType.PLAY_NORMAL);
             oldKing.setKing(false);
             oldKing.playSound(SoundsLibrary.DEAD_AS_KING);
         }
         if(newKing != null) {
-            musicManager.addPlayer(newKing.getPlayer(), MusicType.PLAY_KING);
             newKing.setKing(true);
             broadcast("event.king.new", newKing.getName());
             newKing.addScore(getRules().getScoreKingBonus(), ScoreAddReason.KING_FLAT_BONUS);
@@ -412,7 +411,7 @@ public class GameManagerImpl implements GameManager {
         // Reset players, score, king and state.
         gameTimer.cancel();
         gameTimer = null;
-        players.clearOfflines();
+        players.clearOfflinePlayers();
         ranking.clear();
         if(king != null) {
             king.setKing(false);

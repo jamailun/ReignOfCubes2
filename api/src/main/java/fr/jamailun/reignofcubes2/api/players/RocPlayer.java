@@ -53,4 +53,13 @@ public interface RocPlayer extends RocTagHolder, RocDamageable, RocEntity, RocMe
 
     @NotNull Location getLocation();
 
+    boolean isSpectator();
+
+    void resetAndGoToLobby();
+
+    /**
+     * Reset after a respawn.
+     */
+    void reset();
+
 }

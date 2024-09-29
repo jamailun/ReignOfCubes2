@@ -4,7 +4,6 @@ import com.xxmicloxx.NoteBlockAPI.model.*;
 import com.xxmicloxx.NoteBlockAPI.songplayer.Fade;
 import com.xxmicloxx.NoteBlockAPI.songplayer.RadioSongPlayer;
 import com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder;
-import fr.jamailun.reignofcubes2.MainROC2;
 import fr.jamailun.reignofcubes2.RocScheduler;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.music.MusicManager;
@@ -43,7 +42,7 @@ public class MusicManagerImpl implements MusicManager {
         for(MusicType type : MusicType.values()) {
             List<Song> songs = loadSongs(type);
             if(songs.isEmpty()) {
-                ReignOfCubes2.logWarning("No music for playlist " + type + " !");
+                ReignOfCubes2.logger().warn("No music for playlist " + type + " !");
                 continue;
             }
 
@@ -53,7 +52,7 @@ public class MusicManagerImpl implements MusicManager {
             radio.setRepeatMode(RepeatMode.ALL);
             radios.put(type, radio);
 
-            ReignOfCubes2.logInfo("Music type " + type + " loaded " + songs.size() + " songs.");
+            ReignOfCubes2.logger().info("Music type " + type + " loaded " + songs.size() + " songs.");
         }
 
         // refresh listeners
@@ -76,7 +75,7 @@ public class MusicManagerImpl implements MusicManager {
                 Song song = NBSDecoder.parse(file);
                 songs.add(song);
             } catch (Throwable e) {
-                ReignOfCubes2.logError("Error when parsing " + file + " : " + e.getMessage());
+                ReignOfCubes2.logger().error("Error when parsing " + file + " : " + e.getMessage());
             }
         }
         return songs;
@@ -93,10 +92,10 @@ public class MusicManagerImpl implements MusicManager {
         if(type != null && radios.containsKey(type)) {
             RadioSongPlayer radio = radios.get(type);
             radio.removePlayer(uuid);
-            ReignOfCubes2.logInfo("Player left radio " + type);
+            ReignOfCubes2.logger().info("Player left radio " + type);
             if(radio.getPlayerUUIDs().isEmpty()) {
                 radio.setPlaying(false);
-                ReignOfCubes2.logInfo("Radio stopped.");
+                ReignOfCubes2.logger().info("Radio stopped.");
             }
         }
     }
@@ -118,10 +117,10 @@ public class MusicManagerImpl implements MusicManager {
             RadioSongPlayer radio = radios.get(type);
             radio.addPlayer(uuid);
             listeners.put(uuid, type);
-            ReignOfCubes2.logInfo("Player joined radio " + type);
+            ReignOfCubes2.logger().info("Player joined radio " + type);
             if(!radio.isPlaying()) {
                 radio.setPlaying(true, new Fade(FadeType.LINEAR, 40));
-                ReignOfCubes2.logInfo("Radio started (" + radio.getVolume() + ")");
+                ReignOfCubes2.logger().info("Radio started (" + radio.getVolume() + ")");
             }
         }
     }

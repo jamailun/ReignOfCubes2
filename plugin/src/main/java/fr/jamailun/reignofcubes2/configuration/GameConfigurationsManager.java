@@ -30,7 +30,7 @@ public final class GameConfigurationsManager implements RocConfigurationsManager
 
         File[] files = directory.listFiles();
         if(files == null || files.length == 0) {
-            ReignOfCubes2.logWarning("No configuration exist at all.");
+            ReignOfCubes2.logger().warn("No configuration exist at all.");
             return;
         }
 
@@ -40,7 +40,7 @@ public final class GameConfigurationsManager implements RocConfigurationsManager
                 GameConfiguration configuration = new GameConfiguration(file);
                 configurations.put(configuration.getName(), configuration);
             } catch (BadConfigurationException e) {
-                ReignOfCubes2.logError("Could not load file " + file + " : " + e.getMessage());
+                ReignOfCubes2.logger().error("Could not load file " + file + " : " + e.getMessage());
             }
         }
 
@@ -48,16 +48,16 @@ public final class GameConfigurationsManager implements RocConfigurationsManager
         ConfigurationSection config = MainROC2.getDefaultConfiguration();
         String defaultName = config.getString("default");
         if(defaultName == null) {
-            ReignOfCubes2.logWarning("No default configuration set.");
+            ReignOfCubes2.logger().warn("No default configuration set.");
             return;
         }
         GameConfiguration configuration = get(defaultName);
         if(configuration == null) {
-            ReignOfCubes2.logError("Unknown default configuration: '" + defaultName + "'.");
+            ReignOfCubes2.logger().error("Unknown default configuration: '" + defaultName + "'.");
             return;
         }
         if(!configuration.isPlayable()) {
-            ReignOfCubes2.logError("Invalid default configuration: '" + defaultName + "'.");
+            ReignOfCubes2.logger().error("Invalid default configuration: '" + defaultName + "'.");
             return;
         }
         defaultConfiguration = configuration;
@@ -88,7 +88,7 @@ public final class GameConfigurationsManager implements RocConfigurationsManager
         // validity
         GameConfiguration config = get(configurationName);
         if(config == null || ! config.isPlayable()) {
-            ReignOfCubes2.logError("Cannot set "+ configurationName + " has default configuration : it is invalid/null.");
+            ReignOfCubes2.logger().error("Cannot set "+ configurationName + " has default configuration : it is invalid/null.");
             return;
         }
         // save
@@ -143,7 +143,7 @@ public final class GameConfigurationsManager implements RocConfigurationsManager
         try {
             configuration.save();
         } catch(IOException e) {
-            ReignOfCubes2.logError("Could not save " + configuration + ": " + e);
+            ReignOfCubes2.logger().error("Could not save " + configuration + ": " + e);
             return null;
         }
         configurations.put(name, configuration);

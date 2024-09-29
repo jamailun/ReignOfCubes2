@@ -3,6 +3,7 @@ package fr.jamailun.reignofcubes2.api;
 import fr.jamailun.reignofcubes2.api.configuration.kits.KitsManager;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.api.utils.RocLogger;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -71,6 +72,26 @@ public final class ReignOfCubes2 {
      */
     public static @NotNull GameState state() {
         return service.state();
+    }
+
+    public static boolean isPlaying() {
+        return state() == GameState.PLAYING;
+    }
+
+    public static void broadcast(@NotNull String entry, @NotNull Object... args) {
+        service.broadcast(entry, args);
+    }
+
+    public static boolean isLobbySet() {
+        return getLobby() != null;
+    }
+
+    public static Location getLobby() {
+        return service.getLobby();
+    }
+
+    public static void setLobby(@NotNull Location lobby) {
+        service.setLobby(lobby);
     }
 
 }

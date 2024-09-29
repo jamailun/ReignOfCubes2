@@ -175,7 +175,7 @@ public class RocKit implements Kit {
         }
 
         // if in game ? add shop item !
-        if(ReignOfCubes2.game().isStatePlaying()) {
+        if(ReignOfCubes2.isPlaying()) {
             ItemStack is = ReignOfCubes2.game().getActiveConfiguration().getShopItem();
             if (is != null) {
                 p.getInventory().setItem(8, is);

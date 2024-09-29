@@ -3,6 +3,7 @@ package fr.jamailun.reignofcubes2.api;
 import fr.jamailun.reignofcubes2.api.configuration.kits.KitsManager;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.api.utils.RocLogger;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,4 +25,10 @@ public interface RocService {
     @NotNull List<RocPlayer> players();
 
     @NotNull GameState state();
+
+    void broadcast(@NotNull String entry, @NotNull Object... args);
+
+    Location getLobby();
+
+    void setLobby(@NotNull Location lobby);
 }

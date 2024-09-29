@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 
 @RequiredArgsConstructor
@@ -62,5 +63,10 @@ public class RocSoundsHandler implements Listener {
         if(ReignOfCubes2.state() != GameState.PLAYING) {
             musicManager.addPlayer(event.getPlayer(), MusicType.LOBBY);
         }
+    }
+
+    @EventHandler
+    void onPlayerLeave(@NotNull PlayerQuitEvent event) {
+        musicManager.removePlayer(event.getPlayer());
     }
 }

@@ -27,14 +27,14 @@ public class PlayerDamageListener extends RocListener {
 
     @EventHandler(priority = EventPriority.LOW)
     void playerDamageLobby(@NotNull EntityDamageEvent event) {
-        if( ! game().isStatePlaying()) {
+        if( ! ReignOfCubes2.isPlaying()) {
             event.setCancelled(shouldCancelNonPlaying(event));
         }
     }
 
     @EventHandler
     void entityDamageEvent(@NotNull EntityDamageByEntityEvent event) {
-        if( ! game().isStatePlaying()) {
+        if( ! ReignOfCubes2.isPlaying()) {
             event.setCancelled(shouldCancelNonPlaying(event));
             return;
         }

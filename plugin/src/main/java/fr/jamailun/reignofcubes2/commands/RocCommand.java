@@ -97,7 +97,7 @@ public class RocCommand extends AbstractCommand {
             // Set the current configuration
             if(arg.equalsIgnoreCase("enable")) {
                 if(args.length == 0) return error(sender, "Specify the configuration to use.");
-                if(game().isStatePlaying()) {
+                if(ReignOfCubes2.isPlaying()) {
                     return error(sender, "Cannot change configuration while playing.");
                 }
                 String name = args[0];
@@ -115,7 +115,7 @@ public class RocCommand extends AbstractCommand {
 
             if(arg.equalsIgnoreCase("set-default")) {
                 if(args.length == 0) return error(sender, "Specify the configuration to use.");
-                if(game().isStatePlaying()) {
+                if(ReignOfCubes2.isPlaying()) {
                     return error(sender, "Cannot change configuration while playing.");
                 }
                 String name = args[0];
@@ -494,7 +494,7 @@ public class RocCommand extends AbstractCommand {
         }
 
         if(arg.equalsIgnoreCase("tp.lobby")) {
-            if(game().isStatePlaying()) {
+            if(ReignOfCubes2.isPlaying()) {
                 return error(sender, "Cannot interrupt game while playing. Stop-it first.");
             }
             RocConfiguration config = game().getActiveConfiguration();
@@ -543,7 +543,7 @@ public class RocCommand extends AbstractCommand {
         }
 
         if(arg.equalsIgnoreCase("stop")) {
-            if(game().isStatePlaying()) {
+            if(ReignOfCubes2.isPlaying()) {
                 info(sender, "Stopping game.");
                 game().broadcast("game.cancelled", sender.getName());
                 game().stop();
@@ -593,7 +593,7 @@ public class RocCommand extends AbstractCommand {
         }
 
         if(arg.equalsIgnoreCase("cheat")) {
-            if(!game().isStatePlaying()) return error(sender, "Cannot cheat before the game starts.");
+            if(!ReignOfCubes2.isPlaying()) return error(sender, "Cannot cheat before the game starts.");
             if(args.length < 1) return missingArgument(sender, args_1_cheat);
             arg = args[0];
             args = next(args);

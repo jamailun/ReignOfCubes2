@@ -5,19 +5,17 @@ import fr.jamailun.reignofcubes2.api.GameState;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.RocService;
 import fr.jamailun.reignofcubes2.api.configuration.kits.KitsManager;
-import fr.jamailun.reignofcubes2.api.configuration.sections.RocConfigurationSectionsRegistry;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
 import fr.jamailun.reignofcubes2.api.utils.RocLogger;
 import fr.jamailun.reignofcubes2.commands.*;
 import fr.jamailun.reignofcubes2.configuration.KitsConfigurationManager;
 import fr.jamailun.reignofcubes2.configuration.kits.RocKitItem;
-import fr.jamailun.reignofcubes2.configuration.sections.GameRulesSection;
-import fr.jamailun.reignofcubes2.configuration.sections.TagsConfigurationSection;
-import fr.jamailun.reignofcubes2.configuration.sections.WorldSection;
 import fr.jamailun.reignofcubes2.listeners.*;
 import fr.jamailun.reignofcubes2.messages.Messages;
 import fr.jamailun.reignofcubes2.music.MusicManagerImpl;
 import fr.jamailun.reignofcubes2.placeholder.RocPlaceholderExpansion;
+import fr.jamailun.reignofcubes2.players.PlayersManager;
+import fr.jamailun.reignofcubes2.state.GameStateManager;
 import fr.jamailun.reignofcubes2.tags.NinjaTag;
 import fr.jamailun.reignofcubes2.tags.RegicideTag;
 import fr.jamailun.reignofcubes2.tags.StealerTag;
@@ -26,17 +24,18 @@ import fr.jamailun.reignofcubes2.utils.RocLoggerImpl;
 import io.papermc.paper.plugin.configuration.PluginMeta;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -45,6 +44,9 @@ import java.util.List;
 public final class MainROC2 extends JavaPlugin implements RocService {
 
     private static MainROC2 INSTANCE;
+
+    private final PlayersManager players = new PlayersManager();
+    @Getter private final GameStateManager gameState = new GameStateManager(players);
 
     @Getter private GameManagerImpl gameManager;
     @Getter private MusicManagerImpl musicManager;
@@ -92,7 +94,7 @@ public final class MainROC2 extends JavaPlugin implements RocService {
 
     private void enableRoc() {
         // Game manager
-        gameManager = new GameManagerImpl(musicManager);
+        gameManager = new GameManagerImpl();
 
         // Listeners
         new PlayerConnectionListener(this);
@@ -168,7 +170,22 @@ public final class MainROC2 extends JavaPlugin implements RocService {
 
     @Override
     public @NotNull List<RocPlayer> players() {
-        return gameManager.
+        return new ArrayList<>(players.list());
+    }
+
+    @Override
+    public void broadcast(@NotNull String message, @NotNull Object... args) {
+        players.broadcast(message, args);
+    }
+
+    @Override
+    public Location getLobby() {
+        return null;
+    }
+
+    @Override
+    public void setLobby(@NotNull Location lobby) {
+
     }
 
     @Override
@@ -186,5 +203,7 @@ public final class MainROC2 extends JavaPlugin implements RocService {
     public static Plugin plugin() {
         return INSTANCE;
     }
+
+
 
 }

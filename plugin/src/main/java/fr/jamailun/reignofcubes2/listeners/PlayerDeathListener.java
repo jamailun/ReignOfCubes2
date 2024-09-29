@@ -28,7 +28,7 @@ public class PlayerDeathListener extends RocListener {
 
     @EventHandler
     void savePunchingBallInLobby(@NotNull EntityDeathEvent event) {
-        if(game().isStatePlaying())
+        if(ReignOfCubes2.isPlaying())
             return;
         if(!(event.getEntity() instanceof Player)) {
             EntityDamageEvent last = event.getEntity().getLastDamageCause();

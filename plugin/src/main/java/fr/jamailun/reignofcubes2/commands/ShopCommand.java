@@ -30,7 +30,7 @@ public class ShopCommand extends AbstractCommand {
         if(player == null)
             return error(sender, "Tu n'es pas dans le jeu. Déso pas déso.");
 
-        if(!game().isStatePlaying()) {
+        if(!ReignOfCubes2.isPlaying()) {
             info(sender, "La partie n'ayant pas encore commencé, voici les kits actuellement configurés.");
             new AdminKitsGUI(player);
             return true;
