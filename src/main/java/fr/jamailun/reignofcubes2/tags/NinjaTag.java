@@ -64,7 +64,7 @@ public class NinjaTag extends Tag {
                 p.hidePlayer(ReignOfCubes2.plugin(), player);
             }
         });
-        player.getWorld().spawnParticle(Particle.SMOKE_LARGE, player.getLocation().clone().add(0, 0.6, 0), 2);
+        player.getWorld().spawnParticle(Particle.LARGE_SMOKE, player.getLocation().clone().add(0, 0.6, 0), 2);
     }
 
     public void show(RocPlayer rocPlayer) {
@@ -82,7 +82,7 @@ public class NinjaTag extends Tag {
             }
         });
 
-        player.getWorld().spawnParticle(Particle.SMOKE_LARGE, player.getLocation().clone().add(0, 0.6, 0), 2);
+        player.getWorld().spawnParticle(Particle.LARGE_SMOKE, player.getLocation().clone().add(0, 0.6, 0), 2);
     }
 
     @Override

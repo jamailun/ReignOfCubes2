@@ -14,7 +14,7 @@ public class SoundsLibrary {
 
 
     public final static SoundEntry GAME_STARTED_1 = new SoundEntry(Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.95f);
-    public final static SoundEntry GAME_STARTED_2 = new SoundEntry(Sound.ENTITY_WOLF_HOWL, 1.1f);
+    public final static SoundEntry GAME_STARTED_2 = new SoundEntry(Sound.ENTITY_WOLF_BIG_GROWL, 1.1f);
 
 
     // BLOCK_BEACON_POWER_SELECT
