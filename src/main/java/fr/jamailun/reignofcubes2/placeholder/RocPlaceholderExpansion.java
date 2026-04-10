@@ -10,14 +10,17 @@ import fr.jamailun.reignofcubes2.objects.GameCountdown;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.text.DecimalFormat;
 import java.util.Optional;
 
 public class RocPlaceholderExpansion extends PlaceholderExpansion {
 
     private final static String NONE = "§7none";
+    private static final DecimalFormat FORMAT = new DecimalFormat("#");
 
     private final GameManager game;
 
@@ -32,6 +35,9 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
             return currentSong
                     .map(song -> song.getTitle() == null || song.getTitle().isEmpty() ? "§f§oInconnue" : "§e" + song.getTitle())
                     .orElse("§7§oAucune");
+        }
+        if("health".equals(param)) {
+            return getPlayerHealth(player);
         }
 
         RocPlayer rocPlayer = game.toPlayer(player);
@@ -182,5 +188,23 @@ public class RocPlaceholderExpansion extends PlaceholderExpansion {
 
     private String bool(boolean bool) {
         return bool ? "1" : "0";
+    }
+
+    private static @NotNull String getPlayerHealth(@NotNull Player player) {
+        double healthValue = player.getHealth();
+        String health = getHealthColor(player) + FORMAT.format(healthValue) + " ❤";
+
+        double absValue = player.getAbsorptionAmount();
+        if(absValue <= 0) return health;
+        String abs = "&6" + FORMAT.format(absValue) + " ❤";
+        return health + " " + abs;
+    }
+
+    private static @NotNull String getHealthColor(@NotNull Player player) {
+        if(player.hasPotionEffect(PotionEffectType.WITHER))
+            return "&0";
+        if(player.hasPotionEffect(PotionEffectType.POISON))
+            return "&2";
+        return "&c";
     }
 }
