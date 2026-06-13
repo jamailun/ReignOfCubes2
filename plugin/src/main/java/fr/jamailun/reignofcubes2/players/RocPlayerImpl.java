@@ -56,6 +56,7 @@ public class RocPlayerImpl implements RocPlayer {
         assert delta > 0;
 
         score += delta;
+        if (score > 1000) score = 1000;
         if(reason.hasMessage())
             sendMessage("score.base.gain", String.valueOf(delta), reason.toString(language));
 

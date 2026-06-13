@@ -475,7 +475,7 @@ public class GameManagerImpl implements GameManager {
     public void checkVictory(@Nonnull RocPlayer player) {
         assert isStatePlaying();
 
-        if(player.getScore() >= getRules().getScoreGoal()) {
+        if (player.isKing() && player.getScore() >= getRules().getScoreGoal()) {
             victory(player);
         }
     }
