@@ -30,7 +30,7 @@ public class PlayersManager implements Iterable<RocPlayerImpl> {
         if(players.containsKey(uuid)) {
             return players.get(uuid);
         }
-        RocPlayerImpl rp = new RocPlayerImpl(player);
+        RocPlayerImpl rp = new RocPlayerImpl(player, game);
         players.put(uuid, rp);
         return rp;
     }

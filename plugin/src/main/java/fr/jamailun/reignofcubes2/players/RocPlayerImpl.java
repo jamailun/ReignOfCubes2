@@ -1,6 +1,8 @@
 package fr.jamailun.reignofcubes2.players;
 
+import fr.jamailun.reignofcubes2.GameManagerImpl;
 import fr.jamailun.reignofcubes2.MainROC2;
+import fr.jamailun.reignofcubes2.api.GameManager;
 import fr.jamailun.reignofcubes2.api.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.api.configuration.kits.Kit;
 import fr.jamailun.reignofcubes2.api.players.RocPlayer;
@@ -9,6 +11,7 @@ import fr.jamailun.reignofcubes2.api.players.ScoreRemoveReason;
 import fr.jamailun.reignofcubes2.api.sounds.SoundEffect;
 import fr.jamailun.reignofcubes2.api.tags.RocTag;
 import fr.jamailun.reignofcubes2.api.events.player.ScoreGainedEvent;
+import fr.jamailun.reignofcubes2.configuration.sections.GameRulesSection;
 import fr.jamailun.reignofcubes2.configuration.sections.WorldSection;
 import fr.jamailun.reignofcubes2.messages.Messages;
 import fr.jamailun.reignofcubes2.music.SoundsLibrary;
@@ -35,7 +38,6 @@ import java.util.UUID;
 public class RocPlayerImpl implements RocPlayer {
 
     @Getter private Player player;
-
     @Getter private int score = 0;
     @Getter private float gold = 0;
     @Getter @Setter private boolean isKing = false;
@@ -43,11 +45,13 @@ public class RocPlayerImpl implements RocPlayer {
     @Getter private int lastMoneySpent = 0;
     private RocPlayer lastDamager;
     private long lastDamageTook = 0;
+    private final GameManagerImpl game;
 
     private RocTag tag;
 
-    public RocPlayerImpl(Player player) {
+    public RocPlayerImpl(Player player, GameManagerImpl game) {
         this.player = player;
+        this.game = game;
     }
 
     @Override
@@ -56,7 +60,7 @@ public class RocPlayerImpl implements RocPlayer {
         assert delta > 0;
 
         score += delta;
-        if (score > 1000) score = 1000;
+        if (score > game.getRules().getScoreGoal()) score = game.getRules().getScoreGoal();
         if(reason.hasMessage())
             sendMessage("score.base.gain", String.valueOf(delta), reason.toString(language));
 
