@@ -134,7 +134,7 @@ public class RocPlayer {
 
     public RocPlayer getLastDamager() {
         long now = System.currentTimeMillis();
-        if(now - lastDamageTook <= 6000) { // last 6 seconds ?
+        if(now - lastDamageTook <= 20000) { // last 20 seconds ?
             return lastDamager;
         }
         return null;
