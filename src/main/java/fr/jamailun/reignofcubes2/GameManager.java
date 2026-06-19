@@ -458,7 +458,11 @@ public class GameManager {
         assert isPlaying();
 
         if(player.getScore() >= getRules().getScoreGoal()) {
-            victory(player);
+            if(player.isKing()) {
+                victory(player);
+            } else {
+                player.setScore(getRules().getScoreGoal());
+            }
         }
     }
 
