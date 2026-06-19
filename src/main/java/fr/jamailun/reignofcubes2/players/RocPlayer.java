@@ -28,7 +28,7 @@ public class RocPlayer {
 
     @Getter private Player player;
 
-    @Getter private int score = 0;
+    @Getter @Setter private int score = 0;
     @Getter @Setter private boolean isKing = false;
     @Getter @Setter private String language = "fr";
     @Getter @Setter private int lastMoneySpent = 0;
