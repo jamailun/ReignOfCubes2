@@ -4,18 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -100,13 +95,6 @@ public class ItemBuilder {
     @SuppressWarnings("deprecation")
     public ItemBuilder setDurability(short dur){
         item.setDurability(dur);
-        return this;
-    }
-
-    public ItemBuilder addAttribute(Attribute attribute, double amount, Operation op, EquipmentSlot slot) {
-        ItemMeta im = item.getItemMeta();
-        im.addAttributeModifier(attribute, new AttributeModifier(UUID.randomUUID(), attribute.toString(), amount, op, slot));
-        item.setItemMeta(im);
         return this;
     }
 
@@ -231,7 +219,7 @@ public class ItemBuilder {
     public ItemBuilder shine() {
         if( ! item.getEnchantments().isEmpty() )
             return this;
-        addUnsafeEnchantment(Enchantment.DURABILITY, 1);
+        addUnsafeEnchantment(Enchantment.UNBREAKING, 1);
         addItemFlag(ItemFlag.HIDE_ENCHANTS);
         return this;
     }

@@ -304,11 +304,11 @@ public class WorldConfiguration {
                         Location b = throneB.toLocation(player.getWorld());
                         ParticlesPlayer.playBox(player, a, b, 0.2, Particle.FLAME);
                     } else {
-                        ParticlesPlayer.playLine(player, a, a.clone().add(0, 0.1, 0), 0.1, Particle.ENCHANTMENT_TABLE);
+                        ParticlesPlayer.playLine(player, a, a.clone().add(0, 0.1, 0), 0.1, Particle.ENCHANT);
                     }
                 } else if(throneB != null) {
                     Location b = throneB.toLocation(player.getWorld());
-                    ParticlesPlayer.playLine(player, b, b.clone().add(0, 0.1, 0), 0.1, Particle.ENCHANTMENT_TABLE);
+                    ParticlesPlayer.playLine(player, b, b.clone().add(0, 0.1, 0), 0.1, Particle.ENCHANT);
                 }
 
                 // spawns
@@ -320,7 +320,7 @@ public class WorldConfiguration {
                 // Generators
                 for(Vector v : generators) {
                     Location l = v.toLocation(player.getWorld()).add(0, 0.1, 0);
-                    ParticlesPlayer.playCircleXZ(player, l, 1, Math.toRadians(6), Particle.TOTEM);
+                    ParticlesPlayer.playCircleXZ(player, l, 1, Math.toRadians(6), Particle.TOTEM_OF_UNDYING);
                 }
 
                 //lobby

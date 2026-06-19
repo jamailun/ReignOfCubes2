@@ -1,6 +1,7 @@
 package fr.jamailun.reignofcubes2;
 
 import fr.jamailun.reignofcubes2.configuration.*;
+import fr.jamailun.reignofcubes2.configuration.GameRules;
 import fr.jamailun.reignofcubes2.configuration.pickups.PickupConfigEntry;
 import fr.jamailun.reignofcubes2.messages.Messages;
 import fr.jamailun.reignofcubes2.music.MusicManager;
@@ -140,7 +141,7 @@ public class GameManager {
         p.setGameMode(GameMode.ADVENTURE);
 
         // Heal + saturation
-        p.setHealth(Objects.requireNonNull(p.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue());
+        p.setHealth(Objects.requireNonNull(p.getAttribute(Attribute.MAX_HEALTH)).getValue());
         p.setFoodLevel(20);
     }
 
@@ -368,7 +369,7 @@ public class GameManager {
                 king.addScore(getRules().getScoreKingPerSecond(), ScoreAddReason.KING_EVERY_SECOND);
                 king.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 40, 0, false, false, true));
                 if(throne != null && throne.isAlreadyInside(king)) {
-                    king.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 40, 0, false, false, true));
+                    king.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 40, 0, false, false, true));
                 }
                 ranking.update(king);
             }

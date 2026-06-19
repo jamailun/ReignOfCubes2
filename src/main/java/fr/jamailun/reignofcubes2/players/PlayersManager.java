@@ -111,7 +111,7 @@ public class PlayersManager implements Iterable<RocPlayer> {
             player.setFoodLevel(20);
             player.getInventory().clear();
 
-            player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue());
+            player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.MAX_HEALTH)).getValue());
         }
     }
 
