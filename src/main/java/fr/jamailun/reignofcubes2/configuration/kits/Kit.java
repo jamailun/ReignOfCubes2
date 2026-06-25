@@ -12,7 +12,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -112,7 +111,7 @@ public class Kit {
             ItemStack item = inventory.getItem(slot);
             if(item != null) {
                 player.getPlayer().sendMessage("§fslot=§a"+slot+"§f, item=§e"+item.getType().name().toLowerCase());
-                KitItem ki = new KitItem(slot, item);
+                KitItem ki = new KitItem(slot, item.clone());
                 items.add(ki);
 
                 if(ki.getItem().getType() == Material.AIR) {
