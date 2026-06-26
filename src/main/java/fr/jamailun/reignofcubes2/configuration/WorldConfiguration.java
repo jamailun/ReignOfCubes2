@@ -314,7 +314,7 @@ public class WorldConfiguration {
                 // spawns
                 for(Vector v : spawns) {
                     Location l = v.toLocation(player.getWorld());
-                    ParticlesPlayer.playCircleXZ(player, l, 1, Math.toRadians(6), Particle.DRAGON_BREATH);
+                    ParticlesPlayer.playCircleXZ(player, l, 1, Math.toRadians(6), Particle.HEART);
                 }
 
                 // Generators
