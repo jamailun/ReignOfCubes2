@@ -54,9 +54,9 @@ public final class ReignOfCubes2 extends JavaPlugin {
         musicManager = new MusicManager(getFile("musics"));
 
         // Load tags
-        TagsRegistry.register(new RegicideTag());
-        TagsRegistry.register(new NinjaTag());
-        TagsRegistry.register(new StealerTag());
+        TagsRegistry.register(new RegicideTag(this));
+        TagsRegistry.register(new NinjaTag(this));
+        TagsRegistry.register(new StealerTag(this));
 
         // Load kits
         kitsConfiguration = new KitsConfiguration(getFile("kits"));

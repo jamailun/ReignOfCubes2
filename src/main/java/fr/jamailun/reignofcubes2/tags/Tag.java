@@ -1,6 +1,8 @@
 package fr.jamailun.reignofcubes2.tags;
 
+import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.jetbrains.annotations.NotNull;
@@ -12,13 +14,16 @@ import org.jetbrains.annotations.Nullable;
 public abstract class Tag {
 
     private final String id;
+    protected final ReignOfCubes2 plugin;
 
     /**
      * Create a new tag.
      * @param id the unique ID of this tag.
+     * @param plugin the main plugin instance.
      */
-    public Tag(@NotNull String id) {
+    public Tag(@NotNull String id, @NotNull ReignOfCubes2 plugin) {
         this.id = id;
+        this.plugin = plugin;
     }
 
     /**
@@ -55,6 +60,34 @@ public abstract class Tag {
      */
     public final @NotNull String getId() {
         return id;
+    }
+
+    /**
+     * Check a player has this tag.
+     * @param player player to check.
+     * @return true if player has the tag.
+     */
+    protected boolean is(@NotNull RocPlayer player) {
+        return player.getTag().map(tag -> tag.getId().equals(id)).orElse(false);
+    }
+
+    /**
+     * Check a player has this tag.
+     * @param player player to check.
+     * @return true if player has the tag.
+     */
+    protected boolean is(@NotNull Player player) {
+        RocPlayer hPlayer = plugin.getGameManager().toPlayer(player);
+        return hPlayer != null && is(hPlayer);
+    }
+
+    /**
+     * Map a bukkit player to a ROC player.
+     * @param player player to use.
+     * @return null if the player is not in the game.
+     */
+    protected @Nullable RocPlayer getRocPlayer(@NotNull Player player) {
+        return plugin.getGameManager().toPlayer(player);
     }
 
 }

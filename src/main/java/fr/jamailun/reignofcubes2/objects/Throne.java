@@ -2,6 +2,7 @@ package fr.jamailun.reignofcubes2.objects;
 
 import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import fr.jamailun.reignofcubes2.events.CeremonyStartEvent;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import fr.jamailun.reignofcubes2.utils.MinMax;
 import lombok.Getter;
@@ -66,7 +67,10 @@ public class Throne {
         }
 
         if(playersInside.size() == 1 && canStart && !hasCeremony()) {
-            startCeremony(player);
+            // try to start : only do it when not cancelled.
+            if(new CeremonyStartEvent(player).callEvent()) {
+                startCeremony(player);
+            }
         }
     }
 

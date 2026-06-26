@@ -13,8 +13,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public class RegicideTag extends Tag {
 
-    public RegicideTag() {
-        super("regicide");
+    public RegicideTag(@NotNull ReignOfCubes2 plugin) {
+        super("regicide", plugin);
     }
 
     @Override

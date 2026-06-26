@@ -15,8 +15,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public class StealerTag extends Tag {
 
-    public StealerTag() {
-        super("stealer");
+    public StealerTag(@NotNull ReignOfCubes2 plugin) {
+        super("stealer", plugin);
     }
 
     @Override

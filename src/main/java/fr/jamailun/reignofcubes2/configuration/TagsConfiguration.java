@@ -28,6 +28,10 @@ public class TagsConfiguration {
     // Stealer
     private int stealerPointsPerHit;
 
+    // Ninja
+    private int ninjaCooldownMs;
+    private boolean ninjaCaptureDisableStealth;
+
     public static @Nonnull TagsConfiguration load(@Nullable ConfigurationSection config) {
         if(config == null)
             return defaultConfiguration();
@@ -49,6 +53,11 @@ public class TagsConfiguration {
         ConfigurationSection stealer = config.getConfigurationSection("stealer");
         if(stealer != null) {
             rules.stealerPointsPerHit = stealer.getInt("points-per-hit", 0);
+        }
+        // Ninja
+        ConfigurationSection ninja = config.getConfigurationSection("ninja");
+        if(ninja != null) {
+            // Load ninja-specific configuration here
         }
 
         return rules;

@@ -1,6 +1,8 @@
 package fr.jamailun.reignofcubes2.tags;
 
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import org.bukkit.Bukkit;
+import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,10 +25,14 @@ public final class TagsRegistry {
     public static void register(@NotNull Tag tag) {
         tags.put(tag.getId(), tag);
         ReignOfCubes2.info("New tag registered : '" + tag.getId() + "'.");
+
+        if(tag instanceof Listener tagListener) {
+            Bukkit.getPluginManager().registerEvents(tagListener, ReignOfCubes2.plugin());
+        }
     }
 
     /**
-     * Find a tag from uts ID.
+     * Find a tag from its ID.
      * @param id the ID of the tag to find.
      * @return null if no tags exist with this ID.
      */
