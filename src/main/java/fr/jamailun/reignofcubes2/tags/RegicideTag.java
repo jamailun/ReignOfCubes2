@@ -19,12 +19,12 @@ public class RegicideTag extends Tag {
 
     @Override
     public void added(@NotNull RocPlayer holder) {
-        ReignOfCubes2.info("[debug] " + holder.getName() + " is now REGICIDE");
+        ReignOfCubes2.debug(holder.getName() + " is now REGICIDE");
     }
 
     @Override
     public void removed(@NotNull RocPlayer holder) {
-        ReignOfCubes2.info("[debug] " + holder.getName() + " is not regicide anymore.");
+        ReignOfCubes2.debug(holder.getName() + " is not regicide anymore.");
     }
 
     @Override

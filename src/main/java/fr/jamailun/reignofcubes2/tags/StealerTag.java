@@ -21,12 +21,12 @@ public class StealerTag extends Tag {
 
     @Override
     public void added(@NotNull RocPlayer holder) {
-        ReignOfCubes2.info("[debug] " + holder.getName() + " is now stealer");
+        ReignOfCubes2.debug(holder.getName() + " is now stealer");
     }
 
     @Override
     public void removed(@NotNull RocPlayer holder) {
-        ReignOfCubes2.info("[debug] " + holder.getName() + " is NOT stealer anymore.");
+        ReignOfCubes2.debug(holder.getName() + " is NOT stealer anymore.");
     }
 
     @Override

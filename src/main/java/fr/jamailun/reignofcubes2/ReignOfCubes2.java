@@ -117,6 +117,9 @@ public final class ReignOfCubes2 extends JavaPlugin {
         return new File(INSTANCE.getDataFolder(), name);
     }
 
+    public static void debug(String message) {
+        INSTANCE.getLogger().fine(message);
+    }
     public static void info(String msg) {
         INSTANCE.getLogger().info(msg);
     }

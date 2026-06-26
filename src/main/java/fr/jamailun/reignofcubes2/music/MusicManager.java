@@ -89,10 +89,10 @@ public class MusicManager {
         if(type != null && radios.containsKey(type)) {
             RadioSongPlayer radio = radios.get(type);
             radio.removePlayer(uuid);
-            ReignOfCubes2.info("Player left radio " + type);
+            ReignOfCubes2.debug("Player left radio " + type);
             if(radio.getPlayerUUIDs().isEmpty()) {
                 radio.setPlaying(false);
-                ReignOfCubes2.info("Radio stopped.");
+                ReignOfCubes2.debug("Radio stopped.");
             }
         }
     }
@@ -112,10 +112,10 @@ public class MusicManager {
             RadioSongPlayer radio = radios.get(type);
             radio.addPlayer(uuid);
             listeners.put(uuid, type);
-            ReignOfCubes2.info("Player joined radio " + type);
+            ReignOfCubes2.debug("Player joined radio " + type);
             if(!radio.isPlaying()) {
                 radio.setPlaying(true, new Fade(FadeType.LINEAR, 40));
-                ReignOfCubes2.info("Radio started (" + radio.getVolume() + ")");
+                ReignOfCubes2.debug("Radio started (" + radio.getVolume() + ")");
             }
         }
     }

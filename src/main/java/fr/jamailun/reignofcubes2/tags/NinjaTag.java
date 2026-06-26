@@ -32,13 +32,13 @@ public class NinjaTag extends Tag {
 
     @Override
     public void added(@NotNull RocPlayer holder) {
-        ReignOfCubes2.info("[debug] " + holder.getName() + " is now NINJA");
+        ReignOfCubes2.debug(holder.getName() + " is now NINJA");
         holder.getPlayer().showDemoScreen();
     }
 
     @Override
     public void removed(@NotNull RocPlayer holder) {
-        ReignOfCubes2.info("[debug] " + holder.getName() + " is not NINJA anymore.");
+        ReignOfCubes2.debug(holder.getName() + " is not NINJA anymore.");
         show(holder);
     }
 
