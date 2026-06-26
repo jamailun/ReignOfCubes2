@@ -9,51 +9,47 @@ import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.jetbrains.annotations.NotNull;
 
+/**
+ * Listener to prevent some actions.
+ */
 public class DisabledActionsListener extends RocListener {
-    public DisabledActionsListener(ReignOfCubes2 plugin) {
-        super(plugin);
-    }
+  public DisabledActionsListener(@NotNull ReignOfCubes2 plugin) {
+    super(plugin);
+  }
 
-    @EventHandler
-    public void playerDrop(PlayerDropItemEvent e) {
-        if(e.getPlayer().getGameMode() != GameMode.CREATIVE) {
-            e.setCancelled(true);
-        }
+  @EventHandler
+  void playerDrop(@NotNull PlayerDropItemEvent e) {
+    if (e.getPlayer().getGameMode() != GameMode.CREATIVE) {
+      e.setCancelled(true);
     }
+  }
 
-    @EventHandler
-    public void playerBreakBlock(BlockBreakEvent e) {
-        if(e.getPlayer().getGameMode() != GameMode.CREATIVE) {
-            e.setCancelled(true);
-        }
+  @EventHandler
+  void playerBreakBlock(@NotNull BlockBreakEvent e) {
+    if (e.getPlayer().getGameMode() != GameMode.CREATIVE) {
+      e.setCancelled(true);
     }
+  }
 
-    @EventHandler
-    public void playerPlaceBlock(BlockPlaceEvent e) {
-        if(e.getPlayer().getGameMode() != GameMode.CREATIVE) {
-            e.setCancelled(true);
-        }
+  @EventHandler
+  void playerPlaceBlock(@NotNull BlockPlaceEvent e) {
+    if (e.getPlayer().getGameMode() != GameMode.CREATIVE) {
+      e.setCancelled(true);
     }
+  }
 
-    @EventHandler
-    public void playerCraft(CraftItemEvent e) {
-        if(e.getWhoClicked().getGameMode() != GameMode.CREATIVE) {
-            e.setCancelled(true);
-        }
+  @EventHandler
+  void playerCraft(@NotNull CraftItemEvent e) {
+    if (e.getWhoClicked().getGameMode() != GameMode.CREATIVE) {
+      e.setCancelled(true);
     }
+  }
 
-    @EventHandler
-    public void playerSwapItems(PlayerSwapHandItemsEvent e) {
-        if(e.getPlayer().getGameMode() != GameMode.CREATIVE) {
-            e.setCancelled(true);
-        }
-    }
-
-    @EventHandler
-    public void playerPickupArrow(PlayerPickupArrowEvent e) {
-        e.setCancelled(true);
-        e.getArrow().remove();
-    }
-
+  @EventHandler
+  void playerPickupArrow(@NotNull PlayerPickupArrowEvent e) {
+    e.setCancelled(true);
+    e.getArrow().remove();
+  }
 }

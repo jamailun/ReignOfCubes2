@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+//TODO this is dogshit. Do not use PlayerMoveEvent ...
 public class PlayerMovementListener extends RocListener {
 
     public PlayerMovementListener(ReignOfCubes2 plugin) {
