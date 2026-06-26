@@ -90,11 +90,26 @@ abstract class AbstractCommand implements CommandExecutor, TabCompleter {
             consumer.accept(v);
             return info(sender, success);
         } catch(NumberFormatException ignored) {
-            error(sender, "Invalid integer value: '"+value+"'");
+            error(sender, "Invalid double value: '"+value+"'");
             return false;
         }
     }
-
+    protected boolean setBool(CommandSender sender, String value, Consumer<Boolean> consumer, String success) {
+        return switch (value.toLowerCase()) {
+            case "true", "yes", "1" -> {
+                consumer.accept(true);
+                yield info(sender, success);
+            }
+            case "false", "no", "0" -> {
+                consumer.accept(false);
+                yield info(sender, success);
+            }
+            default -> {
+                error(sender, "Invalid boolean value: '" + value + "'");
+                yield false;
+            }
+        };
+    }
 
     protected RocPlayer getPlayer(CommandSender sender, String playerName) {
         Optional<RocPlayer> player = game().findPlayer(playerName);

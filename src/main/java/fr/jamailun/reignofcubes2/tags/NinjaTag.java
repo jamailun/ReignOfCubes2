@@ -118,7 +118,7 @@ public class NinjaTag extends Tag implements Listener {
 
   @EventHandler
   void playerStartsCapturing(@NotNull CeremonyStartEvent event) {
-    if(is(event.getPlayer())) {
+    if(is(event.getPlayer()) && ReignOfCubes2.getTags().isNinjaCaptureDisableStealth()) {
       show(event.getPlayer());
     }
   }

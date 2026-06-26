@@ -57,7 +57,8 @@ public class TagsConfiguration {
         // Ninja
         ConfigurationSection ninja = config.getConfigurationSection("ninja");
         if(ninja != null) {
-            // Load ninja-specific configuration here
+            rules.ninjaCaptureDisableStealth = ninja.getBoolean("disable-stealth-on-capture", true);
+            rules.ninjaCooldownMs = ninja.getInt("cooldown-millis", 5000);
         }
 
         return rules;
@@ -79,6 +80,9 @@ public class TagsConfiguration {
         regicide.set("defend-others-mult", regicideDefendMultiplicativeOthers);
         ConfigurationSection stealer = config.createSection("stealer");
         stealer.set("points-per-hit", stealerPointsPerHit);
+        ConfigurationSection ninja = config.createSection("ninja");
+        ninja.set("disable-stealth-on-capture", ninjaCaptureDisableStealth);
+        ninja.set("cooldown-millis", ninjaCooldownMs);
     }
 
     /**
@@ -105,6 +109,10 @@ public class TagsConfiguration {
         // Stealer
         config.stealerPointsPerHit = 1;
 
+        // Ninja
+        config.ninjaCaptureDisableStealth = true;
+        config.ninjaCooldownMs = 5000;
+
         return config;
     }
 
@@ -127,6 +135,8 @@ public class TagsConfiguration {
                 + prefix + "  §7defend.others.mult = " + niceDouble(regicideDefendMultiplicativeOthers, 1)
                 + prefix + "},"
                 + prefix + "§7stealer.points-per-hit = " + niceInt(stealerPointsPerHit, 0)
+                + prefix + "§7ninja.disable-stealth-on-capture = " + (ninjaCaptureDisableStealth ? "§atrue" : "§cfalse")
+                + prefix + "§7ninja.cooldown-millis = " + niceInt(ninjaCooldownMs, 0)
                 + last + "§7}";
     }
 

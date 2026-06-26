@@ -65,7 +65,8 @@ public class RocCommand extends AbstractCommand {
             "regicide.attack.others.flat", "regicide.attack.others.mult",
             "regicide.defend.king.flat", "regicide.defend.king.mult",
             "regicide.defend.others.flat", "regicide.defend.others.mult",
-            "stealer.points-per-hit"
+            "stealer.points-per-hit",
+            "ninja.cooldown-ms", "ninja.disable-stealth-on-capture"
     );
 
     public RocCommand(ReignOfCubes2 plugin) {
@@ -201,6 +202,8 @@ public class RocCommand extends AbstractCommand {
                     case "regicide.defend.others.flat" -> setDouble(sender, value, tags::setRegicideDefendFlatOthers, success);
                     case "regicide.defend.others.mult" -> setDouble(sender, value, tags::setRegicideDefendMultiplicativeOthers, success);
                     case "stealer.points-per-hit" -> setInt(sender, value, tags::setStealerPointsPerHit, success);
+                    case "ninja.cooldown-ms" -> setInt(sender, value, tags::setNinjaCooldownMs, success);
+                    case "ninja.disable-stealth-on-capture" -> setBool(sender, value, tags::setNinjaCaptureDisableStealth, success);
                     default -> unexpectedArgument(sender, property, args_2_edit);
                 };
                 if(isSuccess) {
