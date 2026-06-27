@@ -32,6 +32,10 @@ public class TagsConfiguration {
     private int ninjaCooldownMs;
     private boolean ninjaCaptureDisableStealth;
 
+    // Stealer
+    private double throneStealerModifierNormal;
+    private double throneStealerModifierStealing;
+
     public static @Nonnull TagsConfiguration load(@Nullable ConfigurationSection config) {
         if(config == null)
             return defaultConfiguration();
@@ -49,16 +53,25 @@ public class TagsConfiguration {
             rules.regicideDefendFlatOthers = regicide.getDouble("defend-others-flat", 0);
             rules.regicideDefendMultiplicativeOthers = regicide.getDouble("defend-others-mult", 1);
         }
+
         // Stealer
         ConfigurationSection stealer = config.getConfigurationSection("stealer");
         if(stealer != null) {
             rules.stealerPointsPerHit = stealer.getInt("points-per-hit", 0);
         }
+
         // Ninja
         ConfigurationSection ninja = config.getConfigurationSection("ninja");
         if(ninja != null) {
             rules.ninjaCaptureDisableStealth = ninja.getBoolean("disable-stealth-on-capture", true);
             rules.ninjaCooldownMs = ninja.getInt("cooldown-millis", 5000);
+        }
+
+        // Throne stealer
+        ConfigurationSection throneStealer = config.getConfigurationSection("throneStealer");
+        if(throneStealer != null) {
+            rules.throneStealerModifierNormal = throneStealer.getDouble("modifier-normal", 0.5);
+            rules.throneStealerModifierStealing = throneStealer.getDouble("modifier-stealing", 0.33);
         }
 
         return rules;
@@ -83,6 +96,9 @@ public class TagsConfiguration {
         ConfigurationSection ninja = config.createSection("ninja");
         ninja.set("disable-stealth-on-capture", ninjaCaptureDisableStealth);
         ninja.set("cooldown-millis", ninjaCooldownMs);
+        ConfigurationSection throneStealer = config.createSection("throneStealer");
+        throneStealer.set("modifier-normal", throneStealerModifierNormal);
+        throneStealer.set("modifier-stealing", throneStealerModifierStealing);
     }
 
     /**
@@ -113,6 +129,10 @@ public class TagsConfiguration {
         config.ninjaCaptureDisableStealth = true;
         config.ninjaCooldownMs = 5000;
 
+        // Throne stealer
+        config.throneStealerModifierNormal = 0.5;
+        config.throneStealerModifierStealing = 0.33;
+
         return config;
     }
 
@@ -136,7 +156,9 @@ public class TagsConfiguration {
                 + prefix + "},"
                 + prefix + "§7stealer.points-per-hit = " + niceInt(stealerPointsPerHit, 0)
                 + prefix + "§7ninja.disable-stealth-on-capture = " + (ninjaCaptureDisableStealth ? "§atrue" : "§cfalse")
-                + prefix + "§7ninja.cooldown-millis = " + niceInt(ninjaCooldownMs, 0)
+                + prefix + "§7ninja.cooldown = " + niceDouble(ninjaCooldownMs, 0) + "ms"
+                + prefix + "§7throne-stealer.mult-normal = " + niceDouble(throneStealerModifierNormal, 0)
+                + prefix + "§7throne-stealer.mult-stealing = " + niceDouble(throneStealerModifierStealing, 0)
                 + last + "§7}";
     }
 

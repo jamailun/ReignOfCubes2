@@ -11,23 +11,25 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Event called when a ceremony starts.
  */
-@Getter
+@Getter @Setter
 public class CeremonyStartEvent extends Event implements Cancellable {
-    private static final HandlerList HANDLERS_LIST = new HandlerList();
+  private static final HandlerList HANDLERS_LIST = new HandlerList();
 
-    private final RocPlayer player;
-    @Setter private boolean cancelled = false;
+  private final RocPlayer player;
+  private boolean cancelled = false;
+  private double durationSeconds;
 
-    public CeremonyStartEvent(@NotNull RocPlayer player) {
-        this.player = player;
-    }
+  public CeremonyStartEvent(@NotNull RocPlayer player, double durationSeconds) {
+    this.player = player;
+    this.durationSeconds = durationSeconds;
+  }
 
-    @Override
-    public @NotNull HandlerList getHandlers() {
-        return HANDLERS_LIST;
-    }
+  @Override
+  public @NotNull HandlerList getHandlers() {
+    return HANDLERS_LIST;
+  }
 
-    public static HandlerList getHandlerList() {
-        return HANDLERS_LIST;
-    }
+  public static HandlerList getHandlerList() {
+    return HANDLERS_LIST;
+  }
 }

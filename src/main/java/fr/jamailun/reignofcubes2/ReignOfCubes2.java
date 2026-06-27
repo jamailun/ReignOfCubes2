@@ -9,10 +9,7 @@ import fr.jamailun.reignofcubes2.listeners.*;
 import fr.jamailun.reignofcubes2.music.MusicManager;
 import fr.jamailun.reignofcubes2.placeholder.RocPlaceholderExpansion;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
-import fr.jamailun.reignofcubes2.tags.NinjaTag;
-import fr.jamailun.reignofcubes2.tags.RegicideTag;
-import fr.jamailun.reignofcubes2.tags.StealerTag;
-import fr.jamailun.reignofcubes2.tags.TagsRegistry;
+import fr.jamailun.reignofcubes2.tags.*;
 import io.papermc.paper.plugin.configuration.PluginMeta;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -57,6 +54,7 @@ public final class ReignOfCubes2 extends JavaPlugin {
         TagsRegistry.register(new RegicideTag(this));
         TagsRegistry.register(new NinjaTag(this));
         TagsRegistry.register(new StealerTag(this));
+        TagsRegistry.register(new ThroneStealerTag(this));
 
         // Load kits
         kitsConfiguration = new KitsConfiguration(getFile("kits"));

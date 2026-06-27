@@ -24,10 +24,10 @@ public class Ceremony {
     private int dingCounter = 0;
     private boolean playsDings = false;
 
-    public Ceremony(GameManager game, RocPlayer player) {
+    public Ceremony(GameManager game, RocPlayer player, double duration) {
         this.game = game;
         this.player = player;
-        this.duration = game.getRules().getCrownDuration();
+        this.duration = duration;
         // Start
         task = ReignOfCubes2.runTaskTimer(this::tick, TICK_RATE);
         ReignOfCubes2.info("[CEREMONY] Started.");

@@ -68,8 +68,10 @@ public class Throne {
 
         if(playersInside.size() == 1 && canStart && !hasCeremony()) {
             // try to start : only do it when not cancelled.
-            if(new CeremonyStartEvent(player).callEvent()) {
-                startCeremony(player);
+            double baseDuration = game.getRules().getCrownDuration();
+            var event = new CeremonyStartEvent(player, baseDuration);
+            if(event.callEvent()) {
+                startCeremony(player, event.getDurationSeconds());
             }
         }
     }
@@ -89,9 +91,9 @@ public class Throne {
         return ceremony != null;
     }
 
-    private void startCeremony(RocPlayer player) {
+    private void startCeremony(RocPlayer player, double duration) {
         assert ceremony == null : "A ceremony already exists.";
-        ceremony = new Ceremony(game, player);
+        ceremony = new Ceremony(game, player, duration);
     }
 
     private void stopCeremony() {
