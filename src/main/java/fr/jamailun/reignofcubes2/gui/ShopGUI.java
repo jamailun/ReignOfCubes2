@@ -14,7 +14,7 @@ import java.util.List;
 public class ShopGUI extends MenuGUI {
 
     public ShopGUI(RocPlayer player) {
-        super(3, player, "gui.shop.title");
+        super(getLinesForKits(), player, "gui.shop.title");
         String costPrefix = "&7" + player.i18n("gui.shop.cost_prefix");
 
         // Kits ordered by price
@@ -66,6 +66,11 @@ public class ShopGUI extends MenuGUI {
                 .filter(k -> k.getCost() > 0)
                 .sorted(Comparator.comparing(Kit::getCost))
                 .toList();
+    }
+
+    private static int getLinesForKits() {
+        int count = ReignOfCubes2.getKits().getKits().size();
+        return 2 + (Math.max(0, count - 1) / 9);
     }
 
 }
