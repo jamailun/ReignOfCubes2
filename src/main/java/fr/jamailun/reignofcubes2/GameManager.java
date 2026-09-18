@@ -1,7 +1,6 @@
 package fr.jamailun.reignofcubes2;
 
 import fr.jamailun.reignofcubes2.configuration.*;
-import fr.jamailun.reignofcubes2.configuration.GameRules;
 import fr.jamailun.reignofcubes2.configuration.pickups.PickupConfigEntry;
 import fr.jamailun.reignofcubes2.messages.Messages;
 import fr.jamailun.reignofcubes2.music.MusicManager;
@@ -17,7 +16,10 @@ import fr.jamailun.reignofcubes2.players.ScoreRemoveReason;
 import fr.jamailun.reignofcubes2.utils.Ranking;
 import fr.jamailun.reignofcubes2.utils.WorldSetter;
 import lombok.Getter;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;

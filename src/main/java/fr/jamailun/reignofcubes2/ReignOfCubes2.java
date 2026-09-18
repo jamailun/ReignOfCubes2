@@ -1,6 +1,7 @@
 package fr.jamailun.reignofcubes2;
 
-import fr.jamailun.reignofcubes2.commands.*;
+import fr.jamailun.reignofcubes2.commands.RocCommand;
+import fr.jamailun.reignofcubes2.commands.ShopCommand;
 import fr.jamailun.reignofcubes2.configuration.KitsConfiguration;
 import fr.jamailun.reignofcubes2.configuration.TagsConfiguration;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;

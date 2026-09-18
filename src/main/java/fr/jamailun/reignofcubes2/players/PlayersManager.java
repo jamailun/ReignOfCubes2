@@ -2,7 +2,6 @@ package fr.jamailun.reignofcubes2.players;
 
 import fr.jamailun.reignofcubes2.GameManager;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
-import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
 import fr.jamailun.reignofcubes2.utils.Ranking;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;

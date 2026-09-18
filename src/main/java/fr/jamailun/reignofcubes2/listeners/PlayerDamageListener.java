@@ -11,7 +11,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class PlayerDamageListener extends RocListener {
     public PlayerDamageListener(ReignOfCubes2 plugin) {

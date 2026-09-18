@@ -2,10 +2,8 @@ package fr.jamailun.reignofcubes2.listeners;
 
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;

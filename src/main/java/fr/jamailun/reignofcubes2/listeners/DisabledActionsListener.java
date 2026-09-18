@@ -8,7 +8,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**

@@ -1,6 +1,5 @@
 package fr.jamailun.reignofcubes2.configuration.pickups;
 
-import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.configuration.WorldConfiguration;
 import fr.jamailun.reignofcubes2.utils.RandomBag;
 import org.bukkit.configuration.ConfigurationSection;

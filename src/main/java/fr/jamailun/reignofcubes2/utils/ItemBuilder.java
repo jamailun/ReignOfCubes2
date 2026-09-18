@@ -1,10 +1,5 @@
 package fr.jamailun.reignofcubes2.utils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
@@ -19,6 +14,11 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * I copied this from one of my repos. it was 1.15 ...
