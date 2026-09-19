@@ -1,14 +1,18 @@
 package fr.jamailun.reignofcubes2.utils;
 
+import lombok.experimental.UtilityClass;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * I hate so much this chat-Component API...
  */
+@UtilityClass
+@NullMarked
 public final class ComponentApiHelper {
-  private ComponentApiHelper() {
-  }
 
   private static final Map<Character, String> CONVERSIONS = new HashMap<>() {{
     put('0', "<black>");
@@ -36,7 +40,7 @@ public final class ComponentApiHelper {
     put('r', "<!k><!l><!m><!n><!o><white>");
   }};
 
-  public static String convertLegacy(String legacy) {
+  public static String convertLegacy(@Nullable String legacy) {
     if (legacy == null || legacy.isEmpty()) return "";
     StringBuilder output = new StringBuilder();
     char[] chars = legacy.toCharArray();
@@ -49,12 +53,9 @@ public final class ComponentApiHelper {
       output.append(previous);
     }
 
-    print(chars, 0, previousStart, '\0', previous, "", ignoreNext);
-
     // loop
     for (int i = 1; i < chars.length; i++) {
       char c = chars[i];
-      print(chars, i, previousStart, previous, c, output.toString(), ignoreNext);
 
       if (ignoreNext) {
         previous = c;
@@ -88,19 +89,11 @@ public final class ComponentApiHelper {
       }
     }
 
-    print(chars, chars.length, previousStart, previous, previous, output.toString(), ignoreNext);
-
     return output.toString();
   }
 
   private static boolean isStart(char c) {
     return c == '§' || c == '&';
   }
-
-  private static void print(char[] chars, int i, boolean previousStart, char previous, char c, String out, boolean ignoreNext) {
-    //System.out.println("> "+i+":["+ String.valueOf(chars, i, chars.length - i) +"]:'"+c+"'. " +
-    //        "prev='"+previous+"':" + previousStart + "." + (ignoreNext?"IGNORE_NEXT":"") + " output=\""+out+"\"");
-  }
-
 
 }

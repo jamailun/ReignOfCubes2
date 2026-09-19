@@ -10,7 +10,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Firework;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.NoSuchElementException;
 
@@ -23,6 +23,7 @@ import java.util.NoSuchElementException;
  * @param chance   the chance to summon it.
  * @param color    the color to use for the firework.
  */
+@NullMarked
 public record PickupConfigEntry(String id, Material material, int score, double chance, Color color) {
 
   /**
@@ -33,7 +34,7 @@ public record PickupConfigEntry(String id, Material material, int score, double 
    * @return a non-null and valid PickupConfigEntry.
    * @throws WorldConfiguration.BadWorldConfigurationException if the configuration is not valid.
    */
-  public static @NotNull PickupConfigEntry deserialize(@NotNull String id, @NotNull ConfigurationSection section) throws WorldConfiguration.BadWorldConfigurationException {
+  public static PickupConfigEntry deserialize(String id, ConfigurationSection section) throws WorldConfiguration.BadWorldConfigurationException {
     assertExists(id, section, "material");
     assertExists(id, section, "score");
     assertExists(id, section, "chance");
@@ -60,7 +61,7 @@ public record PickupConfigEntry(String id, Material material, int score, double 
    *
    * @param container the configuration holder to serialize to.
    */
-  public void serialize(@NotNull ConfigurationSection container) {
+  public void serialize(ConfigurationSection container) {
     ConfigurationSection section = container.createSection(id);
     //
     section.set("material", material.name());
@@ -79,7 +80,7 @@ public record PickupConfigEntry(String id, Material material, int score, double 
    *
    * @param location the location to spawn it.
    */
-  public void spawnFirework(@NotNull Location location) {
+  public void spawnFirework(Location location) {
     Firework fw = location.getWorld().spawn(location, Firework.class);
     FireworkMeta fwm = fw.getFireworkMeta();
     fwm.setPower(0);

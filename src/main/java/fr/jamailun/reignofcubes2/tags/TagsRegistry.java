@@ -1,6 +1,7 @@
 package fr.jamailun.reignofcubes2.tags;
 
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
+import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
@@ -14,9 +15,8 @@ import java.util.Map;
  *
  * @see #register(Tag)
  */
+@UtilityClass
 public final class TagsRegistry {
-  private TagsRegistry() {
-  }
 
   private static final Map<String, Tag> tags = new HashMap<>();
 

@@ -6,7 +6,9 @@ import fr.jamailun.reignofcubes2.configuration.SoundsLibrary;
 import fr.jamailun.reignofcubes2.music.MusicType;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import org.bukkit.scheduler.BukkitTask;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class Ceremony {
 
   // Relations
@@ -22,7 +24,7 @@ public class Ceremony {
 
   private static final int dingFrequency = 2;
   private int dingCounter = 0;
-  private boolean playsDings = false;
+  private final boolean playsDings;
 
   public Ceremony(GameManager game, RocPlayer player, double duration) {
     this.game = game;

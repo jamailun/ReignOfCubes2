@@ -1,5 +1,6 @@
 package fr.jamailun.reignofcubes2.messages;
 
+import com.google.common.base.Preconditions;
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import lombok.NonNull;
 import net.kyori.adventure.text.Component;
@@ -9,6 +10,7 @@ import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.jspecify.annotations.NullMarked;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -19,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+@NullMarked
 public class Messages {
 
   private String defaultLanguage = "fr";
@@ -69,20 +72,20 @@ public class Messages {
   }
 
   private static boolean assertFileExists(File file) {
-    assert file != null : "File is null";
     if (file.exists())
       return false;
     try {
-      assert file.createNewFile() : "Could not create file.";
+      if(!file.createNewFile())
+        throw new IOException("Could not create file.");
     } catch (IOException e) {
-      assert false : "Could not create file: " + e.getMessage();
+      throw new RuntimeException("Could not create Messages instance : " + e.getMessage());
     }
     return true;
   }
 
   private static void createFileFromJar(File file) {
     try (InputStream in = Messages.class.getClassLoader().getResourceAsStream("messages.yml")) {
-      assert in != null : "Could not get ressource messages.yml";
+      Preconditions.checkState(in != null, "Could not find messages.yml in jar resources.");
       byte[] data = in.readAllBytes();
 
       try (FileOutputStream out = new FileOutputStream(file)) {
@@ -94,7 +97,7 @@ public class Messages {
     }
   }
 
-  private static Messages INSTANCE;
+  private static @Nullable Messages INSTANCE;
 
   private static Messages instance() {
     if (INSTANCE == null) {
@@ -132,8 +135,7 @@ public class Messages {
     return parseComponent(format(language, entry, args));
   }
 
-  private static String niceFormat(String string, Object... values) {
-    assert string != null;
+  private static String niceFormat(String string, @Nullable Object... values) {
     if (values == null) return string;
 
     for (int i = 0; i < values.length; i++) {
@@ -147,9 +149,9 @@ public class Messages {
   }
 
   public static void reload() {
-    INSTANCE.messages.clear();
-    INSTANCE.shared.clear();
-    INSTANCE.init();
+    instance().messages.clear();
+    instance().shared.clear();
+    instance().init();
   }
 
   public static String getDefaultLanguage() {

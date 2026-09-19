@@ -1,6 +1,7 @@
 package fr.jamailun.reignofcubes2.configuration.kits;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.inventory.ItemStack;
@@ -12,20 +13,18 @@ import java.util.Map;
 
 @SerializableAs("KitItem")
 @Getter
+@NoArgsConstructor
 public class KitItem implements Cloneable, ConfigurationSerializable, Comparable<KitItem> {
 
   private int slot;
   private ItemStack item;
-
-  private KitItem() {
-  }
 
   public KitItem(int slot, ItemStack item) {
     this.slot = slot;
     this.item = item;
   }
 
-  public static KitItem deserialize(@NotNull Map<String, Object> map) {
+  public static @NotNull KitItem deserialize(@NotNull Map<String, Object> map) {
     KitItem config = new KitItem();
 
     config.slot = (int) map.get("slot");
@@ -34,7 +33,7 @@ public class KitItem implements Cloneable, ConfigurationSerializable, Comparable
     return config;
   }
 
-  public void equip(PlayerInventory inventory) {
+  public void equip(@NotNull PlayerInventory inventory) {
     inventory.setItem(slot, item);
   }
 
@@ -60,7 +59,7 @@ public class KitItem implements Cloneable, ConfigurationSerializable, Comparable
   }
 
   @Override
-  public KitItem clone() {
+  public @NotNull KitItem clone() {
     KitItem clone = new KitItem();
     clone.item = item.clone();
     clone.slot = slot;

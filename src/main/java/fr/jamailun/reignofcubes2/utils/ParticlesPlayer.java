@@ -1,14 +1,14 @@
 package fr.jamailun.reignofcubes2.utils;
 
+import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+@UtilityClass
 public final class ParticlesPlayer {
-  private ParticlesPlayer() {
-  }
 
   public static void playCircleXZ(Player target, Location center, double radius, double delta, Particle particle) {
     assert delta > 0;
