@@ -2,11 +2,15 @@ package fr.jamailun.reignofcubes2.configuration;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Configuration for native tags.
@@ -15,162 +19,195 @@ import javax.annotation.Nullable;
 @Setter
 public class TagsConfiguration {
 
+  // Regicide
+  private double regicideAttackFlatKing;
+  private double regicideAttackMultiplicativeKing;
+  private double regicideAttackFlatOthers;
+  private double regicideAttackMultiplicativeOthers;
+  private double regicideDefendFlatKing;
+  private double regicideDefendMultiplicativeKing;
+  private double regicideDefendFlatOthers;
+  private double regicideDefendMultiplicativeOthers;
+
+  // Stealer
+  private int stealerPointsPerHit;
+
+  // Ninja
+  private int ninjaCooldownMs;
+  private boolean ninjaCaptureDisableStealth;
+
+  // Stealer
+  private double throneStealerModifierNormal;
+  private double throneStealerModifierStealing;
+
+  // Gold
+  private final Set<Material> minableMaterials = new HashSet<>();
+  private int minablePoints;
+
+  public static @Nonnull TagsConfiguration load(@Nullable ConfigurationSection config) {
+    if (config == null)
+      return defaultConfiguration();
+
+    TagsConfiguration rules = new TagsConfiguration();
     // Regicide
-    private double regicideAttackFlatKing;
-    private double regicideAttackMultiplicativeKing;
-    private double regicideAttackFlatOthers;
-    private double regicideAttackMultiplicativeOthers;
-    private double regicideDefendFlatKing;
-    private double regicideDefendMultiplicativeKing;
-    private double regicideDefendFlatOthers;
-    private double regicideDefendMultiplicativeOthers;
+    ConfigurationSection regicide = config.getConfigurationSection("regicide");
+    if (regicide != null) {
+      rules.regicideAttackFlatKing = regicide.getDouble("attack-king-flat", 0);
+      rules.regicideAttackMultiplicativeKing = regicide.getDouble("attack-king-mult", 1);
+      rules.regicideAttackFlatOthers = regicide.getDouble("attack-others-flat", 0);
+      rules.regicideAttackMultiplicativeOthers = regicide.getDouble("attack-others-mult", 1);
+      rules.regicideDefendFlatKing = regicide.getDouble("defend-king-flat", 0);
+      rules.regicideDefendMultiplicativeKing = regicide.getDouble("defend-king-mult", 1);
+      rules.regicideDefendFlatOthers = regicide.getDouble("defend-others-flat", 0);
+      rules.regicideDefendMultiplicativeOthers = regicide.getDouble("defend-others-mult", 1);
+    }
 
     // Stealer
-    private int stealerPointsPerHit;
+    ConfigurationSection stealer = config.getConfigurationSection("stealer");
+    if (stealer != null) {
+      rules.stealerPointsPerHit = stealer.getInt("points-per-hit", 0);
+    }
 
     // Ninja
-    private int ninjaCooldownMs;
-    private boolean ninjaCaptureDisableStealth;
+    ConfigurationSection ninja = config.getConfigurationSection("ninja");
+    if (ninja != null) {
+      rules.ninjaCaptureDisableStealth = ninja.getBoolean("disable-stealth-on-capture", true);
+      rules.ninjaCooldownMs = ninja.getInt("cooldown-millis", 5000);
+    }
+
+    // Throne stealer
+    ConfigurationSection throneStealer = config.getConfigurationSection("throneStealer");
+    if (throneStealer != null) {
+      rules.throneStealerModifierNormal = throneStealer.getDouble("modifier-normal", 0.5);
+      rules.throneStealerModifierStealing = throneStealer.getDouble("modifier-stealing", 0.33);
+    }
+
+    // Mineur
+    ConfigurationSection mineur = config.getConfigurationSection("mineur");
+    if (mineur != null) {
+      rules.minableMaterials.clear();
+      for (String materialName : mineur.getStringList("minable-materials")) {
+        Material material = Material.getMaterial(materialName);
+        if (material != null) {
+          rules.minableMaterials.add(material);
+        }
+      }
+      rules.minablePoints = mineur.getInt("minable-points", 1);
+    }
+
+    return rules;
+  }
+
+  /**
+   * Serialize this GameRules to configuration.
+   *
+   * @param config the configuration to write to.
+   */
+  public void write(@NotNull ConfigurationSection config) {
+    ConfigurationSection regicide = config.createSection("regicide");
+    regicide.set("attack-king-flat", regicideAttackFlatKing);
+    regicide.set("attack-king-mult", regicideAttackMultiplicativeKing);
+    regicide.set("attack-others-flat", regicideAttackFlatOthers);
+    regicide.set("attack-others-mult", regicideAttackMultiplicativeOthers);
+    regicide.set("defend-king-flat", regicideDefendFlatKing);
+    regicide.set("defend-king-mult", regicideDefendMultiplicativeKing);
+    regicide.set("defend-others-flat", regicideDefendFlatOthers);
+    regicide.set("defend-others-mult", regicideDefendMultiplicativeOthers);
+    ConfigurationSection stealer = config.createSection("stealer");
+    stealer.set("points-per-hit", stealerPointsPerHit);
+    ConfigurationSection ninja = config.createSection("ninja");
+    ninja.set("disable-stealth-on-capture", ninjaCaptureDisableStealth);
+    ninja.set("cooldown-millis", ninjaCooldownMs);
+    ConfigurationSection throneStealer = config.createSection("throneStealer");
+    throneStealer.set("modifier-normal", throneStealerModifierNormal);
+    throneStealer.set("modifier-stealing", throneStealerModifierStealing);
+    ConfigurationSection mineur = config.createSection("mineur");
+    mineur.set("minable-materials", new java.util.ArrayList<>(minableMaterials));
+    mineur.set("minable-points", minablePoints);
+  }
+
+  /**
+   * Test if this rules-set is valid.
+   *
+   * @return false if the configuration cannot be played.
+   */
+  public boolean isValid() {
+    return (true);
+  }
+
+  public static @Nonnull TagsConfiguration defaultConfiguration() {
+    TagsConfiguration config = new TagsConfiguration();
+
+    // Regicide
+    config.regicideAttackFlatKing = 0;
+    config.regicideAttackMultiplicativeKing = 1.2;
+    config.regicideAttackFlatOthers = 0;
+    config.regicideAttackMultiplicativeOthers = 1.1;
+    config.regicideDefendFlatKing = 0;
+    config.regicideDefendMultiplicativeKing = 0.8;
+    config.regicideDefendFlatOthers = 0;
+    config.regicideDefendMultiplicativeOthers = 0.9;
 
     // Stealer
-    private double throneStealerModifierNormal;
-    private double throneStealerModifierStealing;
+    config.stealerPointsPerHit = 1;
 
-    public static @Nonnull TagsConfiguration load(@Nullable ConfigurationSection config) {
-        if(config == null)
-            return defaultConfiguration();
+    // Ninja
+    config.ninjaCaptureDisableStealth = true;
+    config.ninjaCooldownMs = 5000;
 
-        TagsConfiguration rules = new TagsConfiguration();
-        // Regicide
-        ConfigurationSection regicide = config.getConfigurationSection("regicide");
-        if(regicide != null) {
-            rules.regicideAttackFlatKing = regicide.getDouble("attack-king-flat", 0);
-            rules.regicideAttackMultiplicativeKing = regicide.getDouble("attack-king-mult", 1);
-            rules.regicideAttackFlatOthers = regicide.getDouble("attack-others-flat", 0);
-            rules.regicideAttackMultiplicativeOthers = regicide.getDouble("attack-others-mult", 1);
-            rules.regicideDefendFlatKing = regicide.getDouble("defend-king-flat", 0);
-            rules.regicideDefendMultiplicativeKing = regicide.getDouble("defend-king-mult", 1);
-            rules.regicideDefendFlatOthers = regicide.getDouble("defend-others-flat", 0);
-            rules.regicideDefendMultiplicativeOthers = regicide.getDouble("defend-others-mult", 1);
-        }
+    // Throne stealer
+    config.throneStealerModifierNormal = 0.5;
+    config.throneStealerModifierStealing = 0.33;
 
-        // Stealer
-        ConfigurationSection stealer = config.getConfigurationSection("stealer");
-        if(stealer != null) {
-            rules.stealerPointsPerHit = stealer.getInt("points-per-hit", 0);
-        }
+    // Mineur
+    config.minableMaterials.clear();
+    config.minableMaterials.addAll(List.of(Material.GOLD_ORE, Material.DEEPSLATE_GOLD_ORE, Material.NETHER_GOLD_ORE));
+    config.minablePoints = 1;
 
-        // Ninja
-        ConfigurationSection ninja = config.getConfigurationSection("ninja");
-        if(ninja != null) {
-            rules.ninjaCaptureDisableStealth = ninja.getBoolean("disable-stealth-on-capture", true);
-            rules.ninjaCooldownMs = ninja.getInt("cooldown-millis", 5000);
-        }
+    return config;
+  }
 
-        // Throne stealer
-        ConfigurationSection throneStealer = config.getConfigurationSection("throneStealer");
-        if(throneStealer != null) {
-            rules.throneStealerModifierNormal = throneStealer.getDouble("modifier-normal", 0.5);
-            rules.throneStealerModifierStealing = throneStealer.getDouble("modifier-stealing", 0.33);
-        }
+  /**
+   * Create a string for this object.
+   *
+   * @param prefix prefix of each line (indent)
+   * @param last   suffix (indent-1).
+   * @return a bukkit-colored String.
+   */
+  public String nicePrint(String prefix, String last) {
+    return "§7{"
+        + prefix + "§7regicide = {"
+        + prefix + "  §7attack.king.flat = " + niceDouble(regicideAttackFlatKing, 0)
+        + prefix + "  §7attack.king.mult = " + niceDouble(regicideAttackMultiplicativeKing, 1)
+        + prefix + "  §7attack.others.flat = " + niceDouble(regicideAttackFlatOthers, 0)
+        + prefix + "  §7attack.others.mult = " + niceDouble(regicideAttackMultiplicativeOthers, 1)
+        + prefix + "  §7defend.king.flat = " + niceDouble(regicideDefendFlatKing, 0)
+        + prefix + "  §7defend.king.mult = " + niceDouble(regicideDefendMultiplicativeKing, 1)
+        + prefix + "  §7defend.others.flat = " + niceDouble(regicideDefendFlatOthers, 0)
+        + prefix + "  §7defend.others.mult = " + niceDouble(regicideDefendMultiplicativeOthers, 1)
+        + prefix + "},"
+        + prefix + "§7stealer.points-per-hit = " + niceInt(stealerPointsPerHit, 0)
+        + prefix + "§7ninja.disable-stealth-on-capture = " + (ninjaCaptureDisableStealth ? "§atrue" : "§cfalse")
+        + prefix + "§7ninja.cooldown = " + niceDouble(ninjaCooldownMs, 0) + "ms"
+        + prefix + "§7throne-stealer.mult-normal = " + niceDouble(throneStealerModifierNormal, 0)
+        + prefix + "§7throne-stealer.mult-stealing = " + niceDouble(throneStealerModifierStealing, 0)
+        + last + "§7}";
+  }
 
-        return rules;
-    }
+  private String niceInt(int num, int zero) {
+    if (num == zero)
+      return "§e" + num;
+    return (num < zero ? "§c" : "§a") + num;
+  }
 
-    /**
-     * Serialize this GameRules to configuration.
-     * @param config the configuration to write to.
-     */
-    public void write(@NotNull ConfigurationSection config) {
-        ConfigurationSection regicide = config.createSection("regicide");
-        regicide.set("attack-king-flat", regicideAttackFlatKing);
-        regicide.set("attack-king-mult", regicideAttackMultiplicativeKing);
-        regicide.set("attack-others-flat", regicideAttackFlatOthers);
-        regicide.set("attack-others-mult", regicideAttackMultiplicativeOthers);
-        regicide.set("defend-king-flat", regicideDefendFlatKing);
-        regicide.set("defend-king-mult", regicideDefendMultiplicativeKing);
-        regicide.set("defend-others-flat", regicideDefendFlatOthers);
-        regicide.set("defend-others-mult", regicideDefendMultiplicativeOthers);
-        ConfigurationSection stealer = config.createSection("stealer");
-        stealer.set("points-per-hit", stealerPointsPerHit);
-        ConfigurationSection ninja = config.createSection("ninja");
-        ninja.set("disable-stealth-on-capture", ninjaCaptureDisableStealth);
-        ninja.set("cooldown-millis", ninjaCooldownMs);
-        ConfigurationSection throneStealer = config.createSection("throneStealer");
-        throneStealer.set("modifier-normal", throneStealerModifierNormal);
-        throneStealer.set("modifier-stealing", throneStealerModifierStealing);
-    }
+  private String niceDouble(double d, double zero) {
+    if (d == zero)
+      return "§e" + d;
+    return (d < zero ? "§c" : "§a") + d;
+  }
 
-    /**
-     * Test if this rules-set is valid.
-     * @return false if the configuration cannot be played.
-     */
-    public boolean isValid() {
-        return ( true );
-    }
-
-    public static @Nonnull TagsConfiguration defaultConfiguration() {
-        TagsConfiguration config = new TagsConfiguration();
-
-        // Regicide
-        config.regicideAttackFlatKing = 0;
-        config.regicideAttackMultiplicativeKing = 1.2;
-        config.regicideAttackFlatOthers = 0;
-        config.regicideAttackMultiplicativeOthers = 1.1;
-        config.regicideDefendFlatKing = 0;
-        config.regicideDefendMultiplicativeKing = 0.8;
-        config.regicideDefendFlatOthers = 0;
-        config.regicideDefendMultiplicativeOthers = 0.9;
-
-        // Stealer
-        config.stealerPointsPerHit = 1;
-
-        // Ninja
-        config.ninjaCaptureDisableStealth = true;
-        config.ninjaCooldownMs = 5000;
-
-        // Throne stealer
-        config.throneStealerModifierNormal = 0.5;
-        config.throneStealerModifierStealing = 0.33;
-
-        return config;
-    }
-
-    /**
-     * Create a string for this object.
-     * @param prefix prefix of each line (indent)
-     * @param last suffix (indent-1).
-     * @return a bukkit-colored String.
-     */
-    public String nicePrint(String prefix, String last) {
-        return "§7{"
-                + prefix + "§7regicide = {"
-                + prefix + "  §7attack.king.flat = " + niceDouble(regicideAttackFlatKing, 0)
-                + prefix + "  §7attack.king.mult = " + niceDouble(regicideAttackMultiplicativeKing, 1)
-                + prefix + "  §7attack.others.flat = " + niceDouble(regicideAttackFlatOthers, 0)
-                + prefix + "  §7attack.others.mult = " + niceDouble(regicideAttackMultiplicativeOthers, 1)
-                + prefix + "  §7defend.king.flat = " + niceDouble(regicideDefendFlatKing, 0)
-                + prefix + "  §7defend.king.mult = " + niceDouble(regicideDefendMultiplicativeKing, 1)
-                + prefix + "  §7defend.others.flat = " + niceDouble(regicideDefendFlatOthers, 0)
-                + prefix + "  §7defend.others.mult = " + niceDouble(regicideDefendMultiplicativeOthers, 1)
-                + prefix + "},"
-                + prefix + "§7stealer.points-per-hit = " + niceInt(stealerPointsPerHit, 0)
-                + prefix + "§7ninja.disable-stealth-on-capture = " + (ninjaCaptureDisableStealth ? "§atrue" : "§cfalse")
-                + prefix + "§7ninja.cooldown = " + niceDouble(ninjaCooldownMs, 0) + "ms"
-                + prefix + "§7throne-stealer.mult-normal = " + niceDouble(throneStealerModifierNormal, 0)
-                + prefix + "§7throne-stealer.mult-stealing = " + niceDouble(throneStealerModifierStealing, 0)
-                + last + "§7}";
-    }
-
-    private String niceInt(int num, int zero) {
-        if(num == zero)
-            return "§e" + num;
-        return (num < zero ? "§c" : "§a") + num;
-    }
-    private String niceDouble(double d, double zero) {
-        if(d == zero)
-            return "§e" + d;
-        return (d < zero ? "§c" : "§a") + d;
-    }
+  public boolean isMinable(Material material) {
+    return minableMaterials.contains(material);
+  }
 
 }

@@ -11,8 +11,10 @@ public enum ScoreAddReason {
     PICKUP("score.reason.pickup"),
     ADMINISTRATOR("score.reason.administrator"),
 
+    TAG_STEALER("score.reason.tags.stolen"),
+    TAG_MINEUR("score.reason.tags.mined"),
+;
 
-    TAG_STEALER("score.reason.tags.stolen");
 
     private final String entry;
     ScoreAddReason(String entry) {

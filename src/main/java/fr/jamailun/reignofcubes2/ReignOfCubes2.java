@@ -56,6 +56,7 @@ public final class ReignOfCubes2 extends JavaPlugin {
         TagsRegistry.register(new NinjaTag(this));
         TagsRegistry.register(new StealerTag(this));
         TagsRegistry.register(new ThroneStealerTag(this));
+        TagsRegistry.register(new MineurTag(this));
 
         // Load kits
         kitsConfiguration = new KitsConfiguration(getFile("kits"));

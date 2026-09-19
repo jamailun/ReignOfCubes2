@@ -25,6 +25,7 @@ messages:
         tags:
           steal: "Points subtilisés"
           stolen: "Voleur de points"
+          mined: "Récolte de ressources"
       messages:
         too-poor: "<red>[<dark_red>$<red>] Pas assez de score pour acheter ce kit."
         kit-bought: "<green>[<gold>$<green>] <white>Achat du kit effectué avec succès."
