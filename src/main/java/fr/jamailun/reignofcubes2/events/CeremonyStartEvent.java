@@ -11,7 +11,8 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Event called when a ceremony starts.
  */
-@Getter @Setter
+@Getter
+@Setter
 public class CeremonyStartEvent extends Event implements Cancellable {
   private static final HandlerList HANDLERS_LIST = new HandlerList();
 

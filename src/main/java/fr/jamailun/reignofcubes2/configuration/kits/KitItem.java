@@ -14,55 +14,56 @@ import java.util.Map;
 @Getter
 public class KitItem implements Cloneable, ConfigurationSerializable, Comparable<KitItem> {
 
-    private int slot;
-    private ItemStack item;
+  private int slot;
+  private ItemStack item;
 
-    private KitItem() {}
+  private KitItem() {
+  }
 
-    public KitItem(int slot, ItemStack item) {
-        this.slot = slot;
-        this.item = item;
-    }
+  public KitItem(int slot, ItemStack item) {
+    this.slot = slot;
+    this.item = item;
+  }
 
-    public static KitItem deserialize(@NotNull Map<String, Object> map) {
-        KitItem config = new KitItem();
+  public static KitItem deserialize(@NotNull Map<String, Object> map) {
+    KitItem config = new KitItem();
 
-        config.slot = (int) map.get("slot");
-        config.item = (ItemStack) map.get("item");
+    config.slot = (int) map.get("slot");
+    config.item = (ItemStack) map.get("item");
 
-        return config;
-    }
+    return config;
+  }
 
-    public void equip(PlayerInventory inventory) {
-        inventory.setItem(slot, item);
-    }
+  public void equip(PlayerInventory inventory) {
+    inventory.setItem(slot, item);
+  }
 
-    public boolean isEquipment() {
-        return slot >= 36 && slot <= 40;
-    }
+  public boolean isEquipment() {
+    return slot >= 36 && slot <= 40;
+  }
 
-    @Override
-    public @NotNull Map<String, Object> serialize() {
-        Map<String, Object> map = new LinkedHashMap<>();
-        map.put("slot", slot);
-        map.put("item", item);
-        return map;
-    }
+  @Override
+  public @NotNull Map<String, Object> serialize() {
+    Map<String, Object> map = new LinkedHashMap<>();
+    map.put("slot", slot);
+    map.put("item", item);
+    return map;
+  }
 
-    public String slotString() {
-        return String.valueOf(slot);
-    }
+  public String slotString() {
+    return String.valueOf(slot);
+  }
 
-    @Override
-    public int compareTo(@NotNull KitItem o) {
-        return slot - o.slot;
-    }
+  @Override
+  public int compareTo(@NotNull KitItem o) {
+    return slot - o.slot;
+  }
 
-    @Override
-    public KitItem clone() {
-        KitItem clone = new KitItem();
-        clone.item = item.clone();
-        clone.slot = slot;
-        return clone;
-    }
+  @Override
+  public KitItem clone() {
+    KitItem clone = new KitItem();
+    clone.item = item.clone();
+    clone.slot = slot;
+    return clone;
+  }
 }

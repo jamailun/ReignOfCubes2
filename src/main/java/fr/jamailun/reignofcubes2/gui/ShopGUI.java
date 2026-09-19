@@ -13,64 +13,64 @@ import java.util.List;
 
 public class ShopGUI extends MenuGUI {
 
-    public ShopGUI(RocPlayer player) {
-        super(getLinesForKits(), player, "gui.shop.title");
-        String costPrefix = "&7" + player.i18n("gui.shop.cost_prefix");
+  public ShopGUI(RocPlayer player) {
+    super(getLinesForKits(), player, "gui.shop.title");
+    String costPrefix = "&7" + player.i18n("gui.shop.cost_prefix");
 
-        // Kits ordered by price
-        int slot = 0;
-        for(Kit kit : listKits()) {
-            ItemBuilder ib = new ItemBuilder(kit.toIcon())
-                    .addLoreLine(costPrefix + printCost(player, kit));
-            if(player.getLastMoneySpent() >= kit.getCost()) {
-                ib.addLoreLine(player.i18n("gui.shop.too-rich"));
-            } else if(player.hasScore(kit.getCost())) {
-                ib.shine();
-            }
-            set(slot, ib.toItemStack(), () -> clickedOnKit(kit));
-            slot ++;
-        }
-
-        // default& open
-        setDefaultFooter();
-        open();
+    // Kits ordered by price
+    int slot = 0;
+    for (Kit kit : listKits()) {
+      ItemBuilder ib = new ItemBuilder(kit.toIcon())
+          .addLoreLine(costPrefix + printCost(player, kit));
+      if (player.getLastMoneySpent() >= kit.getCost()) {
+        ib.addLoreLine(player.i18n("gui.shop.too-rich"));
+      } else if (player.hasScore(kit.getCost())) {
+        ib.shine();
+      }
+      set(slot, ib.toItemStack(), () -> clickedOnKit(kit));
+      slot++;
     }
 
-    private void clickedOnKit(Kit kit) {
-        int cost = kit.getCost();
+    // default& open
+    setDefaultFooter();
+    open();
+  }
 
-        // Check
-        if(!getPlayer().hasScore(cost)) {
-            getPlayer().sendMessage("score.messages.too-poor");
-            getPlayer().playSound(SoundsLibrary.TOO_POOR);
-            return;
-        }
+  private void clickedOnKit(Kit kit) {
+    int cost = kit.getCost();
 
-        // Buy it
-        getPlayer().playSound(SoundsLibrary.KIT_BOUGHT);
-        getPlayer().removeScore(cost, ScoreRemoveReason.BUY_KIT);
-        kit.equip(getPlayer());
-        getPlayer().sendMessage("score.messages.kit-bought");
-        getPlayer().getPlayer().closeInventory();
-        ReignOfCubes2.updateRanks(getPlayer());
+    // Check
+    if (!getPlayer().hasScore(cost)) {
+      getPlayer().sendMessage("score.messages.too-poor");
+      getPlayer().playSound(SoundsLibrary.TOO_POOR);
+      return;
     }
 
-    private String printCost(RocPlayer player, Kit kit) {
-        String color = player.hasScore(kit.getCost()) ? "&e" : "&4";
-        return color + kit.getCost();
-    }
+    // Buy it
+    getPlayer().playSound(SoundsLibrary.KIT_BOUGHT);
+    getPlayer().removeScore(cost, ScoreRemoveReason.BUY_KIT);
+    kit.equip(getPlayer());
+    getPlayer().sendMessage("score.messages.kit-bought");
+    getPlayer().getPlayer().closeInventory();
+    ReignOfCubes2.updateRanks(getPlayer());
+  }
 
-    private List<Kit> listKits() {
-        return ReignOfCubes2.getKits().getKits()
-                .stream()
-                .filter(k -> k.getCost() > 0)
-                .sorted(Comparator.comparing(Kit::getCost))
-                .toList();
-    }
+  private String printCost(RocPlayer player, Kit kit) {
+    String color = player.hasScore(kit.getCost()) ? "&e" : "&4";
+    return color + kit.getCost();
+  }
 
-    private static int getLinesForKits() {
-        int count = ReignOfCubes2.getKits().getKits().size();
-        return 2 + (Math.max(0, count - 1) / 9);
-    }
+  private List<Kit> listKits() {
+    return ReignOfCubes2.getKits().getKits()
+        .stream()
+        .filter(k -> k.getCost() > 0)
+        .sorted(Comparator.comparing(Kit::getCost))
+        .toList();
+  }
+
+  private static int getLinesForKits() {
+    int count = ReignOfCubes2.getKits().getKits().size();
+    return 2 + (Math.max(0, count - 1) / 9);
+  }
 
 }

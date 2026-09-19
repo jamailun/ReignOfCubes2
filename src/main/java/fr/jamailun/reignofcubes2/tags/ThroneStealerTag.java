@@ -31,7 +31,7 @@ public class ThroneStealerTag extends Tag implements Listener {
 
   @Override
   public void holderAttacks(@NotNull RocPlayer holder, @NotNull RocPlayer other, @NotNull EntityDamageByEntityEvent event) {
-   // nothing
+    // nothing
   }
 
   @Override
@@ -41,7 +41,7 @@ public class ThroneStealerTag extends Tag implements Listener {
 
   @EventHandler
   void playerStartsCapturing(@NotNull CeremonyStartEvent event) {
-    if(is(event.getPlayer())) {
+    if (is(event.getPlayer())) {
       boolean stealing = plugin.getGameManager().hasKing();
       double multiplier = stealing ? ReignOfCubes2.getTags().getThroneStealerModifierStealing() : ReignOfCubes2.getTags().getThroneStealerModifierNormal();
       double originalDuration = event.getDurationSeconds();

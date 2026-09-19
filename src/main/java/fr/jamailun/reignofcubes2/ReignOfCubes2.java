@@ -26,150 +26,154 @@ import java.io.File;
 
 public final class ReignOfCubes2 extends JavaPlugin {
 
-    private static ReignOfCubes2 INSTANCE;
+  private static ReignOfCubes2 INSTANCE;
 
-    @Getter private GameManager gameManager;
-    @Getter private MusicManager musicManager;
-    private KitsConfiguration kitsConfiguration;
-    private NamespacedKey marker;
+  @Getter private GameManager gameManager;
+  @Getter private MusicManager musicManager;
+  private KitsConfiguration kitsConfiguration;
+  private NamespacedKey marker;
 
-    // Register serializable
-    static {
-        ConfigurationSerialization.registerClass(KitItem.class, "KitItem");
+  // Register serializable
+  static {
+    ConfigurationSerialization.registerClass(KitItem.class, "KitItem");
+  }
+
+  @Override
+  public void onEnable() {
+    INSTANCE = this;
+    ReignOfCubes2.info("Enabling plugin.");
+    if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") == null) {
+      warning("Could not find PlaceholderAPI. Disabling.");
+      Bukkit.getPluginManager().disablePlugin(this);
+      return;
     }
 
-    @Override
-    public void onEnable() {
-        INSTANCE = this;
-        ReignOfCubes2.info("Enabling plugin.");
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") == null) {
-            warning("Could not find PlaceholderAPI. Disabling.");
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
-        }
+    // Load musics
+    musicManager = new MusicManager(getFile("musics"));
 
-        // Load musics
-        musicManager = new MusicManager(getFile("musics"));
+    // Load tags
+    TagsRegistry.register(new RegicideTag(this));
+    TagsRegistry.register(new NinjaTag(this));
+    TagsRegistry.register(new StealerTag(this));
+    TagsRegistry.register(new ThroneStealerTag(this));
+    TagsRegistry.register(new MineurTag(this));
 
-        // Load tags
-        TagsRegistry.register(new RegicideTag(this));
-        TagsRegistry.register(new NinjaTag(this));
-        TagsRegistry.register(new StealerTag(this));
-        TagsRegistry.register(new ThroneStealerTag(this));
-        TagsRegistry.register(new MineurTag(this));
+    // Load kits
+    kitsConfiguration = new KitsConfiguration(getFile("kits"));
 
-        // Load kits
-        kitsConfiguration = new KitsConfiguration(getFile("kits"));
+    // default config
+    saveDefaultConfig();
 
-        // default config
-        saveDefaultConfig();
+    Bukkit.getScheduler().runTaskLater(this, this::enableRoc, 20L);
+  }
 
-        Bukkit.getScheduler().runTaskLater(this, this::enableRoc, 20L);
+  private void enableRoc() {
+    // Game manager
+    gameManager = new GameManager(musicManager);
+
+    // Listeners
+    new PlayerConnectionListener(this);
+    new PlayerMovementListener(this);
+    new PlayerDeathListener(this);
+    new PlayerDamageListener(this);
+    new PlayerInteractionListener(this);
+    new DisabledActionsListener(this);
+    new PlayerRespawnListener(this);
+    new PlayerSaturationChangedListener(this);
+    new RocScoreListener(this);
+    new GuiListener(this);
+    new PlayerPickupListener(this);
+
+    // Commands
+    new RocCommand(this);
+    new ShopCommand(this);
+
+    // Placeholder API
+    new RocPlaceholderExpansion(gameManager).register();
+
+    // Reload
+    for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+      gameManager.playerJoinsServer(onlinePlayer);
     }
+  }
 
-    private void enableRoc() {
-        // Game manager
-        gameManager = new GameManager(musicManager);
+  @Override
+  public void onDisable() {
+    ReignOfCubes2.info("Disabling plugin.");
+    gameManager.purge();
+  }
 
-        // Listeners
-        new PlayerConnectionListener(this);
-        new PlayerMovementListener(this);
-        new PlayerDeathListener(this);
-        new PlayerDamageListener(this);
-        new PlayerInteractionListener(this);
-        new DisabledActionsListener(this);
-        new PlayerRespawnListener(this);
-        new PlayerSaturationChangedListener(this);
-        new RocScoreListener(this);
-        new GuiListener(this);
-        new PlayerPickupListener(this);
+  public static BukkitTask runTaskTimer(Runnable runnable, double periodSeconds) {
+    long period = (long) (periodSeconds * 20L);
+    return Bukkit.getScheduler().runTaskTimer(INSTANCE, runnable, 0L, period);
+  }
 
-        // Commands
-        new RocCommand(this);
-        new ShopCommand(this);
+  public static BukkitTask runTaskLater(Runnable runnable, double waitSeconds) {
+    long wait = (long) (waitSeconds * 20L);
+    return Bukkit.getScheduler().runTaskLater(INSTANCE, runnable, wait);
+  }
 
-        // Placeholder API
-        new RocPlaceholderExpansion(gameManager).register();
+  public static File getFile(String name) {
+    return new File(INSTANCE.getDataFolder(), name);
+  }
 
-        // Reload
-        for(Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            gameManager.playerJoinsServer(onlinePlayer);
-        }
-    }
+  public static void debug(String message) {
+    INSTANCE.getLogger().fine(message);
+  }
 
-    @Override
-    public void onDisable() {
-        ReignOfCubes2.info("Disabling plugin.");
-        gameManager.purge();
-    }
+  public static void info(String msg) {
+    INSTANCE.getLogger().info(msg);
+  }
 
-    public static BukkitTask runTaskTimer(Runnable runnable, double periodSeconds) {
-        long period = (long)( periodSeconds * 20L );
-        return Bukkit.getScheduler().runTaskTimer(INSTANCE, runnable, 0L, period);
-    }
+  public static void warning(String msg) {
+    INSTANCE.getLogger().warning(msg);
+  }
 
-    public static BukkitTask runTaskLater(Runnable runnable, double waitSeconds) {
-        long wait = (long)( waitSeconds * 20L );
-        return Bukkit.getScheduler().runTaskLater(INSTANCE, runnable, wait);
-    }
+  public static void error(String msg) {
+    INSTANCE.getLogger().severe(msg);
+  }
 
-    public static File getFile(String name) {
-        return new File(INSTANCE.getDataFolder(), name);
-    }
+  public static ConfigurationSection getDefaultConfiguration() {
+    return INSTANCE.getConfig();
+  }
 
-    public static void debug(String message) {
-        INSTANCE.getLogger().fine(message);
-    }
-    public static void info(String msg) {
-        INSTANCE.getLogger().info(msg);
-    }
-    public static void warning(String msg) {
-        INSTANCE.getLogger().warning(msg);
-    }
-    public static void error(String msg) {
-        INSTANCE.getLogger().severe(msg);
-    }
+  public static void saveDefaultConfiguration() {
+    INSTANCE.saveConfig();
+  }
 
-    public static ConfigurationSection getDefaultConfiguration() {
-        return INSTANCE.getConfig();
-    }
+  public static PluginMeta getMeta() {
+    return INSTANCE.getPluginMeta();
+  }
 
-    public static void saveDefaultConfiguration() {
-        INSTANCE.saveConfig();
-    }
+  public static KitsConfiguration getKits() {
+    return INSTANCE.kitsConfiguration;
+  }
 
-    public static PluginMeta getMeta() {
-        return INSTANCE.getPluginMeta();
-    }
+  public static TagsConfiguration getTags() {
+    return INSTANCE.gameManager.getTagsConfiguration();
+  }
 
-    public static KitsConfiguration getKits() {
-        return INSTANCE.kitsConfiguration;
-    }
-    public static TagsConfiguration getTags() {
-        return INSTANCE.gameManager.getTagsConfiguration();
-    }
+  public static WorldConfiguration getCurrentConfig() {
+    return INSTANCE.gameManager.getWorldConfiguration();
+  }
 
-    public static WorldConfiguration getCurrentConfig() {
-        return INSTANCE.gameManager.getWorldConfiguration();
-    }
+  public static boolean isPlaying() {
+    return INSTANCE.gameManager.isPlaying();
+  }
 
-    public static boolean isPlaying() {
-        return INSTANCE.gameManager.isPlaying();
-    }
+  public static void updateRanks(RocPlayer player) {
+    INSTANCE.gameManager.getRanking().update(player);
+  }
 
-    public static void updateRanks(RocPlayer player) {
-        INSTANCE.gameManager.getRanking().update(player);
+  public static NamespacedKey marker() {
+    if (INSTANCE.marker == null) {
+      INSTANCE.marker = new NamespacedKey(INSTANCE, "marker");
     }
+    return INSTANCE.marker;
+  }
 
-    public static NamespacedKey marker() {
-        if(INSTANCE.marker == null) {
-            INSTANCE.marker = new NamespacedKey(INSTANCE, "marker");
-        }
-        return INSTANCE.marker;
-    }
-
-    public static Plugin plugin() {
-        return INSTANCE;
-    }
+  public static Plugin plugin() {
+    return INSTANCE;
+  }
 
 }

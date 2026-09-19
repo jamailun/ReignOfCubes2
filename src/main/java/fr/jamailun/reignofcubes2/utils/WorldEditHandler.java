@@ -16,39 +16,40 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 
 public final class WorldEditHandler {
-    private WorldEditHandler() {}
+  private WorldEditHandler() {
+  }
 
-    private static final WorldEdit worldEdit = WorldEdit.getInstance();
+  private static final WorldEdit worldEdit = WorldEdit.getInstance();
 
-    public static @Nullable Region getSelectedRegion(String authorsName) {
-        LocalSession worldEditSession = worldEdit.getSessionManager().findByName(authorsName);
-        if(worldEditSession != null && worldEditSession.getSelectionWorld() != null) {
-            RegionSelector regionSelector = worldEditSession.getRegionSelector(worldEditSession.getSelectionWorld());
-            if(regionSelector.isDefined()) {
-                try {
-                    return regionSelector.getRegion();
-                } catch (IncompleteRegionException e) {
-                    Bukkit.getLogger().severe("[WorldEditHandler] Failed to load zone: " + e.getMessage());
-                    return null;
-                }
-            }
+  public static @Nullable Region getSelectedRegion(String authorsName) {
+    LocalSession worldEditSession = worldEdit.getSessionManager().findByName(authorsName);
+    if (worldEditSession != null && worldEditSession.getSelectionWorld() != null) {
+      RegionSelector regionSelector = worldEditSession.getRegionSelector(worldEditSession.getSelectionWorld());
+      if (regionSelector.isDefined()) {
+        try {
+          return regionSelector.getRegion();
+        } catch (IncompleteRegionException e) {
+          Bukkit.getLogger().severe("[WorldEditHandler] Failed to load zone: " + e.getMessage());
+          return null;
         }
-        return null;
+      }
     }
+    return null;
+  }
 
-    public static @NotNull Block[] getSelectedBlocks(String authorsName) {
-        Region region = getSelectedRegion(authorsName);
-        if(region == null)
-            return new Block[0];
+  public static @NotNull Block[] getSelectedBlocks(String authorsName) {
+    Region region = getSelectedRegion(authorsName);
+    if (region == null)
+      return new Block[0];
 
-        World world = Bukkit.getWorld(Objects.requireNonNull(region.getWorld()).getName());
-        Block[] blocks = new Block[(int) region.getVolume()];
-        int i = 0;
-        for(BlockVector3 blockVector3 : region) {
-            blocks[i] = new Location(world, blockVector3.getX(), blockVector3.getY(), blockVector3.getZ()).getBlock();
-            i++;
-        }
-        return blocks;
+    World world = Bukkit.getWorld(Objects.requireNonNull(region.getWorld()).getName());
+    Block[] blocks = new Block[(int) region.getVolume()];
+    int i = 0;
+    for (BlockVector3 blockVector3 : region) {
+      blocks[i] = new Location(world, blockVector3.getX(), blockVector3.getY(), blockVector3.getZ()).getBlock();
+      i++;
     }
+    return blocks;
+  }
 
 }

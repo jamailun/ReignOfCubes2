@@ -6,13 +6,13 @@ import org.bukkit.event.EventHandler;
 
 public class RocScoreListener extends RocListener {
 
-    public RocScoreListener(ReignOfCubes2 plugin) {
-        super(plugin);
-    }
+  public RocScoreListener(ReignOfCubes2 plugin) {
+    super(plugin);
+  }
 
-    @EventHandler
-    public void playerGainedScore(ScoreGainedEvent event) {
-        game().checkVictory(event.getPlayer());
-    }
+  @EventHandler
+  public void playerGainedScore(ScoreGainedEvent event) {
+    game().checkVictory(event.getPlayer());
+  }
 
 }

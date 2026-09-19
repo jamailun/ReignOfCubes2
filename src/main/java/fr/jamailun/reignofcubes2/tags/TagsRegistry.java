@@ -11,34 +11,38 @@ import java.util.Map;
 
 /**
  * Registry for tags.
+ *
  * @see #register(Tag)
  */
 public final class TagsRegistry {
-    private TagsRegistry() {}
+  private TagsRegistry() {
+  }
 
-    private static final Map<String, Tag> tags = new HashMap<>();
+  private static final Map<String, Tag> tags = new HashMap<>();
 
-    /**
-     * Register a new tag.
-     * @param tag the tag to add. Will override tags with same ID.
-     */
-    public static void register(@NotNull Tag tag) {
-        tags.put(tag.getId(), tag);
-        ReignOfCubes2.info("New tag registered : '" + tag.getId() + "'.");
+  /**
+   * Register a new tag.
+   *
+   * @param tag the tag to add. Will override tags with same ID.
+   */
+  public static void register(@NotNull Tag tag) {
+    tags.put(tag.getId(), tag);
+    ReignOfCubes2.info("New tag registered : '" + tag.getId() + "'.");
 
-        if(tag instanceof Listener tagListener) {
-            Bukkit.getPluginManager().registerEvents(tagListener, ReignOfCubes2.plugin());
-        }
+    if (tag instanceof Listener tagListener) {
+      Bukkit.getPluginManager().registerEvents(tagListener, ReignOfCubes2.plugin());
     }
+  }
 
-    /**
-     * Find a tag from its ID.
-     * @param id the ID of the tag to find.
-     * @return null if no tags exist with this ID.
-     */
-    public static @Nullable Tag find(@Nullable String id) {
-        if(id == null) return null;
-        return tags.get(id);
-    }
+  /**
+   * Find a tag from its ID.
+   *
+   * @param id the ID of the tag to find.
+   * @return null if no tags exist with this ID.
+   */
+  public static @Nullable Tag find(@Nullable String id) {
+    if (id == null) return null;
+    return tags.get(id);
+  }
 
 }

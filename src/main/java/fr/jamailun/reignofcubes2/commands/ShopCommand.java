@@ -15,38 +15,38 @@ import java.util.List;
 
 public class ShopCommand extends AbstractCommand {
 
-    public ShopCommand(ReignOfCubes2 plugin) {
-        super(plugin, "shop");
+  public ShopCommand(ReignOfCubes2 plugin) {
+    super(plugin, "shop");
+  }
+
+  @Override
+  public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
+    if (!(sender instanceof Player)) {
+      return error(sender, "Must be a player tp open shop.");
     }
 
-    @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
-        if(!(sender instanceof Player)) {
-            return error(sender, "Must be a player tp open shop.");
-        }
+    RocPlayer player = game().toPlayer((Player) sender);
+    if (player == null)
+      return error(sender, "Tu n'es pas dans le jeu. Déso pas déso.");
 
-        RocPlayer player = game().toPlayer((Player) sender);
-        if(player == null)
-            return error(sender, "Tu n'es pas dans le jeu. Déso pas déso.");
-
-        if(!game().isPlaying()) {
-            info(sender, "La partie n'ayant pas encore commencé, voici les kits actuellement configurés.");
-            new AdminKitsGUI(player);
-            return true;
-        }
-
-        new ShopGUI(player);
-
-        return info(sender, "Shop opened.");
+    if (!game().isPlaying()) {
+      info(sender, "La partie n'ayant pas encore commencé, voici les kits actuellement configurés.");
+      new AdminKitsGUI(player);
+      return true;
     }
 
-    @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
-        return Collections.emptyList();
-    }
+    new ShopGUI(player);
 
-    @Override
-    protected boolean sendHelp(CommandSender sender) {
-        return false;
-    }
+    return info(sender, "Shop opened.");
+  }
+
+  @Override
+  public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
+    return Collections.emptyList();
+  }
+
+  @Override
+  protected boolean sendHelp(CommandSender sender) {
+    return false;
+  }
 }

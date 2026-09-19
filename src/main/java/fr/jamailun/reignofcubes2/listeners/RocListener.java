@@ -8,25 +8,25 @@ import org.bukkit.event.Listener;
 
 abstract class RocListener implements Listener {
 
-    private final ReignOfCubes2 plugin;
+  private final ReignOfCubes2 plugin;
 
-    public RocListener(ReignOfCubes2 plugin) {
-        this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(this, plugin);
-        ReignOfCubes2.info("Registering events on " + getClass().getSimpleName());
-    }
+  public RocListener(ReignOfCubes2 plugin) {
+    this.plugin = plugin;
+    Bukkit.getPluginManager().registerEvents(this, plugin);
+    ReignOfCubes2.info("Registering events on " + getClass().getSimpleName());
+  }
 
-    protected ReignOfCubes2 plugin() {
-        return plugin;
-    }
+  protected ReignOfCubes2 plugin() {
+    return plugin;
+  }
 
-    protected GameManager game() {
-        return plugin.getGameManager();
-    }
+  protected GameManager game() {
+    return plugin.getGameManager();
+  }
 
-    protected boolean shouldIgnore(World world) {
-        return ! game().isPlaying()
-                || ! game().isInWorld(world);
-    }
+  protected boolean shouldIgnore(World world) {
+    return !game().isPlaying()
+        || !game().isInWorld(world);
+  }
 
 }

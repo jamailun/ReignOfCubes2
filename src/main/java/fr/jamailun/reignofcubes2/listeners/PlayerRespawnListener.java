@@ -7,26 +7,26 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 
 public class PlayerRespawnListener extends RocListener {
 
-    public PlayerRespawnListener(ReignOfCubes2 plugin) {
-        super(plugin);
+  public PlayerRespawnListener(ReignOfCubes2 plugin) {
+    super(plugin);
+  }
+
+  @EventHandler
+  public void playerRespawn(PlayerRespawnEvent event) {
+    if (shouldIgnore(event.getPlayer().getWorld())) {
+      return;
     }
+    if (game().toPlayer(event.getPlayer()) == null)
+      return; // Ignore completely
 
-    @EventHandler
-    public void playerRespawn(PlayerRespawnEvent event) {
-        if(shouldIgnore(event.getPlayer().getWorld())) {
-            return;
-        }
-        if(game().toPlayer(event.getPlayer()) == null)
-            return; // Ignore completely
+    // Change the respawn location.
+    event.setRespawnLocation(game().getWorldConfiguration().getSafeSpawn(true));
 
-        // Change the respawn location.
-        event.setRespawnLocation(game().getWorldConfiguration().getSafeSpawn(true));
-
-        // Signal respawn to the player class.
-        RocPlayer player = game().toPlayer(event.getPlayer());
-        if(player != null) {
-            player.respawned();
-        }
+    // Signal respawn to the player class.
+    RocPlayer player = game().toPlayer(event.getPlayer());
+    if (player != null) {
+      player.respawned();
     }
+  }
 
 }

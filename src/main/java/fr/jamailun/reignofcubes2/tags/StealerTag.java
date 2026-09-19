@@ -15,33 +15,33 @@ import org.jetbrains.annotations.Nullable;
  */
 public class StealerTag extends Tag {
 
-    public StealerTag(@NotNull ReignOfCubes2 plugin) {
-        super("stealer", plugin);
-    }
+  public StealerTag(@NotNull ReignOfCubes2 plugin) {
+    super("stealer", plugin);
+  }
 
-    @Override
-    public void added(@NotNull RocPlayer holder) {
-        ReignOfCubes2.debug(holder.getName() + " is now stealer");
-    }
+  @Override
+  public void added(@NotNull RocPlayer holder) {
+    ReignOfCubes2.debug(holder.getName() + " is now stealer");
+  }
 
-    @Override
-    public void removed(@NotNull RocPlayer holder) {
-        ReignOfCubes2.debug(holder.getName() + " is NOT stealer anymore.");
-    }
+  @Override
+  public void removed(@NotNull RocPlayer holder) {
+    ReignOfCubes2.debug(holder.getName() + " is NOT stealer anymore.");
+  }
 
-    @Override
-    public void holderAttacks(@NotNull RocPlayer holder, @NotNull RocPlayer other, @NotNull EntityDamageByEntityEvent event) {
-        TagsConfiguration config = ReignOfCubes2.getTags();
-        int stole = config.getStealerPointsPerHit();
+  @Override
+  public void holderAttacks(@NotNull RocPlayer holder, @NotNull RocPlayer other, @NotNull EntityDamageByEntityEvent event) {
+    TagsConfiguration config = ReignOfCubes2.getTags();
+    int stole = config.getStealerPointsPerHit();
 
-        if(other.hasScore(stole)) {
-            other.removeScore(stole, ScoreRemoveReason.TAG_STEALER);
-            holder.addScore(stole, ScoreAddReason.TAG_STEALER);
-        }
+    if (other.hasScore(stole)) {
+      other.removeScore(stole, ScoreRemoveReason.TAG_STEALER);
+      holder.addScore(stole, ScoreAddReason.TAG_STEALER);
     }
+  }
 
-    @Override
-    public void holderDefends(@NotNull RocPlayer holder, @Nullable RocPlayer other, @NotNull EntityDamageEvent event) {
-        // nothing
-    }
+  @Override
+  public void holderDefends(@NotNull RocPlayer holder, @Nullable RocPlayer other, @NotNull EntityDamageEvent event) {
+    // nothing
+  }
 }

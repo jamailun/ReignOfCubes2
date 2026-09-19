@@ -18,6 +18,7 @@ public class MineurTag extends Tag implements Listener {
 
   /**
    * Create a new tag.
+   *
    * @param plugin the main plugin instance.
    */
   public MineurTag(ReignOfCubes2 plugin) {
@@ -38,7 +39,7 @@ public class MineurTag extends Tag implements Listener {
   void whenMinerMines(BlockBreakEvent event) {
     RocPlayer hPlayer = getRocPlayer(event.getPlayer());
     var type = event.getBlock().getType();
-    if(hPlayer != null && is(hPlayer) && ReignOfCubes2.getTags().isMinable(type)) {
+    if (hPlayer != null && is(hPlayer) && ReignOfCubes2.getTags().isMinable(type)) {
       hPlayer.addScore(ReignOfCubes2.getTags().getMinablePoints(), ScoreAddReason.TAG_MINEUR);
       event.setCancelled(true);
       event.getBlock().setType(Material.BEDROCK);

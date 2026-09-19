@@ -2,20 +2,20 @@ package fr.jamailun.reignofcubes2;
 
 public enum GameState {
 
-    /**
-     * Configuration error.
-     */
-    NOT_CONFIGURED,
+  /**
+   * Configuration error.
+   */
+  NOT_CONFIGURED,
 
-    /**
-     * Currently waiting for more players to join.
-     */
-    WAITING,
-    
-    COUNT_DOWN,
+  /**
+   * Currently waiting for more players to join.
+   */
+  WAITING,
 
-    /**
-     * Currently playing.
-     */
-    PLAYING
+  COUNT_DOWN,
+
+  /**
+   * Currently playing.
+   */
+  PLAYING
 }

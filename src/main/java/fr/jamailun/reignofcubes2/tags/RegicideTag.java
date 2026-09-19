@@ -13,47 +13,47 @@ import org.jetbrains.annotations.Nullable;
  */
 public class RegicideTag extends Tag {
 
-    public RegicideTag(@NotNull ReignOfCubes2 plugin) {
-        super("regicide", plugin);
-    }
+  public RegicideTag(@NotNull ReignOfCubes2 plugin) {
+    super("regicide", plugin);
+  }
 
-    @Override
-    public void added(@NotNull RocPlayer holder) {
-        ReignOfCubes2.debug(holder.getName() + " is now REGICIDE");
-    }
+  @Override
+  public void added(@NotNull RocPlayer holder) {
+    ReignOfCubes2.debug(holder.getName() + " is now REGICIDE");
+  }
 
-    @Override
-    public void removed(@NotNull RocPlayer holder) {
-        ReignOfCubes2.debug(holder.getName() + " is not regicide anymore.");
-    }
+  @Override
+  public void removed(@NotNull RocPlayer holder) {
+    ReignOfCubes2.debug(holder.getName() + " is not regicide anymore.");
+  }
 
-    @Override
-    public void holderAttacks(@NotNull RocPlayer holder, @NotNull RocPlayer other, @NotNull EntityDamageByEntityEvent event) {
-        TagsConfiguration config = ReignOfCubes2.getTags();
-        boolean targetKing = other.isKing();
+  @Override
+  public void holderAttacks(@NotNull RocPlayer holder, @NotNull RocPlayer other, @NotNull EntityDamageByEntityEvent event) {
+    TagsConfiguration config = ReignOfCubes2.getTags();
+    boolean targetKing = other.isKing();
 
-        double flatMod = targetKing ? config.getRegicideAttackFlatKing() : config.getRegicideAttackFlatOthers();
-        double multMod = targetKing ? config.getRegicideAttackMultiplicativeKing() : config.getRegicideAttackMultiplicativeOthers();
+    double flatMod = targetKing ? config.getRegicideAttackFlatKing() : config.getRegicideAttackFlatOthers();
+    double multMod = targetKing ? config.getRegicideAttackMultiplicativeKing() : config.getRegicideAttackMultiplicativeOthers();
 
-        // Add bonus damages
-        double damages = event.getDamage();
-        double modDamages = (damages + flatMod) * multMod;
-        event.setDamage(modDamages);
-    }
+    // Add bonus damages
+    double damages = event.getDamage();
+    double modDamages = (damages + flatMod) * multMod;
+    event.setDamage(modDamages);
+  }
 
-    @Override
-    public void holderDefends(@NotNull RocPlayer holder, @Nullable RocPlayer other, @NotNull EntityDamageEvent event) {
-        if(other == null) // only care when attacker is non-null
-            return;
-        TagsConfiguration config = ReignOfCubes2.getTags();
-        boolean attackerKing = other.isKing();
+  @Override
+  public void holderDefends(@NotNull RocPlayer holder, @Nullable RocPlayer other, @NotNull EntityDamageEvent event) {
+    if (other == null) // only care when attacker is non-null
+      return;
+    TagsConfiguration config = ReignOfCubes2.getTags();
+    boolean attackerKing = other.isKing();
 
-        double flatMod = attackerKing ? config.getRegicideDefendFlatKing() : config.getRegicideDefendFlatOthers();
-        double multMod = attackerKing ? config.getRegicideDefendMultiplicativeKing() : config.getRegicideDefendMultiplicativeOthers();
+    double flatMod = attackerKing ? config.getRegicideDefendFlatKing() : config.getRegicideDefendFlatOthers();
+    double multMod = attackerKing ? config.getRegicideDefendMultiplicativeKing() : config.getRegicideDefendMultiplicativeOthers();
 
-        // Add bonus defense
-        double damages = event.getDamage();
-        double modDamages = (damages - flatMod) * multMod;
-        event.setDamage(modDamages);
-    }
+    // Add bonus defense
+    double damages = event.getDamage();
+    double modDamages = (damages - flatMod) * multMod;
+    event.setDamage(modDamages);
+  }
 }

@@ -2,12 +2,12 @@ package fr.jamailun.reignofcubes2.music;
 
 public enum MusicType {
 
-    LOBBY,
+  LOBBY,
 
-    PLAY_NORMAL,
+  PLAY_NORMAL,
 
-    PLAY_KING,
+  PLAY_KING,
 
-    CEREMONY
+  CEREMONY
 
 }

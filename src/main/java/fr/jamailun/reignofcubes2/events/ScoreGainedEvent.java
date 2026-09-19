@@ -9,24 +9,24 @@ import org.jetbrains.annotations.NotNull;
 
 @Getter
 public class ScoreGainedEvent extends Event {
-    private static final HandlerList HANDLERS_LIST = new HandlerList();
+  private static final HandlerList HANDLERS_LIST = new HandlerList();
 
-    private final RocPlayer player;
-    private final int delta;
-    private final ScoreAddReason reason;
+  private final RocPlayer player;
+  private final int delta;
+  private final ScoreAddReason reason;
 
-    public ScoreGainedEvent(RocPlayer player, int delta, ScoreAddReason reason) {
-        this.player = player;
-        this.delta = delta;
-        this.reason = reason;
-    }
+  public ScoreGainedEvent(RocPlayer player, int delta, ScoreAddReason reason) {
+    this.player = player;
+    this.delta = delta;
+    this.reason = reason;
+  }
 
-    @Override
-    public @NotNull HandlerList getHandlers() {
-        return HANDLERS_LIST;
-    }
+  @Override
+  public @NotNull HandlerList getHandlers() {
+    return HANDLERS_LIST;
+  }
 
-    public static HandlerList getHandlerList() {
-        return HANDLERS_LIST;
-    }
+  public static HandlerList getHandlerList() {
+    return HANDLERS_LIST;
+  }
 }

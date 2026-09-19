@@ -18,116 +18,118 @@ import java.util.UUID;
  */
 public class Throne {
 
-    private final GameManager game;
-    private final Vector vectorA, vectorB;
-    private final Set<UUID> playersInside = new HashSet<>();
+  private final GameManager game;
+  private final Vector vectorA, vectorB;
+  private final Set<UUID> playersInside = new HashSet<>();
 
-    // current
-    @Getter private Ceremony ceremony;
+  // current
+  @Getter private Ceremony ceremony;
 
-    public Throne(GameManager game, Vector vectorA, Vector vectorB) {
-        this.game = game;
-        this.vectorA = vectorA;
-        this.vectorB = vectorB;
+  public Throne(GameManager game, Vector vectorA, Vector vectorB) {
+    this.game = game;
+    this.vectorA = vectorA;
+    this.vectorB = vectorB;
+  }
+
+  public boolean isAlreadyInside(RocPlayer player) {
+    return playersInside.contains(player.getUUID());
+  }
+
+  /**
+   * Custom AABB test. Check if the location is inside the throne zone.
+   *
+   * @param loc location to test
+   * @return true if inside.
+   */
+  public boolean isInside(Location loc) {
+    MinMax x = new MinMax(vectorA.getX(), vectorB.getX());
+    MinMax y = new MinMax(vectorA.getY(), vectorB.getY());
+    MinMax z = new MinMax(vectorA.getZ(), vectorB.getZ());
+
+    return x.contains(loc.getX())
+        && y.contains(loc.getY())
+        && z.contains(loc.getZ());
+  }
+
+  public void enters(RocPlayer player) {
+    playersInside.add(player.getUUID());
+
+    boolean canStart = true;
+    if (game.hasKing()) {
+      if (player.isKing()) {
+        player.sendMessage("throne.enters-as-king");
+        canStart = false;
+        //TODO give effects
+      } else {
+        player.sendMessage("throne.enters-but-king");
+      }
+    } else {
+      player.sendMessage("throne.enters");
     }
 
-    public boolean isAlreadyInside(RocPlayer player) {
-        return playersInside.contains(player.getUUID());
+    if (playersInside.size() == 1 && canStart && !hasCeremony()) {
+      // try to start : only do it when not cancelled.
+      double baseDuration = game.getRules().getCrownDuration();
+      var event = new CeremonyStartEvent(player, baseDuration);
+      if (event.callEvent()) {
+        startCeremony(player, event.getDurationSeconds());
+      }
     }
+  }
 
-    /**
-     * Custom AABB test. Check if the location is inside the throne zone.
-     * @param loc location to test
-     * @return true if inside.
-     */
-    public boolean isInside(Location loc) {
-        MinMax x = new MinMax(vectorA.getX(), vectorB.getX());
-        MinMax y = new MinMax(vectorA.getY(), vectorB.getY());
-        MinMax z = new MinMax(vectorA.getZ(), vectorB.getZ());
+  public void leaves(RocPlayer player) {
+    playersInside.remove(player.getUUID());
 
-        return x.contains(loc.getX())
-                && y.contains(loc.getY())
-                && z.contains(loc.getZ());
+    if (!player.isKing())
+      player.sendMessage("throne.leaves");
+
+    if (hasCeremony() && ceremony.isPlayer(player)) {
+      stopCeremony();
     }
+  }
 
-    public void enters(RocPlayer player) {
-        playersInside.add(player.getUUID());
+  public boolean hasCeremony() {
+    return ceremony != null;
+  }
 
-        boolean canStart = true;
-        if(game.hasKing()) {
-            if(player.isKing()) {
-                player.sendMessage("throne.enters-as-king");
-                canStart = false;
-                //TODO give effects
-            } else {
-                player.sendMessage("throne.enters-but-king");
-            }
-        } else {
-            player.sendMessage("throne.enters");
-        }
+  private void startCeremony(RocPlayer player, double duration) {
+    assert ceremony == null : "A ceremony already exists.";
+    ceremony = new Ceremony(game, player, duration);
+  }
 
-        if(playersInside.size() == 1 && canStart && !hasCeremony()) {
-            // try to start : only do it when not cancelled.
-            double baseDuration = game.getRules().getCrownDuration();
-            var event = new CeremonyStartEvent(player, baseDuration);
-            if(event.callEvent()) {
-                startCeremony(player, event.getDurationSeconds());
-            }
-        }
+  private void stopCeremony() {
+    assert ceremony != null : "No ceremony to stop.";
+    ceremony.stop();
+    ceremony = null;
+  }
+
+  public void resetCeremony() {
+    playersInside.clear();
+    if (ceremony != null) {
+      stopCeremony();
     }
+  }
 
-    public void leaves(RocPlayer player) {
-        playersInside.remove(player.getUUID());
+  // COOLDOWNS
 
-        if(!player.isKing())
-            player.sendMessage("throne.leaves");
+  private final Set<UUID> playersCooldowns = new HashSet<>();
+  private final Object pcKey = new Object();
 
-        if(hasCeremony() && ceremony.isPlayer(player)) {
-            stopCeremony();
-        }
+  public boolean isCooldownOk(UUID uuid) {
+    if (playersCooldowns.contains(uuid)) {
+      return false;
     }
-
-    public boolean hasCeremony() {
-        return ceremony != null;
+    // Add it now
+    synchronized (pcKey) {
+      playersCooldowns.add(uuid);
     }
-
-    private void startCeremony(RocPlayer player, double duration) {
-        assert ceremony == null : "A ceremony already exists.";
-        ceremony = new Ceremony(game, player, duration);
-    }
-
-    private void stopCeremony() {
-        assert ceremony != null : "No ceremony to stop.";
-        ceremony.stop();
-        ceremony = null;
-    }
-
-    public void resetCeremony() {
-        playersInside.clear();
-        if(ceremony != null) {
-            stopCeremony();
-        }
-    }
-
-    // COOLDOWNS
-
-    private final Set<UUID> playersCooldowns = new HashSet<>();
-    private final Object pcKey = new Object();
-    public boolean isCooldownOk(UUID uuid) {
-        if(playersCooldowns.contains(uuid)) {
-            return false;
-        }
-        // Add it now
-        synchronized (pcKey) {
-            playersCooldowns.add(uuid);
-        }
-        // Remove it later
-        ReignOfCubes2.runTaskLater(() -> {
-            synchronized (pcKey) {
-                playersCooldowns.remove(uuid);
-            }
-        }, game.getRules().getThroneCooldown());
-        return true;
-    }
+    // Remove it later
+    ReignOfCubes2.runTaskLater(() -> {
+      synchronized (pcKey) {
+        playersCooldowns.remove(uuid);
+      }
+    }, game.getRules().getThroneCooldown());
+    return true;
+  }
 
 }
