@@ -10,11 +10,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+@NullMarked
 public class PlayerDamageListener extends RocListener {
   public PlayerDamageListener(ReignOfCubes2 plugin) {
     super(plugin);
@@ -24,14 +26,14 @@ public class PlayerDamageListener extends RocListener {
   private final Map<UUID, UUID> safeThorns = new HashMap<>();
 
   @EventHandler(priority = EventPriority.LOW)
-  public void playerDamageLobby(EntityDamageEvent event) {
+  void playerDamageLobby(EntityDamageEvent event) {
     if (!game().isPlaying()) {
       event.setCancelled(shouldCancelNonPlaying(event));
     }
   }
 
   @EventHandler
-  public void entityDamageEvent(EntityDamageByEntityEvent event) {
+  void entityDamageEvent(EntityDamageByEntityEvent event) {
     if (!game().isPlaying()) {
       event.setCancelled(shouldCancelNonPlaying(event));
       return;
@@ -91,6 +93,8 @@ public class PlayerDamageListener extends RocListener {
   }
 
   private void playerAttacked(RocPlayer damager, RocPlayer victim, EntityDamageByEntityEvent event) {
+    if(victim.getUUID().equals(damager.getUUID()))
+      return;
     damager.getTag().ifPresent(t -> t.holderAttacks(damager, victim, event));
     victim.getTag().ifPresent(t -> t.holderDefends(victim, damager, event));
     victim.setLastDamager(damager);
