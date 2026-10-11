@@ -44,6 +44,12 @@ public class NinjaTag extends Tag implements Listener {
   }
 
   public void hide(RocPlayer rocPlayer) {
+    // if king, stop
+    if(rocPlayer.isKing()) {
+      rocPlayer.sendMessage("tags.ninja.is-king");
+      return;
+    }
+
     int cooldown = ReignOfCubes2.getTags().getNinjaCooldownMs();
 
     UUID uuid = rocPlayer.getUUID();

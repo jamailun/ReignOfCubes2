@@ -71,6 +71,7 @@ messages:
         hidden: "<white>[<green>!<white>] <gray>Tu es désormais invisible."
         visible: "<white>[<red>!<white>] <gray>Attention, tu es désormais <white>visible<gray>."
         cooldown: "<white>[<dark_red>!<white>] <gray>Compétence en cooldown !"
+        is-king: "<white>[<dark_red>!<white>] <gray>Tu es le roi ! <red>Impossible d'activer l'invisibilité."
     tab:
       player:
         you: "&2toi"
