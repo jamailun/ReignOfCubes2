@@ -2,6 +2,7 @@ package fr.jamailun.reignofcubes2.tags;
 
 import fr.jamailun.reignofcubes2.ReignOfCubes2;
 import fr.jamailun.reignofcubes2.events.CeremonyStartEvent;
+import fr.jamailun.reignofcubes2.events.KingChangedEvent;
 import fr.jamailun.reignofcubes2.players.RocPlayer;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
@@ -126,6 +127,14 @@ public class NinjaTag extends Tag implements Listener {
   void playerStartsCapturing(@NotNull CeremonyStartEvent event) {
     if (is(event.getPlayer()) && ReignOfCubes2.getTags().isNinjaCaptureDisableStealth()) {
       show(event.getPlayer());
+    }
+  }
+
+  @EventHandler
+  void kingChanged(@NotNull KingChangedEvent event) {
+    RocPlayer player = event.getNewKing();
+    if (player != null && is(player)) {
+      show(player);
     }
   }
 }

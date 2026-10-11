@@ -2,6 +2,7 @@ package fr.jamailun.reignofcubes2;
 
 import fr.jamailun.reignofcubes2.configuration.*;
 import fr.jamailun.reignofcubes2.configuration.pickups.PickupConfigEntry;
+import fr.jamailun.reignofcubes2.events.KingChangedEvent;
 import fr.jamailun.reignofcubes2.messages.Messages;
 import fr.jamailun.reignofcubes2.music.MusicManager;
 import fr.jamailun.reignofcubes2.music.MusicType;
@@ -256,12 +257,14 @@ public class GameManager {
         king.playSound(SoundsLibrary.DEAD_AS_KING);
         playSound(SoundsLibrary.KING_KILLED);
 
+        new KingChangedEvent(king, null).callEvent();
         king.setKing(false);
         king = null;
       }
       return;
     }
     // remove king from old king.
+    RocPlayer oldKing = king;
     if (king != null) {
       assert king != player : "The king wanted to become the king again...";
       musics.addPlayer(king.getPlayer(), MusicType.PLAY_NORMAL);
@@ -273,6 +276,7 @@ public class GameManager {
     king = player;
     broadcast("event.king.new", king.getName());
     musics.addPlayer(king.getPlayer(), MusicType.PLAY_KING);
+    new KingChangedEvent(oldKing, king).callEvent();
 
     // Add score
     king.addScore(getRules().getScoreKingBonus(), ScoreAddReason.KING_FLAT_BONUS);
